@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Chew Zhan Hong (Gabe)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="antialiased">
+
+    <!-- Navbar -->
+    <nav class="nav-bg backdrop-blur-lg sticky w-full top-0 z-50 border-b border-color">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html#hero" class="text-2xl font-bold accent-text">Gabe.</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Back to Home</a>
+                    <button id="theme-toggle" class="p-2 rounded-md focus:outline-none ml-4">
+                        <svg id="theme-icon-light" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <svg id="theme-icon-dark" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <header class="text-center mb-16 scroll-animate">
+            <h1 class="text-5xl font-bold">Blog & Write-Ups</h1>
+            <p class="text-xl mt-4 opacity-80">Thoughts on security, technology, and everything in between.</p>
+        </header>
+
+        <!-- Blog posts will be injected here by script.js -->
+        <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Loading placeholder -->
+            <p class="col-span-full text-center opacity-70">Loading posts...</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-color mt-16">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <p class="opacity-80">&copy; 2025 Chew Zhan Hong (Gabe). All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
