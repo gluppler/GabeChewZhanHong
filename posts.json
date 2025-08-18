@@ -1,5 +1,12 @@
 [
     {
+        "slug": "assembly-deep-dive",
+        "title": "A Journey into Assembly Language",
+        "date": "August 18, 2025",
+        "description": "An exploration of low-level programming with practical examples in ARM64 and x86-64 for security research.",
+        "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Assembly"
+    },
+    {
         "slug": "trace-challenge-writeup",
         "title": "HackTheBox Write-up: Trace",
         "date": "August 18, 2025",
@@ -14,3 +21,4 @@
         "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Low+Logic"
     }
 ]
+
