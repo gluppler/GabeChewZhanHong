@@ -1,0 +1,58 @@
+{
+  "posts": [
+    {
+      "slug": "assembly-deep-dive",
+      "title": "A Journey into Assembly Language",
+      "date": "August 18, 2025",
+      "description": "An exploration of low-level programming with practical examples in ARM64 and x86-64 for security research.",
+      "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Assembly",
+      "tags": ["assembly", "programming", "security"],
+      "featured": true
+    },
+    {
+      "slug": "the-needle-writeup",
+      "title": "HackTheBox Write-up: The Needle",
+      "date": "August 15, 2025",
+      "description": "A firmware analysis challenge involving ARM boot executable reverse engineering and credential extraction.",
+      "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=The+Needle",
+      "tags": ["hackthebox", "firmware", "reverse-engineering"],
+      "featured": false
+    },
+    {
+      "slug": "rflag-writeup",
+      "title": "HackTheBox Write-up: RFlag",
+      "date": "August 12, 2025",
+      "description": "A radio frequency challenge involving complex signal analysis using rtl_433 to decode .cf32 files.",
+      "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=RFlag+RF",
+      "tags": ["hackthebox", "radio", "signal-analysis"],
+      "featured": false
+    },
+    {
+      "slug": "qsstv-challenge",
+      "title": "QSSTV Challenge: Slow-Scan Television Decoding",
+      "date": "August 10, 2025",
+      "description": "A radio challenge involving slow-scan television (SSTV) signal decoding using QSSTV software.",
+      "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=SSTV+Radio",
+      "tags": ["radio", "sstv", "signal-processing"],
+      "featured": false
+    },
+    {
+      "slug": "trace-challenge-writeup",
+      "title": "HackTheBox Write-up: Trace",
+      "date": "August 8, 2025",
+      "description": "A hardware challenge involving GPIO signal analysis from a Raspberry Pi to reverse engineer an 8x8 LED matrix display.",
+      "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Trace+Challenge",
+      "tags": ["hackthebox", "hardware", "gpio"],
+      "featured": false
+    },
+    {
+      "slug": "low-logic-challenge-writeup",
+      "title": "HackTheBox Write-up: Low Logic",
+      "date": "August 5, 2025",
+      "description": "A detailed walkthrough of the 'Low Logic' hardware challenge from HackTheBox, involving reverse engineering a digital logic circuit.",
+      "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Low+Logic",
+      "tags": ["hackthebox", "hardware", "digital-logic"],
+      "featured": false
+    }
+  ]
+}
