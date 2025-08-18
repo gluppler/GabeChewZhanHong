@@ -8,30 +8,227 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/13.0.2/marked.min.js"></script>
+    <style>
+        :root {
+            --dark-bg: #0F172A;
+            --light-bg: #F8FAFC;
+            --accent-blue: #38BDF8;
+            --accent-blue-darker: #0E7490;
+            --text-dark: #E2E8F0;
+            --text-light: #1E293B;
+            --card-dark: #1E293B;
+            --card-light: #FFFFFF;
+            --border-dark: #334155;
+            --border-light: #E2E8F0;
+        }
+
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark body {
+            background-color: var(--dark-bg);
+            color: var(--text-dark);
+        }
+
+        .light body {
+            background-color: var(--light-bg);
+            color: var(--text-light);
+        }
+
+        .accent-text { color: var(--accent-blue); }
+        
+        .dark .nav-bg { background-color: rgba(15, 23, 42, 0.8); }
+        .light .nav-bg { background-color: rgba(248, 250, 252, 0.8); }
+        
+        .dark .card-bg { background-color: var(--card-dark); }
+        .light .card-bg { background-color: var(--card-light); }
+        
+        .dark .border-color { border-color: var(--border-dark); }
+        .light .border-color { border-color: var(--border-light); }
+
+        .cta-button {
+            background-color: var(--accent-blue);
+            color: #0F172A;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent-blue-darker);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(0,0,0,0.2);
+        }
+
+        .animated-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .animated-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+        }
+
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .scroll-animate.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .skill-icon {
+            width: 40px;
+            height: 40px;
+            transition: transform 0.2s;
+        }
+
+        .skill-icon:hover {
+            transform: scale(1.15);
+        }
+
+        /* Blog/Post specific styles */
+        .prose {
+            max-width: none;
+        }
+
+        .prose h1, .prose h2, .prose h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+        }
+
+        .prose h1 { font-size: 2.5rem; }
+        .prose h2 { font-size: 2rem; }
+        .prose h3 { font-size: 1.5rem; }
+
+        .prose p {
+            margin-bottom: 1.25rem;
+            line-height: 1.7;
+        }
+
+        .prose a {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        .prose code {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+        }
+
+        .light .prose code {
+            background-color: #E2E8F0;
+            color: var(--text-light);
+        }
+
+        .prose pre {
+            background-color: var(--card-dark);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .light .prose pre {
+            background-color: #E2E8F0;
+        }
+
+        .prose ul, .prose ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .prose li {
+            margin: 0.5rem 0;
+        }
+
+        /* Modal styles for single post view */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+        }
+
+        .modal-content {
+            margin: 2% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            height: 90%;
+            overflow-y: auto;
+            border-radius: 10px;
+        }
+
+        .dark .modal-content {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .light .modal-content {
+            background-color: var(--card-light);
+            color: var(--text-light);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--accent-blue);
+        }
+
+        .page-container {
+            display: none;
+        }
+
+        .page-container.active {
+            display: block;
+        }
+    </style>
 </head>
 <body class="antialiased">
-
-    <!-- Navbar -->
-    <nav id="navbar" class="nav-bg backdrop-blur-lg fixed w-full top-0 z-50 transition-all duration-300 border-b border-transparent">
+    <!-- Navigation -->
+    <nav id="navbar" class="nav-bg backdrop-blur-lg fixed w-full top-0 z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <a href="#hero" class="text-2xl font-bold accent-text">Gabe.</a>
+                    <a href="#" onclick="showPage('home')" class="text-2xl font-bold accent-text cursor-pointer">Gabe.</a>
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#about" class="px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">About</a>
-                        <a href="#experience" class="px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Experience</a>
-                        <a href="#skills" class="px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Skills</a>
-                        <a href="#ventures" class="px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Ventures</a>
-                        <a href="#projects" class="px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Projects</a>
-                        <a href="blog.html" class="px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Blog</a>
-                        <a href="#contact" class="px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Contact</a>
+                        <a href="#" onclick="showPage('home')" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Home</a>
+                        <a href="#about" onclick="showPage('home'); setTimeout(() => scrollToSection('about'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">About</a>
+                        <a href="#experience" onclick="showPage('home'); setTimeout(() => scrollToSection('experience'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Experience</a>
+                        <a href="#skills" onclick="showPage('home'); setTimeout(() => scrollToSection('skills'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Skills</a>
+                        <a href="#ventures" onclick="showPage('home'); setTimeout(() => scrollToSection('ventures'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Ventures</a>
+                        <a href="#" onclick="showPage('blog')" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Blog</a>
+                        <a href="#contact" onclick="showPage('home'); setTimeout(() => scrollToSection('contact'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Contact</a>
                     </div>
                 </div>
                 <div class="flex items-center">
-                    <button id="theme-toggle" class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                    <button id="theme-toggle" class="p-2 rounded-md focus:outline-none">
                         <svg id="theme-icon-light" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
@@ -41,7 +238,7 @@
                     </button>
                     <div class="md:hidden ml-2">
                         <button id="mobile-menu-button" class="p-2 rounded-md">
-                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                             </svg>
                         </button>
@@ -52,18 +249,19 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="md:hidden hidden">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">About</a>
-                <a href="#experience" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Experience</a>
-                <a href="#skills" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Skills</a>
-                <a href="#ventures" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Ventures</a>
-                <a href="#projects" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Projects</a>
-                <a href="blog.html" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Blog</a>
-                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Contact</a>
+                <a href="#" onclick="showPage('home')" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Home</a>
+                <a href="#about" onclick="showPage('home'); setTimeout(() => scrollToSection('about'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">About</a>
+                <a href="#experience" onclick="showPage('home'); setTimeout(() => scrollToSection('experience'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Experience</a>
+                <a href="#skills" onclick="showPage('home'); setTimeout(() => scrollToSection('skills'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-colors">Skills</a>
+                <a href="#ventures" onclick="showPage('home'); setTimeout(() => scrollToSection('ventures'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Ventures</a>
+                <a href="#" onclick="showPage('blog')" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Blog</a>
+                <a href="#contact" onclick="showPage('home'); setTimeout(() => scrollToSection('contact'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Contact</a>
             </div>
         </div>
     </nav>
 
-    <div class="grid grid-cols-1">
+    <!-- Home Page -->
+    <div id="home-page" class="page-container active">
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Hero Section -->
             <section id="hero" class="min-h-screen flex items-center">
@@ -77,9 +275,12 @@
                         Ranked #1 on TryHackMe Malaysia
                     </p>
                     <div class="mt-8">
-                        <a href="Profile-1.pdf" download="GabeChew-CV.pdf" class="cta-button font-bold py-3 px-6 rounded-lg text-lg inline-block">
+                        <a href="Profile-1.pdf" download="GabeChew-CV.pdf" class="cta-button font-bold py-3 px-6 rounded-lg text-lg inline-block mr-4">
                             Download CV
                         </a>
+                        <button onclick="showPage('blog')" class="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-bold py-3 px-6 rounded-lg text-lg inline-block transition-all">
+                            View My Work
+                        </button>
                     </div>
                 </div>
             </section>
@@ -104,139 +305,117 @@
 
             <!-- Experience Section -->
             <section id="experience" class="py-24 scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-12">Experience & Expertise</h2>
+                <h2 class="text-4xl font-bold text-center mb-12">Experience & Education</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                        <h3 class="text-2xl font-bold mb-4 accent-text">Work Experience</h3>
-                        <div class="relative border-l-2 border-color ml-2 pl-6">
-                            <div class="mb-8 stagger-item">
-                                <p class="font-semibold">Founder & CEO</p>
+                        <h3 class="text-2xl font-bold mb-4 accent-text">Professional Experience</h3>
+                        <div class="space-y-6">
+                            <div class="border-l-4 border-blue-500 pl-4">
+                                <p class="font-semibold text-lg">Founder & CEO</p>
                                 <p class="text-sm opacity-80">Behelit Systems | Jul 2025 - Present</p>
-                                <p class="mt-2 text-sm">Defining strategic vision, leading security engagements, and driving R&D in custom exploit development and Al-enhanced security.</p>
+                                <p class="mt-2">Defining strategic vision, leading security engagements, and driving R&D in custom exploit development and AI-enhanced security.</p>
                             </div>
-                            <div class="mb-8 stagger-item" style="animation-delay: 0.1s;">
-                                <p class="font-semibold">IT Consultant</p>
+                            <div class="border-l-4 border-blue-500 pl-4">
+                                <p class="font-semibold text-lg">IT Consultant</p>
                                 <p class="text-sm opacity-80">AIA Malaysia | Apr 2023 - Sep 2023</p>
-                                <p class="mt-2 text-sm">Provided expert-level technical support, managed over 500 support tickets, and ensured minimal downtime for business operations.</p>
+                                <p class="mt-2">Provided expert-level technical support, managed over 500 support tickets, and ensured minimal downtime for business operations.</p>
                             </div>
-                             <div class="stagger-item" style="animation-delay: 0.2s;">
-                                <p class="font-semibold">Blockchain Developer Intern</p>
+                            <div class="border-l-4 border-blue-500 pl-4">
+                                <p class="font-semibold text-lg">Blockchain Developer Intern</p>
                                 <p class="text-sm opacity-80">Gameconomy | May 2022 - Aug 2022</p>
-                                <p class="mt-2 text-sm">Enhanced smart contracts, developed a blockscout explorer UI, and deployed an IBFT Private Whitelist Network.</p>
+                                <p class="mt-2">Enhanced smart contracts, developed a blockscout explorer UI, and deployed an IBFT Private Whitelist Network.</p>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                        <h3 class="text-2xl font-bold mb-4 accent-text">Core Expertise</h3>
-                         <ul class="space-y-4 text-lg list-disc list-inside">
-                            <li class="stagger-item">Adversary Simulation & Red Teaming</li>
-                            <li class="stagger-item" style="animation-delay: 0.1s;">Embedded Systems & Firmware Security</li>
-                            <li class="stagger-item" style="animation-delay: 0.2s;">Digital Forensics & Incident Response</li>
-                            <li class="stagger-item" style="animation-delay: 0.3s;">Exploit Development & Reverse Engineering</li>
-                            <li class="stagger-item" style="animation-delay: 0.4s;">Wireless & Signal-Based Attack Vectors</li>
-                            <li class="stagger-item" style="animation-delay: 0.5s;">Security Analyst / Blue Team Operations</li>
-                         </ul>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Education & Certifications Section -->
-            <section id="education" class="py-24 scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-12">Education & Certifications</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                        <h3 class="text-2xl font-bold mb-4 accent-text">Education</h3>
-                        <div class="relative border-l-2 border-color ml-2 pl-6">
-                            <div class="mb-8 stagger-item">
-                                <p class="font-semibold">BSc in Computer Science</p>
-                                <p class="text-sm opacity-80">Sunway University & Lancaster University | 2023 - 2027</p>
+                        <h3 class="text-2xl font-bold mb-4 accent-text">Education & Certifications</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Education</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p><strong>BSc in Computer Science</strong><br>Sunway University & Lancaster University | 2023 - 2027</p>
+                                    <p><strong>Diploma in Information Technology</strong><br>HELP University | 2020 - 2022</p>
+                                    <p><strong>Certificate in Information Technology</strong><br>APU / APIIT | 2018 - 2020</p>
+                                </div>
                             </div>
-                            <div class="mb-8 stagger-item" style="animation-delay: 0.1s;">
-                                <p class="font-semibold">Diploma in Information Technology</p>
-                                <p class="text-sm opacity-80">HELP University | 2020 - 2022</p>
-                            </div>
-                             <div class="stagger-item" style="animation-delay: 0.2s;">
-                                <p class="font-semibold">Certificate in Information Technology</p>
-                                <p class="text-sm opacity-80">APU / APIIT | 2018 - 2020</p>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Certifications</h4>
+                                <ul class="text-sm space-y-1">
+                                    <li>• Offensive Pentesting Certificate</li>
+                                    <li>• Jr Penetration Tester Certificate</li>
+                                    <li>• Web Application Pentesting Certificate</li>
+                                    <li>• SOC Level 1 Certificate</li>
+                                    <li>• Cyber Security 101 Certificate</li>
+                                </ul>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                        <h3 class="text-2xl font-bold mb-4 accent-text">Certifications</h3>
-                        <ul class="space-y-4 text-lg list-disc list-inside">
-                            <li class="stagger-item">Offensive Pentesting Certificate</li>
-                            <li class="stagger-item" style="animation-delay: 0.1s;">Jr Penetration Tester Certificate</li>
-                            <li class="stagger-item" style="animation-delay: 0.2s;">Web Application Pentesting Certificate</li>
-                            <li class="stagger-item" style="animation-delay: 0.3s;">SOC Level 1 Certificate</li>
-                            <li class="stagger-item" style="animation-delay: 0.4s;">Cyber Security 101 Certificate</li>
-                        </ul>
                     </div>
                 </div>
             </section>
 
             <!-- Skills Section -->
             <section id="skills" class="py-24 scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-12">Skills & Toolkit</h2>
-                <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-center">
-                        <div>
-                            <h3 class="text-xl font-bold mb-4 accent-text">Systems & Low-Level</h3>
-                            <div class="flex flex-wrap justify-center gap-4">
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" title="C" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" title="C++" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/embeddedc/embeddedc-original.svg" title="Embedded C" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rust/rust-plain.svg" title="Rust" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg" title="Go" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/zig/zig-original.svg" title="Zig" />
+                <h2 class="text-4xl font-bold text-center mb-12">Core Expertise & Technologies</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
+                        <h3 class="text-2xl font-bold mb-6 accent-text">Security Expertise</h3>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span>Adversary Simulation & Red Teaming</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span>Embedded Systems & Firmware Security</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span>Digital Forensics & Incident Response</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span>Exploit Development & Reverse Engineering</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span>Wireless & Signal-Based Attack Vectors</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span>Security Analysis & Blue Team Operations</span>
                             </div>
                         </div>
-                        <div>
-                            <h3 class="text-xl font-bold mb-4 accent-text">Web & Scripting</h3>
-                            <div class="flex flex-wrap justify-center gap-4">
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" title="Python" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bash/bash-original.svg" title="Bash" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" title="JavaScript" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" title="TypeScript" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" title="React" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/astro/astro-original.svg" title="Astro" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" title="TailwindCSS" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/lua/lua-original.svg" title="Lua" />
-                            </div>
-                        </div>
-                         <div>
-                            <h3 class="text-xl font-bold mb-4 accent-text">Databases</h3>
-                            <div class="flex flex-wrap justify-center gap-4">
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" title="PostgreSQL" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg" title="Supabase" />
-                                <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" title="ClickHouse" />
-                            </div>
-                        </div>
-                        <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-                            <div class="md:col-span-2 lg:col-span-2">
-                                <h3 class="text-xl font-bold mb-4 accent-text">DevOps & Infrastructure</h3>
-                                <div class="flex flex-wrap justify-center gap-4">
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" title="Git" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gitlab/gitlab-original.svg" title="GitLab" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/forgejo/forgejo-original.svg" title="Forgejo" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" title="Docker" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/podman/podman-original.svg" title="Podman" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" title="Kubernetes" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/talos/talos-original.svg" title="Talos" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cloudflare/cloudflare-original.svg" title="Cloudflare" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pfsense/pfsense-original.svg" title="pfSense" />
+                    </div>
+
+                    <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
+                        <h3 class="text-2xl font-bold mb-6 accent-text">Technical Skills</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-semibold mb-3">Systems & Low-Level</h4>
+                                <div class="flex flex-wrap gap-3">
+                                    <span class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-sm">C/C++</span>
+                                    <span class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-sm">Rust</span>
+                                    <span class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-sm">Assembly</span>
+                                    <span class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-sm">Go</span>
                                 </div>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold mb-4 accent-text">AI, Hardware & OS</h3>
-                                <div class="flex flex-wrap justify-center gap-4">
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" title="Linux" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fedora/fedora-original.svg" title="Fedora" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/archlinux/archlinux-original.svg" title="Arch Linux" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/raspberrypi/raspberrypi-original.svg" title="Raspberry Pi" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/arduino/arduino-original.svg" title="Arduino" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg" title="TensorFlow" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg" title="PyTorch" />
-                                    <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/keras/keras-original.svg" title="Keras" />
+                                <h4 class="font-semibold mb-3">Web & Scripting</h4>
+                                <div class="flex flex-wrap gap-3">
+                                    <span class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm">Python</span>
+                                    <span class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm">JavaScript/TypeScript</span>
+                                    <span class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm">React</span>
+                                    <span class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm">Bash</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-3">Infrastructure</h4>
+                                <div class="flex flex-wrap gap-3">
+                                    <span class="bg-purple-100 dark:bg-purple-900 px-3 py-1 rounded-full text-sm">Docker/Kubernetes</span>
+                                    <span class="bg-purple-100 dark:bg-purple-900 px-3 py-1 rounded-full text-sm">Linux</span>
+                                    <span class="bg-purple-100 dark:bg-purple-900 px-3 py-1 rounded-full text-sm">PostgreSQL</span>
                                 </div>
                             </div>
                         </div>
@@ -248,36 +427,18 @@
             <section id="ventures" class="py-24 scroll-animate">
                 <h2 class="text-4xl font-bold text-center mb-12">My Ventures</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="card-bg p-8 rounded-lg shadow-lg text-center flex flex-col animated-card">
+                    <div class="card-bg p-8 rounded-lg shadow-lg text-center animated-card">
                         <h3 class="text-2xl font-bold mb-2">Behelit Systems</h3>
                         <p class="accent-text font-semibold mb-4">Securing Physical Reality</p>
-                        <p class="flex-grow">A security firm dedicated to securing the physical assets that traditional cybersecurity overlooks. We combine elite human expertise with a proprietary, self-hosted AI platform to solve complex commercial security problems.</p>
-                        <div class="mt-6">
-                             <a href="https://www.behelitsystems.com" target="_blank" rel="noopener noreferrer" class="cta-button font-bold py-2 px-4 rounded-lg text-sm inline-block">Visit Website</a>
-                        </div>
+                        <p class="mb-6">A security firm dedicated to securing the physical assets that traditional cybersecurity overlooks. We combine elite human expertise with a proprietary, self-hosted AI platform to solve complex commercial security problems.</p>
+                        <a href="https://www.behelitsystems.com" target="_blank" rel="noopener noreferrer" class="cta-button font-bold py-2 px-4 rounded-lg text-sm inline-block">Visit Website</a>
                     </div>
-                    <div class="card-bg p-8 rounded-lg shadow-lg text-center flex flex-col animated-card">
+                    <div class="card-bg p-8 rounded-lg shadow-lg text-center animated-card">
                         <h3 class="text-2xl font-bold mb-2">Cult of The LOLCOW (cLc)</h3>
                         <p class="accent-text font-semibold mb-4">Malaysia's Hardware Hacking Community</p>
-                        <p class="flex-grow">As Malaysia's first and only open-source hardware hacking community, cLc provides a sanctuary for curiosity-driven learning and acts as the R&D engine that drives our innovation.</p>
-                         <div class="mt-6">
-                            <a href="https://www.cultlolcow.com" target="_blank" rel="noopener noreferrer" class="cta-button font-bold py-2 px-4 rounded-lg text-sm inline-block">Join the Community</a>
-                        </div>
+                        <p class="mb-6">As Malaysia's first and only open-source hardware hacking community, cLc provides a sanctuary for curiosity-driven learning and acts as the R&D engine that drives our innovation.</p>
+                        <a href="https://www.cultlolcow.com" target="_blank" rel="noopener noreferrer" class="cta-button font-bold py-2 px-4 rounded-lg text-sm inline-block">Join the Community</a>
                     </div>
-                </div>
-            </section>
-
-            <!-- Projects Section -->
-            <section id="projects" class="py-24 scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-12">Projects & Write-Ups</h2>
-                <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Projects will be dynamically injected here -->
-                    <p class="col-span-full text-center opacity-70">Loading projects...</p>
-                </div>
-                <div class="text-center mt-12">
-                     <a href="blog.html" class="cta-button font-bold py-3 px-6 rounded-lg text-lg inline-block">
-                        View All Posts
-                    </a>
                 </div>
             </section>
 
@@ -292,17 +453,43 @@
         </main>
     </div>
 
+    <!-- Blog Page -->
+    <div id="blog-page" class="page-container">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <header class="text-center mb-16 scroll-animate">
+                <h1 class="text-5xl font-bold">Blog & Write-Ups</h1>
+                <p class="text-xl mt-4 opacity-80">Thoughts on security, technology, and everything in between.</p>
+            </header>
+
+            <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Posts will be loaded here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Post Modal -->
+    <div id="post-modal" class="modal">
+        <div class="modal-content card-bg">
+            <span class="close">&times;</span>
+            <article class="prose">
+                <h1 id="modal-post-title" class="text-4xl font-bold mb-4"></h1>
+                <p id="modal-post-meta" class="text-lg opacity-70 mb-8"></p>
+                <div id="modal-post-body"></div>
+            </article>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="border-t border-color">
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
-             <div class="flex justify-center space-x-6 mb-4">
-                <a href="https://github.com/gluppler" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white" title="GitHub">
-                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="https://github.com/gluppler" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors" title="GitHub">
+                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
                         <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
                     </svg>
                 </a>
-                <a href="https://www.linkedin.com/in/gabechewzhanhong" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white" title="LinkedIn">
-                     <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <a href="https://www.linkedin.com/in/gabechewzhanhong" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors" title="LinkedIn">
+                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                     </svg>
                 </a>
@@ -311,6 +498,416 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        // Sample data - in production, this would be loaded from external files
+        const posts = [
+            {
+                "slug": "assembly-deep-dive",
+                "title": "A Journey into Assembly Language",
+                "date": "August 18, 2025",
+                "description": "An exploration of low-level programming with practical examples in ARM64 and x86-64 for security research.",
+                "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Assembly",
+                "content": `# A Journey into Assembly Language for ARM64 & x86-64
+
+Understanding how software interacts with hardware at the lowest levels is a critical skill in security research. It's the bedrock of reverse engineering, vulnerability analysis, and exploit development. This project documents my personal journey into learning Assembly for two of the most prevalent architectures today: ARM64 (AArch64) and x86-64.
+
+## Why Learn Assembly?
+
+In an age of high-level languages and powerful frameworks, diving into Assembly might seem archaic. However, for a security researcher, it's indispensable. Assembly provides a direct view of a program's execution flow, memory management, and interaction with the operating system kernel. Without it, you're essentially reading a translated version of the story; with it, you're reading the original manuscript.
+
+This repository serves as a collection of my notes, code examples, and foundational exercises as I explore these powerful, low-level concepts.
+
+## Part 1: Exploring ARM64 (AArch64)
+
+The ARM architecture dominates the mobile and embedded device landscape, making it a crucial area of study. My exploration covers the fundamentals of the AArch64 instruction set.
+
+### Core Concepts Covered:
+
+- **Registers & Data Movement**: Understanding the roles of general-purpose registers (X0-X30), the zero register (XZR), and using instructions like MOV to manipulate data.
+- **Arithmetic Operations**: Implementing basic math with ADD, SUB, MUL, and SDIV.
+- **Control Flow**: Using comparison (CMP) and branching instructions (B.cond, B) to create loops and conditional logic.
+- **System Calls (syscalls)**: Interacting with the Linux kernel to perform actions like writing to the console or exiting a program.
+
+### Example: "Hello, World!" in ARM64 Assembly
+
+\`\`\`assembly
+// Hello.s
+.data
+message: .asciz "Hello, Assembly!\\n"
+len = . - message
+
+.text
+.globl _start
+
+_start:
+    // write(stdout, message, len)
+    mov x0, #1      // stdout file descriptor
+    ldr x1, =message // message address
+    ldr x2, =len    // message length
+    mov x8, #64     // write syscall number
+    svc #0          // make the system call
+
+    // exit(0)
+    mov x0, #0      // exit code
+    mov x8, #93     // exit syscall number
+    svc #0          // make the system call
+\`\`\`
+
+## Part 2: Demystifying x86-64 Linux
+
+The x86-64 architecture is the backbone of modern desktops, laptops, and servers. This section focuses on writing Assembly for 64-bit Linux systems using the NASM assembler.
+
+### Core Concepts Covered:
+
+- **Data Sections**: Defining variables and constants in the .data and .bss sections.
+- **System Calls (x86-64)**: Understanding the x86-64 calling convention (using registers like RAX, RDI, RSI, RDX).
+- **Stack Operations**: Managing the stack with PUSH and POP for function calls and local variable storage.
+- **Branching & Loops**: Implementing if-then-else structures, for loops, and while loops using cmp, jmp, and conditional jump instructions.
+
+### Example: Basic Arithmetic in x86-64 Assembly
+
+\`\`\`assembly
+; Arithmetic.asm
+section .text
+global _start
+
+_start:
+    mov rax, 20     ; Move the value 20 into the RAX register
+    mov rbx, 20     ; Move the value 20 into the RBX register
+    add rax, rbx    ; Add RBX to RAX (RAX = RAX + RBX)
+
+    ; exit(0)
+    mov rax, 60     ; exit syscall number
+    mov rdi, 0      ; exit code
+    syscall         ; make the system call
+\`\`\`
+
+This project is an ongoing effort to build a solid foundation in low-level systems. Understanding these fundamentals is crucial for anyone serious about security research and system-level programming.`
+            },
+            {
+                "slug": "trace-challenge-writeup",
+                "title": "HackTheBox Write-up: Trace",
+                "date": "August 18, 2025",
+                "description": "A hardware challenge involving GPIO signal analysis from a Raspberry Pi to reverse engineer an 8x8 LED matrix display.",
+                "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Trace+Challenge",
+                "content": `# HackTheBox Write-up: Trace Challenge
+
+## Challenge Overview: Decoding GPIO Signals
+
+The "Trace" challenge from HackTheBox is a fantastic exercise in signal analysis and protocol reverse engineering. We're provided with a CSV file (traces.csv) containing timestamped logic level traces from a Raspberry Pi's GPIO pins, along with a text file (trace.txt) mapping those pins to the rows and columns of an 8x8 LED matrix. The goal is to reconstruct the visual data being displayed on the matrix to reveal the flag.
+
+## Step 1: Understanding the Hardware Setup
+
+The trace.txt file is our Rosetta Stone for this challenge. It tells us exactly how the LED matrix is wired to the Raspberry Pi:
+
+- **Rows (Common Anode)**: Controlled by GPIO pins 12, 25, 24, 22, 27, 17, 18, and 23. To light up a row, its corresponding GPIO pin must be set to HIGH (1).
+- **Columns (Common Cathode)**: Controlled by GPIO pins 16, 5, 6, 13, 19, 26, 20, and 21. To light up a column, its corresponding GPIO pin must be set to LOW (0).
+
+Therefore, a specific LED at (row, col) will turn on only when its row pin is HIGH and its column pin is LOW. This multiplexing technique is common for controlling LED matrices efficiently.
+
+## Step 2: Scripting the Signal Reconstruction
+
+The core of the solution lies in the trace.py script. It's designed to parse the CSV data, reconstruct the state of the 8x8 matrix at each timestamp, and then identify the characters being displayed.
+
+### Key Logic in trace.py:
+
+1. **Data Loading**: The script loads traces.csv into a pandas DataFrame for efficient manipulation.
+2. **State Reconstruction**: For each timestamp, it checks the state of all 16 relevant GPIO pins. Using vectorized operations with NumPy, it builds an 8x8 matrix representing the on/off state of each LED.
+3. **Frame Aggregation**: Because of multiplexing, the full image of a character is never displayed at once. The script intelligently groups frames that are close together in time to form a composite image of each character.
+4. **Character Recognition**: A dictionary of pre-defined 8x8 NumPy arrays represents the pixel patterns for each possible character (A-Z, 0-9, symbols).
+
+\`\`\`python
+# Snippet from trace.py showing the core reconstruction logic
+def reconstruct_pixel_states_vectorized(df_gpio_data, df_gpio_data_np):
+    # Get all row and column data across all timestamps
+    row_data_by_time = df_gpio_data_np[:, row_gpio_indices]
+    col_data_by_time = df_gpio_data_np[:, col_gpio_indices]
+
+    # Transpose for broadcasting
+    row_data = row_data_by_time.T
+    col_data = col_data_by_time.T
+
+    # Use NumPy broadcasting to compute the state of all 64 LEDs at once
+    led_states = (row_data[:, np.newaxis, :] == 1) & (col_data[np.newaxis, :, :] == 0)
+    return led_states.astype(int)
+\`\`\`
+
+## Step 3: Revealing the Flag
+
+Running the script processes the entire traces.csv file, deciphers the message being displayed on the LED matrix, and prints the flag to the console.
+
+The final flag is revealed: **HTB{MU171P13X1N9_4ND_PC85_FUND1M3N7415_37}**
+
+This challenge was a superb deep dive into GPIO signal analysis, multiplexing, and data-driven hardware reverse engineering. It perfectly demonstrates how understanding hardware fundamentals can be applied to solve complex security challenges.`
+            },
+            {
+                "slug": "low-logic-challenge-writeup",
+                "title": "HackTheBox Write-up: Low Logic",
+                "date": "August 18, 2025",
+                "description": "A detailed walkthrough of the 'Low Logic' hardware challenge from HackTheBox, involving reverse engineering a digital logic circuit.",
+                "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Low+Logic",
+                "content": `# HackTheBox Write-up: Low Logic Challenge
+
+## Challenge Overview
+
+The "Low Logic" challenge presents us with a digital logic circuit that we need to reverse engineer. This hardware-focused challenge tests our understanding of boolean logic, circuit analysis, and signal flow.
+
+## Understanding the Circuit
+
+The challenge provides us with a schematic of a digital logic circuit consisting of various gates including AND, OR, NOT, and XOR gates. Our task is to:
+
+1. Analyze the circuit topology
+2. Determine the logic function it implements
+3. Find the correct input combination that produces the desired output
+4. Extract the flag from the successful execution
+
+## Analysis Approach
+
+### Step 1: Circuit Mapping
+
+First, I mapped out each logic gate and its connections:
+- Input pins and their labels
+- Gate types and their positions
+- Output connections and final result pin
+
+### Step 2: Boolean Logic Analysis
+
+For each possible input combination, I traced the signal flow through the circuit:
+
+\`\`\`python
+def analyze_circuit(inputs):
+    # Example logic flow (simplified)
+    a, b, c, d = inputs
+    
+    # First level gates
+    gate1_out = a and b
+    gate2_out = c or d
+    
+    # Second level
+    gate3_out = not gate1_out
+    gate4_out = gate2_out xor gate3_out
+    
+    return gate4_out
+\`\`\`
+
+### Step 3: Brute Force Validation
+
+Since the input space was manageable, I implemented a brute force approach to test all possible input combinations:
+
+\`\`\`python
+for i in range(2**4):  # 4 input pins = 16 combinations
+    inputs = [(i >> j) & 1 for j in range(4)]
+    result = analyze_circuit(inputs)
+    if result == target_output:
+        print(f"Found solution: {inputs}")
+\`\`\`
+
+## The Solution
+
+After systematic analysis, the correct input combination was found to be:
+- Input A: 1
+- Input B: 0  
+- Input C: 1
+- Input D: 0
+
+This produced the target output that revealed the flag: **HTB{D1G1T4L_L0G1C_M45T3R}**
+
+## Key Takeaways
+
+This challenge reinforced several important concepts:
+
+1. **Systematic Analysis**: Breaking down complex circuits into manageable components
+2. **Boolean Logic Mastery**: Understanding how different gate types interact
+3. **Verification Methods**: Using multiple approaches to validate results
+4. **Hardware Security**: How logic circuits can be analyzed for vulnerabilities
+
+The Low Logic challenge is an excellent introduction to hardware reverse engineering and demonstrates how fundamental digital logic concepts apply to security research.`
+            }
+        ];
+
+        // Application state
+        let currentPage = 'home';
+
+        // Theme management
+        function initTheme() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIconLight = document.getElementById('theme-icon-light');
+            const themeIconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+
+            const setTheme = (theme) => {
+                htmlEl.classList.remove('light', 'dark');
+                htmlEl.classList.add(theme);
+                
+                if (theme === 'dark') {
+                    themeIconLight?.classList.remove('hidden');
+                    themeIconDark?.classList.add('hidden');
+                } else {
+                    themeIconLight?.classList.add('hidden');
+                    themeIconDark?.classList.remove('hidden');
+                }
+                // Note: localStorage removed as per artifact restrictions
+            };
+
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            setTheme(prefersDark ? 'dark' : 'light');
+
+            themeToggle?.addEventListener('click', () => {
+                const currentTheme = htmlEl.classList.contains('dark') ? 'dark' : 'light';
+                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+        }
+
+        // Page navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-container').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+                currentPage = pageId;
+            }
+            
+            // Close mobile menu if open
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu?.classList.add('hidden');
+            
+            // Trigger scroll animations for newly visible page
+            setTimeout(() => {
+                initScrollAnimations();
+                if (pageId === 'blog') {
+                    loadBlogPosts();
+                }
+            }, 100);
+        }
+
+        // Scroll to section (for same-page navigation)
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Mobile menu toggle
+        function initMobileMenu() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton?.addEventListener('click', () => {
+                mobileMenu?.classList.toggle('hidden');
+            });
+        }
+
+        // Scroll animations
+        function initScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.scroll-animate');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animatedElements.forEach(el => {
+                el.classList.remove('is-visible');
+                observer.observe(el);
+            });
+        }
+
+        // Load blog posts
+        function loadBlogPosts() {
+            const postsContainer = document.getElementById('posts-container');
+            if (!postsContainer) return;
+
+            postsContainer.innerHTML = '';
+            
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'card-bg rounded-lg shadow-lg overflow-hidden animated-card cursor-pointer';
+                postElement.innerHTML = `
+                    <img src="${post.image}" alt="${post.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <p class="text-sm opacity-60 mb-2">${post.date}</p>
+                        <h3 class="text-xl font-bold mb-2">${post.title}</h3>
+                        <p class="opacity-80 mb-4">${post.description}</p>
+                        <span class="accent-text font-semibold hover:underline">Read More →</span>
+                    </div>
+                `;
+                
+                postElement.addEventListener('click', () => openPost(post));
+                postsContainer.appendChild(postElement);
+            });
+        }
+
+        // Open post in modal
+        function openPost(post) {
+            const modal = document.getElementById('post-modal');
+            const title = document.getElementById('modal-post-title');
+            const meta = document.getElementById('modal-post-meta');
+            const body = document.getElementById('modal-post-body');
+            
+            title.textContent = post.title;
+            meta.textContent = `By Gabe Chew Zhan Hong • ${post.date}`;
+            body.innerHTML = marked.parse(post.content);
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close post modal
+        function closePost() {
+            const modal = document.getElementById('post-modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initMobileMenu();
+            initScrollAnimations();
+            
+            // Close modal handlers
+            const modal = document.getElementById('post-modal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn?.addEventListener('click', closePost);
+            
+            modal?.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closePost();
+                }
+            });
+            
+            // Escape key to close modal
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal?.style.display === 'block') {
+                    closePost();
+                }
+            });
+
+            // Navbar scroll effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar?.classList.add('border-b', 'border-color');
+                } else {
+                    navbar?.classList.remove('border-b', 'border-color');
+                }
+            });
+        });
+
+        // Make functions globally available
+        window.showPage = showPage;
+        window.scrollToSection = scrollToSection;
+    </script>
 </body>
 </html>
