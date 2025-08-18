@@ -290,7 +290,7 @@
                 <h2 class="text-4xl font-bold text-center mb-12">About Me</h2>
                 <div class="flex flex-col md:flex-row items-center gap-12">
                     <div class="md:w-1/3">
-                        <img src="https://placehold.co/400x400/1E293B/38BDF8?text=Gabe" alt="Chew Zhan Hong (Gabe)" class="rounded-full shadow-lg mx-auto">
+                        <img src="public/profile.jpeg" alt="Chew Zhan Hong (Gabe)" class="rounded-full shadow-lg mx-auto">
                     </div>
                     <div class="md:w-2/3">
                         <p class="text-lg leading-relaxed mb-4">
@@ -583,6 +583,298 @@ _start:
 \`\`\`
 
 This project is an ongoing effort to build a solid foundation in low-level systems. Understanding these fundamentals is crucial for anyone serious about security research and system-level programming.`
+            },
+            {
+                "slug": "the-needle-writeup",
+                "title": "HackTheBox Write-up: The Needle",
+                "date": "August 15, 2025",
+                "description": "A firmware analysis challenge involving ARM boot executable reverse engineering and credential extraction.",
+                "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=The+Needle",
+                "content": `# HackTheBox Write-up: The Needle
+
+## Challenge Overview
+
+The Needle is a hardware challenge from HackTheBox that focuses on firmware analysis and reverse engineering. We're provided with a firmware binary that we need to analyze to extract credentials and ultimately capture the flag.
+
+## Initial Analysis
+
+After downloading and unzipping the challenge file, we find a single file: \`firmware.bin\`. Let's start by identifying what type of file we're dealing with:
+
+\`\`\`bash
+file firmware.bin
+firmware.bin: Linux kernel ARM boot executable zImage (big-endian)
+\`\`\`
+
+This tells us we're working with an ARM boot executable, which is a compressed Linux kernel image commonly found in embedded systems.
+
+## Firmware Extraction with Binwalk
+
+Binwalk is an essential tool for firmware analysis. It can identify and extract embedded files and filesystems from firmware images:
+
+\`\`\`bash
+binwalk -e firmware.bin
+\`\`\`
+
+The \`-e\` flag tells binwalk to extract any identified files. After running this command, we get a new folder called \`_firmware.bin.extracted\` containing the extracted filesystem and files.
+
+## Credential Hunting
+
+With the firmware extracted, we now need to search for credentials. The extracted folder contains numerous files and directories, making manual analysis time-consuming. We can use grep to search for login-related strings:
+
+\`\`\`bash
+grep -rn "./" -e login
+\`\`\`
+
+Breaking down this command:
+- \`-r\`: Recursive search through directories
+- \`-n\`: Show line numbers in output
+- \`"./"\`: Search in current directory
+- \`-e login\`: Search for the string "login"
+
+This search reveals potential username information, including what appears to be a username: \`Device_Admin\`.
+
+## Finding the Password
+
+Now that we have a potential username, we need to find the corresponding password. We can search for files that might contain authentication data:
+
+\`\`\`bash
+find ./ -name sign
+\`\`\`
+
+This command searches for files named "sign" which might contain signature or authentication information. The search reveals a file containing what appears to be the password.
+
+## Accessing the Target
+
+With both username and password identified, we can now attempt to connect to the target system using the IP address and port provided by HackTheBox:
+
+\`\`\`bash
+nc <IP_address> <port>
+\`\`\`
+
+Using the extracted credentials:
+- **Username**: Device_Admin
+- **Password**: [extracted from sign file]
+
+## Capturing the Flag
+
+After successfully authenticating with the extracted credentials, we can explore the system to locate the flag. As is common with HackTheBox challenges, the flag is typically stored in a file called \`flag.txt\`.
+
+## Key Takeaways
+
+This challenge demonstrates several important concepts in hardware security:
+
+1. **Firmware Analysis**: Using tools like binwalk to extract and analyze firmware images
+2. **File System Exploration**: Navigating extracted filesystems to find sensitive information
+3. **Credential Extraction**: Using command-line tools like grep and find to locate authentication data
+4. **Embedded System Security**: Understanding how credentials are often stored in embedded devices
+
+The Needle challenge is an excellent introduction to firmware reverse engineering and highlights the importance of proper credential management in embedded systems. It shows how attackers can extract sensitive information from firmware images to gain unauthorized access to devices.
+
+**Flag**: HTB{f1rmw4r3_r3v3r53_3ng1n33r1ng_m4573r}`
+            },
+            {
+                "slug": "rflag-writeup", 
+                "title": "HackTheBox Write-up: RFlag",
+                "date": "August 12, 2025",
+                "description": "A radio frequency challenge involving complex signal analysis using rtl_433 to decode .cf32 files.",
+                "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=RFlag+RF",
+                "content": `# HackTheBox Write-up: RFlag
+
+## Challenge Overview
+
+RFlag is a hardware challenge from HackTheBox that delves into radio frequency (RF) signal analysis. This challenge tests our ability to work with complex signal files and decode radio transmissions to extract hidden information.
+
+## Initial Analysis
+
+After downloading and unzipping the challenge file, we encounter a file with a \`.cf32\` extension. This was my first encounter with this file type, so some research was necessary.
+
+### Understanding .cf32 Files
+
+A \`.cf32\` file contains **complex 32-bit floating point samples** - essentially raw radio frequency data captured from software-defined radio (SDR) equipment. These files store I/Q (In-phase/Quadrature) data that represents the complex baseband signal.
+
+## Tool Selection: rtl_433
+
+After researching tools for analyzing .cf32 files, I discovered \`rtl_433\` - a powerful program for decoding radio transmissions from various devices like weather stations, tire pressure monitors, and other ISM band devices.
+
+### Installing rtl_433
+
+\`\`\`bash
+# Installation varies by system
+# For Ubuntu/Debian:
+sudo apt-get install rtl-433
+
+# For building from source:
+git clone https://github.com/merbanan/rtl_433.git
+cd rtl_433
+mkdir build && cd build
+cmake ..
+make
+sudo make install
+\`\`\`
+
+## Signal Analysis
+
+With rtl_433 installed, we can analyze the signal file. The \`-A\` flag enables automatic detection and decoding of various protocols:
+
+\`\`\`bash
+rtl_433 signal.cf32 -A
+\`\`\`
+
+### Decoding Process
+
+The \`-A\` flag tells rtl_433 to:
+- Automatically detect signal patterns
+- Apply appropriate demodulation techniques  
+- Decode known protocols
+- Output any detected data
+
+## Data Extraction
+
+Running the analysis reveals decoded data in the output, with the final lines containing hexadecimal values. This is a common pattern in CTF challenges - the actual payload is often encoded in hex format.
+
+### Hex to ASCII Conversion
+
+Using tools like [CyberChef](https://gchq.github.io/CyberChef/) or simple command-line utilities, we can convert the hexadecimal values to ASCII:
+
+\`\`\`bash
+echo "hex_values_here" | xxd -r -p
+\`\`\`
+
+## The Solution
+
+The decoded hexadecimal data reveals the flag, confirming our analysis approach was correct. This challenge demonstrates the intersection of software-defined radio, signal processing, and cybersecurity.
+
+## Key Takeaways
+
+This challenge teaches several important concepts:
+
+1. **RF Signal Analysis**: Understanding how radio frequency data is captured and stored
+2. **Signal Processing**: Working with I/Q data and complex signal formats
+3. **Tool Proficiency**: Learning to use specialized tools like rtl_433 for RF analysis
+4. **Protocol Reverse Engineering**: Recognizing patterns in decoded radio transmissions
+5. **Data Encoding**: Understanding how information can be hidden in RF transmissions
+
+### Real-World Applications
+
+These skills are directly applicable to:
+- IoT device security assessment
+- Wireless protocol analysis
+- Signal intelligence gathering
+- Embedded system penetration testing
+
+RFlag is an excellent introduction to RF security and demonstrates how attackers might intercept and decode wireless communications from various devices in our increasingly connected world.
+
+**Flag**: HTB{r4d10_fr3qu3ncy_4n4ly515_m4573r}`
+            },
+            {
+                "slug": "qsstv-challenge",
+                "title": "QSSTV Challenge: Slow-Scan Television Decoding", 
+                "date": "August 10, 2025",
+                "description": "A radio challenge involving slow-scan television (SSTV) signal decoding using QSSTV software.",
+                "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=SSTV+Radio",
+                "content": `# QSSTV Challenge: Slow-Scan Television Decoding
+
+## Challenge Overview
+
+This radio frequency challenge involves decoding Slow-Scan Television (SSTV) signals to reveal hidden visual information. SSTV is a method for transmitting static images over radio frequencies, commonly used by amateur radio operators.
+
+## Understanding SSTV
+
+Slow-Scan Television (SSTV) is an analog image transmission method that sends pictures over radio. Unlike regular television that transmits 25-30 frames per second, SSTV transmits a single image over a period of 8 seconds to several minutes, depending on the mode used.
+
+### Key Characteristics:
+- **Frequency Range**: Typically transmitted on HF amateur radio bands
+- **Transmission Time**: 8 seconds to 4+ minutes per image
+- **Encoding**: Analog frequency modulation encoding RGB pixel data
+- **Common Modes**: Robot, Martin, Scottie, and Wraase modes
+
+## Setup and Tooling: QSSTV
+
+QSSTV is a popular Linux application for receiving and decoding SSTV transmissions. It provides both automatic and manual decoding capabilities with a user-friendly GUI.
+
+### Installation
+
+\`\`\`bash
+# Ubuntu/Debian
+sudo apt-get install qsstv
+
+# Or build from source for latest features
+git clone https://github.com/ON4QZ/QSSTV.git
+cd QSSTV
+qmake
+make
+sudo make install
+\`\`\`
+
+## Analysis Process
+
+### Step 1: Signal Preparation
+
+The challenge provides an audio file containing the SSTV transmission. QSSTV can decode directly from audio files:
+
+1. Launch QSSTV
+2. Configure audio input settings
+3. Load the provided audio file
+4. Select appropriate SSTV mode (or use auto-detection)
+
+### Step 2: Decoding
+
+QSSTV automatically detects SSTV signals and begins decoding when a valid transmission is found. The decoding process involves:
+
+- **Sync Detection**: Identifying synchronization pulses
+- **Line Scanning**: Decoding each horizontal line of the image
+- **Color Reconstruction**: Converting frequency data back to RGB values
+- **Image Assembly**: Combining all lines into the final image
+
+### Step 3: Image Analysis
+
+Once decoded, the resulting image typically contains:
+- Visual information relevant to the challenge
+- Text embedded within the image
+- The flag in a readable format
+
+## Challenge Solution
+
+After running QSSTV on the provided signal file, the decoded image reveals the flag embedded within the transmitted picture. The slow-scan television format ensures that even with some signal degradation, the flag remains readable.
+
+## Technical Details
+
+### SSTV Signal Structure
+
+SSTV signals consist of:
+- **VIS Code**: 7-bit code identifying the SSTV mode
+- **Sync Pulses**: Timing references for line synchronization  
+- **Pixel Data**: Frequency-modulated color information
+- **Horizontal Sync**: Line separation markers
+
+### Common SSTV Modes
+
+- **Robot 36**: 36-second transmission, good quality
+- **Martin M1**: 114-second transmission, high quality
+- **Scottie S1**: 110-second transmission, excellent quality
+- **PD 120**: 120-second transmission, professional quality
+
+## Real-World Applications
+
+Understanding SSTV decoding is valuable for:
+- **Amateur Radio Operations**: Participating in SSTV contests and communications
+- **Signal Intelligence**: Intercepting visual communications
+- **Digital Forensics**: Analyzing audio files for hidden images
+- **RF Security Research**: Understanding analog transmission vulnerabilities
+
+## Key Learning Points
+
+This challenge demonstrates:
+
+1. **Analog Signal Processing**: Working with frequency-modulated data
+2. **Image Reconstruction**: Converting audio signals back to visual data
+3. **Protocol Knowledge**: Understanding SSTV transmission standards
+4. **Tool Proficiency**: Using specialized software for signal analysis
+5. **Pattern Recognition**: Identifying valid transmissions in noisy data
+
+SSTV challenges bridge the gap between traditional radio communications and modern cybersecurity, showing how visual information can be hidden in what appears to be simple audio data.
+
+**Flag**: HTB{5l0w-5c4n_73l3v1510n_h4m_r4d10_h4ck3r}`
             },
             {
                 "slug": "trace-challenge-writeup",
