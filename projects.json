@@ -1,17 +1,11 @@
 [
     {
-        "slug": "trace-challenge-writeup",
-        "title": "HackTheBox Write-up: Trace",
-        "description": "A hardware challenge involving GPIO signal analysis from a Raspberry Pi to reverse engineer an 8x8 LED matrix display.",
-        "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Trace+Challenge",
-        "link": "post.html?slug=trace-challenge-writeup"
-    },
-    {
-        "slug": "low-logic-challenge-writeup",
-        "title": "HackTheBox Write-up: Low Logic",
-        "description": "A detailed walkthrough of the 'Low Logic' hardware challenge from HackTheBox, involving reverse engineering a digital logic circuit.",
-        "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Low+Logic",
-        "link": "post.html?slug=low-logic-challenge-writeup"
+        "slug": "assembly-deep-dive",
+        "title": "A Journey into Assembly Language",
+        "description": "An exploration of low-level programming with practical examples in ARM64 and x86-64 for security research.",
+        "image": "https://placehold.co/600x400/1E293B/E2E8F0?text=Assembly",
+        "link": "post.html?slug=assembly-deep-dive"
     }
 ]
+
 
