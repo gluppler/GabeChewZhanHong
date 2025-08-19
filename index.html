@@ -1,306 +1,641 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chew Zhan Hong (Gabe) - Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Chew Zhan Hong (Gabe) - Security Specialist & Founder</title>
+    <meta name="description" content="Founder of Behelit Systems, Hardware & Physical Security Specialist, Ranked #1 on TryHackMe Malaysia">
+    <meta name="keywords" content="cybersecurity, hardware security, penetration testing, blockchain developer">
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/13.0.2/marked.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
 </head>
-<body class="antialiased">
-    <!-- Navigation -->
-    <nav id="navbar" class="nav-bg backdrop-blur-lg fixed w-full top-0 z-50 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="#" onclick="showPage('home')" class="text-2xl font-bold accent-text cursor-pointer">Gabe.</a>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#" onclick="showPage('home')" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Home</a>
-                        <a href="#about" onclick="showPage('home'); setTimeout(() => scrollToSection('about'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">About</a>
-                        <a href="#experience" onclick="showPage('home'); setTimeout(() => scrollToSection('experience'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Experience</a>
-                        <a href="#skills" onclick="showPage('home'); setTimeout(() => scrollToSection('skills'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Skills</a>
-                        <a href="#ventures" onclick="showPage('home'); setTimeout(() => scrollToSection('ventures'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Ventures</a>
-                        <a href="#" onclick="showPage('blog')" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Blog</a>
-                        <a href="#contact" onclick="showPage('home'); setTimeout(() => scrollToSection('contact'), 100)" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:accent-text transition-colors">Contact</a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <button id="theme-toggle" class="p-2 rounded-md focus:outline-none">
-                        <svg id="theme-icon-light" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        <svg id="theme-icon-dark" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                    </button>
-                    <div class="md:hidden ml-2">
-                        <button id="mobile-menu-button" class="p-2 rounded-md">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+            <div class="shape shape-5"></div>
         </div>
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="md:hidden hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#" onclick="showPage('home')" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Home</a>
-                <a href="#about" onclick="showPage('home'); setTimeout(() => scrollToSection('about'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">About</a>
-                <a href="#experience" onclick="showPage('home'); setTimeout(() => scrollToSection('experience'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Experience</a>
-                <a href="#skills" onclick="showPage('home'); setTimeout(() => scrollToSection('skills'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-colors">Skills</a>
-                <a href="#ventures" onclick="showPage('home'); setTimeout(() => scrollToSection('ventures'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Ventures</a>
-                <a href="#" onclick="showPage('blog')" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Blog</a>
-                <a href="#contact" onclick="showPage('home'); setTimeout(() => scrollToSection('contact'), 100)" class="block px-3 py-2 rounded-md text-base font-medium hover:accent-text transition-colors">Contact</a>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">Gabe<span class="accent">.</span></span>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link" data-section="home">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link" data-section="about">
+                        <i class="fas fa-user"></i>
+                        <span>About</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#experience" class="nav-link" data-section="experience">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Experience</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#skills" class="nav-link" data-section="skills">
+                        <i class="fas fa-code"></i>
+                        <span>Skills</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#ventures" class="nav-link" data-section="ventures">
+                        <i class="fas fa-rocket"></i>
+                        <span>Ventures</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link" data-section="contact">
+                        <i class="fas fa-envelope"></i>
+                        <span>Contact</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
             </div>
         </div>
     </nav>
 
-    <!-- Home Page -->
-    <div id="home-page" class="page-container active">
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Hero Section -->
-            <section id="hero" class="min-h-screen flex items-center">
-                <div class="w-full scroll-animate">
-                    <h1 class="text-5xl md:text-7xl font-bold leading-tight">Chew Zhan Hong (Gabe)</h1>
-                    <h2 class="text-2xl md:text-3xl font-semibold accent-text mt-2">Founder, Behelit Systems & Cult of the LOLCOW</h2>
-                    <p class="mt-4 text-lg md:text-xl">
-                        Final-Year Computer Science Student | Hardware & Physical Security Specialist
-                    </p>
-                    <p class="mt-2 text-md md:text-lg opacity-80">
-                        Ranked #1 on TryHackMe Malaysia
-                    </p>
-                    <div class="mt-8">
-                        <a href="Profile-1.pdf" download="GabeChew-CV.pdf" class="cta-button font-bold py-3 px-6 rounded-lg text-lg inline-block mr-4">
-                            Download CV
-                        </a>
-                        <button onclick="showPage('blog')" class="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-bold py-3 px-6 rounded-lg text-lg inline-block transition-all">
-                            View My Work
-                        </button>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge fade-in-up" style="animation-delay: 0.2s;">
+                    <i class="fas fa-trophy"></i>
+                    <span>Ranked #1 on TryHackMe Malaysia</span>
+                </div>
+                
+                <h1 class="hero-title fade-in-up" style="animation-delay: 0.4s;">
+                    <span class="typing-text">Chew Zhan Hong</span>
+                    <span class="title-accent">(Gabe)</span>
+                </h1>
+                
+                <div class="hero-roles fade-in-up" style="animation-delay: 0.6s;">
+                    <div class="role-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security Specialist</span>
+                    </div>
+                    <div class="role-separator">•</div>
+                    <div class="role-item">
+                        <i class="fas fa-building"></i>
+                        <span>Founder, Behelit Systems</span>
+                    </div>
+                    <div class="role-separator">•</div>
+                    <div class="role-item">
+                        <i class="fas fa-users"></i>
+                        <span>Cult of the LOLCOW</span>
                     </div>
                 </div>
-            </section>
+                
+                <p class="hero-subtitle fade-in-up" style="animation-delay: 0.8s;">
+                    Final-Year Computer Science Student specializing in Hardware & Physical Security. 
+                    20 years of hands-on experience in breaking and securing systems.
+                </p>
+                
+                <div class="hero-cta fade-in-up" style="animation-delay: 1s;">
+                    <a href="#contact" class="btn btn-primary">
+                        <span>Get In Touch</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#about" class="btn btn-secondary">
+                        <span>Learn More</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                </div>
+                
+                <div class="hero-social fade-in-up" style="animation-delay: 1.2s;">
+                    <a href="mailto:chewzhanhongint@gmail.com" class="social-link" aria-label="Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                    <a href="https://www.behelitsystems.com" class="social-link" target="_blank" aria-label="Behelit Systems">
+                        <i class="fas fa-globe"></i>
+                    </a>
+                    <a href="https://www.cultlolcow.com" class="social-link" target="_blank" aria-label="Cult of LOLCOW">
+                        <i class="fas fa-users"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-visual fade-in-right" style="animation-delay: 1.4s;">
+                <div class="profile-container">
+                    <div class="profile-glow"></div>
+                    <img src="public/profile.jpeg" alt="Chew Zhan Hong (Gabe)" class="profile-image">
+                    <div class="profile-ring"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <div class="scroll-line"></div>
+            <div class="scroll-text">Scroll</div>
+        </div>
+    </section>
 
-            <!-- About Section -->
-            <section id="about" class="py-24 scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-12">About Me</h2>
-                <div class="flex flex-col md:flex-row items-center gap-12">
-                    <div class="md:w-1/3">
-                        <img src="public/profile.jpeg" alt="Chew Zhan Hong (Gabe)" class="rounded-full shadow-lg mx-auto">
-                    </div>
-                    <div class="md:w-2/3">
-                        <p class="text-lg leading-relaxed mb-4">
-                            My passion for security didn't start in a classroom; it began 20 years ago with a relentless curiosity to understand how physical systems work by taking them apart. This deep, hands-on journey into hardware, firmware, and signal manipulation has given me a unique perspective on real-world attack surfaces.
-                        </p>
-                        <p class="text-lg leading-relaxed mb-4">
-                            Now, as a final-year Computer Science student at <strong>Sunway University</strong>, I am formalizing this deep, practical knowledge and applying it to the next generation of security challenges. I am driven by the challenge of understanding how systems break and using that knowledge to build more resilient defenses.
-                        </p>
+    <!-- About Section -->
+    <section id="about" class="section about-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">About Me</h2>
+                <p class="section-subtitle">Passionate about security, driven by curiosity</p>
+            </div>
+            
+            <div class="about-content">
+                <div class="about-text">
+                    <div class="about-story">
+                        <div class="story-item fade-in-up">
+                            <div class="story-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="story-content">
+                                <h3>The Beginning</h3>
+                                <p>My passion for security didn't start in a classroom; it began 20 years ago with a relentless curiosity to understand how physical systems work by taking them apart.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="story-item fade-in-up" style="animation-delay: 0.2s;">
+                            <div class="story-icon">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <div class="story-content">
+                                <h3>The Journey</h3>
+                                <p>This deep, hands-on journey into hardware, firmware, and signal manipulation has given me a unique perspective on real-world attack surfaces.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="story-item fade-in-up" style="animation-delay: 0.4s;">
+                            <div class="story-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="story-content">
+                                <h3>The Present</h3>
+                                <p>Now, as a final-year Computer Science student at Sunway University, I am formalizing this deep, practical knowledge and applying it to the next generation of security challenges.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="story-item fade-in-up" style="animation-delay: 0.6s;">
+                            <div class="story-icon">
+                                <i class="fas fa-target"></i>
+                            </div>
+                            <div class="story-content">
+                                <h3>The Mission</h3>
+                                <p>I am driven by the challenge of understanding how systems break and using that knowledge to build more resilient defenses.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
+                
+                <div class="about-stats">
+                    <div class="stat-grid">
+                        <div class="stat-item fade-in-up" style="animation-delay: 0.8s;">
+                            <div class="stat-number">20+</div>
+                            <div class="stat-label">Years Experience</div>
+                        </div>
+                        <div class="stat-item fade-in-up" style="animation-delay: 1s;">
+                            <div class="stat-number">#1</div>
+                            <div class="stat-label">TryHackMe Malaysia</div>
+                        </div>
+                        <div class="stat-item fade-in-up" style="animation-delay: 1.2s;">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Founded Companies</div>
+                        </div>
+                        <div class="stat-item fade-in-up" style="animation-delay: 1.4s;">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Support Tickets</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <!-- Experience Section -->
-            <section id="experience" class="py-24 scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-12">Experience & Education</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                        <h3 class="text-2xl font-bold mb-4 accent-text">Professional Experience</h3>
-                        <div class="space-y-6">
-                            <div class="border-l-4 border-blue-500 pl-4">
-                                <p class="font-semibold text-lg">Founder & CEO</p>
-                                <p class="text-sm opacity-80">Behelit Systems | Jul 2025 - Present</p>
-                                <p class="mt-2">Defining strategic vision, leading security engagements, and driving R&D in custom exploit development and AI-enhanced security.</p>
+    <!-- Experience Section -->
+    <section id="experience" class="section experience-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Experience & Education</h2>
+                <p class="section-subtitle">Building expertise through hands-on experience and continuous learning</p>
+            </div>
+            
+            <div class="experience-container">
+                <!-- Professional Experience -->
+                <div class="experience-category">
+                    <h3 class="category-title">
+                        <i class="fas fa-briefcase"></i>
+                        Professional Experience
+                    </h3>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item fade-in-up">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">Founder & CEO</h4>
+                                    <div class="timeline-meta">
+                                        <span class="timeline-company">Behelit Systems</span>
+                                        <span class="timeline-date">Jul 2025 - Present</span>
+                                    </div>
+                                </div>
+                                <p class="timeline-description">
+                                    Defining strategic vision, leading security engagements, and driving R&D in custom exploit development and AI-enhanced security.
+                                </p>
+                                <div class="timeline-tags">
+                                    <span class="tag">Leadership</span>
+                                    <span class="tag">AI Security</span>
+                                    <span class="tag">R&D</span>
+                                </div>
                             </div>
-                            <div class="border-l-4 border-blue-500 pl-4">
-                                <p class="font-semibold text-lg">IT Consultant</p>
-                                <p class="text-sm opacity-80">AIA Malaysia | Apr 2023 - Sep 2023</p>
-                                <p class="mt-2">Provided expert-level technical support, managed over 500 support tickets, and ensured minimal downtime for business operations.</p>
+                        </div>
+                        
+                        <div class="timeline-item fade-in-up" style="animation-delay: 0.2s;">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">IT Consultant</h4>
+                                    <div class="timeline-meta">
+                                        <span class="timeline-company">AIA Malaysia</span>
+                                        <span class="timeline-date">Apr 2023 - Sep 2023</span>
+                                    </div>
+                                </div>
+                                <p class="timeline-description">
+                                    Provided expert-level technical support, managed over 500 support tickets, and ensured minimal downtime for business operations.
+                                </p>
+                                <div class="timeline-tags">
+                                    <span class="tag">Technical Support</span>
+                                    <span class="tag">Problem Solving</span>
+                                    <span class="tag">System Management</span>
+                                </div>
                             </div>
-                            <div class="border-l-4 border-blue-500 pl-4">
-                                <p class="font-semibold text-lg">Blockchain Developer Intern</p>
-                                <p class="text-sm opacity-80">Gameconomy | May 2022 - Aug 2022</p>
-                                <p class="mt-2">Enhanced smart contracts, developed a blockscout explorer UI, and deployed an IBFT Private Whitelist Network.</p>
+                        </div>
+                        
+                        <div class="timeline-item fade-in-up" style="animation-delay: 0.4s;">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">Blockchain Developer Intern</h4>
+                                    <div class="timeline-meta">
+                                        <span class="timeline-company">Gameconomy</span>
+                                        <span class="timeline-date">May 2022 - Aug 2022</span>
+                                    </div>
+                                </div>
+                                <p class="timeline-description">
+                                    Enhanced smart contracts, developed a blockscout explorer UI, and deployed an IBFT Private Whitelist Network.
+                                </p>
+                                <div class="timeline-tags">
+                                    <span class="tag">Blockchain</span>
+                                    <span class="tag">Smart Contracts</span>
+                                    <span class="tag">Web Development</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Education -->
+                <div class="experience-category">
+                    <h3 class="category-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Education & Certifications
+                    </h3>
+                    
+                    <div class="education-grid">
+                        <div class="education-item fade-in-up">
+                            <div class="education-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="education-content">
+                                <h4>BSc in Computer Science</h4>
+                                <p class="education-institution">Sunway University & Lancaster University</p>
+                                <span class="education-date">2023 - 2027</span>
+                            </div>
+                        </div>
+                        
+                        <div class="education-item fade-in-up" style="animation-delay: 0.1s;">
+                            <div class="education-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="education-content">
+                                <h4>Diploma in Information Technology</h4>
+                                <p class="education-institution">HELP University</p>
+                                <span class="education-date">2020 - 2022</span>
+                            </div>
+                        </div>
+                        
+                        <div class="education-item fade-in-up" style="animation-delay: 0.2s;">
+                            <div class="education-icon">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <div class="education-content">
+                                <h4>Certificate in Information Technology</h4>
+                                <p class="education-institution">APU / APIIT</p>
+                                <span class="education-date">2018 - 2020</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                        <h3 class="text-2xl font-bold mb-4 accent-text">Education & Certifications</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <h4 class="font-semibold text-lg mb-2">Education</h4>
-                                <div class="space-y-2 text-sm">
-                                    <p><strong>BSc in Computer Science</strong><br>Sunway University & Lancaster University | 2023 - 2027</p>
-                                    <p><strong>Diploma in Information Technology</strong><br>HELP University | 2020 - 2022</p>
-                                    <p><strong>Certificate in Information Technology</strong><br>APU / APIIT | 2018 - 2020</p>
-                                </div>
+                    <div class="certifications">
+                        <h4 class="cert-title">Professional Certifications</h4>
+                        <div class="cert-grid">
+                            <div class="cert-item fade-in-up">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Offensive Pentesting Certificate</span>
                             </div>
-                            <div>
-                                <h4 class="font-semibold text-lg mb-2">Certifications</h4>
-                                <ul class="text-sm space-y-1">
-                                    <li>• Offensive Pentesting Certificate</li>
-                                    <li>• Jr Penetration Tester Certificate</li>
-                                    <li>• Web Application Pentesting Certificate</li>
-                                    <li>• SOC Level 1 Certificate</li>
-                                    <li>• Cyber Security 101 Certificate</li>
-                                </ul>
+                            <div class="cert-item fade-in-up" style="animation-delay: 0.1s;">
+                                <i class="fas fa-bug"></i>
+                                <span>Jr Penetration Tester Certificate</span>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Skills Section -->
-            <section id="skills" class="py-24 scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-12">Core Expertise & Technologies</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                    <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                        <h3 class="text-2xl font-bold mb-6 accent-text">Security Expertise</h3>
-                        <div class="grid grid-cols-1 gap-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span>Adversary Simulation & Red Teaming</span>
+                            <div class="cert-item fade-in-up" style="animation-delay: 0.2s;">
+                                <i class="fas fa-globe"></i>
+                                <span>Web Application Pentesting Certificate</span>
                             </div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span>Embedded Systems & Firmware Security</span>
+                            <div class="cert-item fade-in-up" style="animation-delay: 0.3s;">
+                                <i class="fas fa-eye"></i>
+                                <span>SOC Level 1 Certificate</span>
                             </div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span>Digital Forensics & Incident Response</span>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span>Exploit Development & Reverse Engineering</span>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span>Wireless & Signal-Based Attack Vectors</span>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span>Security Analysis & Blue Team Operations</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-bg p-8 rounded-lg shadow-lg animated-card">
-                        <h3 class="text-2xl font-bold mb-6 accent-text">Technical Skills</h3>
-                        <div class="space-y-6">
-                            <div>
-                                <h4 class="font-semibold mb-3">Systems & Low-Level</h4>
-                                <div class="flex flex-wrap gap-3">
-                                    <span class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-sm">C/C++</span>
-                                    <span class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-sm">Rust</span>
-                                    <span class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-sm">Assembly</span>
-                                    <span class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-sm">Go</span>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold mb-3">Web & Scripting</h4>
-                                <div class="flex flex-wrap gap-3">
-                                    <span class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm">Python</span>
-                                    <span class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm">JavaScript/TypeScript</span>
-                                    <span class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm">React</span>
-                                    <span class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm">Bash</span>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold mb-3">Infrastructure</h4>
-                                <div class="flex flex-wrap gap-3">
-                                    <span class="bg-purple-100 dark:bg-purple-900 px-3 py-1 rounded-full text-sm">Docker/Kubernetes</span>
-                                    <span class="bg-purple-100 dark:bg-purple-900 px-3 py-1 rounded-full text-sm">Linux</span>
-                                    <span class="bg-purple-100 dark:bg-purple-900 px-3 py-1 rounded-full text-sm">PostgreSQL</span>
-                                </div>
+                            <div class="cert-item fade-in-up" style="animation-delay: 0.4s;">
+                                <i class="fas fa-lock"></i>
+                                <span>Cyber Security 101 Certificate</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <!-- Ventures Section -->
-            <section id="ventures" class="py-24 scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-12">My Ventures</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="card-bg p-8 rounded-lg shadow-lg text-center animated-card">
-                        <h3 class="text-2xl font-bold mb-2">Behelit Systems</h3>
-                        <p class="accent-text font-semibold mb-4">Securing Physical Reality</p>
-                        <p class="mb-6">A security firm dedicated to securing the physical assets that traditional cybersecurity overlooks. We combine elite human expertise with a proprietary, self-hosted AI platform to solve complex commercial security problems.</p>
-                        <a href="https://www.behelitsystems.com" target="_blank" rel="noopener noreferrer" class="cta-button font-bold py-2 px-4 rounded-lg text-sm inline-block">Visit Website</a>
-                    </div>
-                    <div class="card-bg p-8 rounded-lg shadow-lg text-center animated-card">
-                        <h3 class="text-2xl font-bold mb-2">Cult of The LOLCOW (cLc)</h3>
-                        <p class="accent-text font-semibold mb-4">Malaysia's Hardware Hacking Community</p>
-                        <p class="mb-6">As Malaysia's first and only open-source hardware hacking community, cLc provides a sanctuary for curiosity-driven learning and acts as the R&D engine that drives our innovation.</p>
-                        <a href="https://www.cultlolcow.com" target="_blank" rel="noopener noreferrer" class="cta-button font-bold py-2 px-4 rounded-lg text-sm inline-block">Join the Community</a>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Contact Section -->
-            <section id="contact" class="py-24 text-center scroll-animate">
-                <h2 class="text-4xl font-bold text-center mb-4">Get In Touch</h2>
-                <p class="text-center text-lg opacity-80 mb-12 max-w-2xl mx-auto">I'm seeking strategic opportunities, including internships and collaborative projects. If you're working on innovative challenges at the intersection of hardware and software, I'd love to connect.</p>
-                <a href="mailto:chewzhanhongint@gmail.com" class="cta-button font-bold py-4 px-8 rounded-lg text-xl inline-block">
-                    Contact Me
-                </a>
-            </section>
-        </main>
-    </div>
-
-    <!-- Blog Page -->
-    <div id="blog-page" class="page-container">
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <header class="text-center mb-16 scroll-animate">
-                <h1 class="text-5xl font-bold">Blog & Write-Ups</h1>
-                <p class="text-xl mt-4 opacity-80">Thoughts on security, technology, and everything in between.</p>
-            </header>
-
-            <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Posts will be loaded here -->
             </div>
-        </main>
-    </div>
-
-    <!-- Post Modal -->
-    <div id="post-modal" class="modal">
-        <div class="modal-content card-bg">
-            <span class="close">&times;</span>
-            <article class="prose">
-                <h1 id="modal-post-title" class="text-4xl font-bold mb-4"></h1>
-                <p id="modal-post-meta" class="text-lg opacity-70 mb-8"></p>
-                <div id="modal-post-body"></div>
-            </article>
         </div>
-    </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section skills-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Core Expertise & Technologies</h2>
+                <p class="section-subtitle">Comprehensive skill set spanning security, development, and infrastructure</p>
+            </div>
+            
+            <div class="skills-container">
+                <div class="skill-category fade-in-up">
+                    <div class="skill-header">
+                        <div class="skill-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Security Expertise</h3>
+                    </div>
+                    <div class="skill-list">
+                        <div class="skill-item">Penetration Testing</div>
+                        <div class="skill-item">Hardware Security</div>
+                        <div class="skill-item">Physical Security</div>
+                        <div class="skill-item">Firmware Analysis</div>
+                        <div class="skill-item">Signal Manipulation</div>
+                        <div class="skill-item">Exploit Development</div>
+                        <div class="skill-item">OSINT</div>
+                        <div class="skill-item">SOC Operations</div>
+                    </div>
+                </div>
+                
+                <div class="skill-category fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="skill-header">
+                        <div class="skill-icon">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <h3>Systems & Low-Level</h3>
+                    </div>
+                    <div class="skill-list">
+                        <div class="skill-item">Assembly Language</div>
+                        <div class="skill-item">Reverse Engineering</div>
+                        <div class="skill-item">Embedded Systems</div>
+                        <div class="skill-item">IoT Security</div>
+                        <div class="skill-item">Binary Analysis</div>
+                        <div class="skill-item">Memory Forensics</div>
+                        <div class="skill-item">Hardware Debugging</div>
+                        <div class="skill-item">JTAG/SWD</div>
+                    </div>
+                </div>
+                
+                <div class="skill-category fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="skill-header">
+                        <div class="skill-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h3>Web & Scripting</h3>
+                    </div>
+                    <div class="skill-list">
+                        <div class="skill-item">Python</div>
+                        <div class="skill-item">JavaScript</div>
+                        <div class="skill-item">C/C++</div>
+                        <div class="skill-item">Go</div>
+                        <div class="skill-item">Rust</div>
+                        <div class="skill-item">Web3/Solidity</div>
+                        <div class="skill-item">React</div>
+                        <div class="skill-item">Node.js</div>
+                    </div>
+                </div>
+                
+                <div class="skill-category fade-in-up" style="animation-delay: 0.6s;">
+                    <div class="skill-header">
+                        <div class="skill-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <h3>Infrastructure</h3>
+                    </div>
+                    <div class="skill-list">
+                        <div class="skill-item">Linux Administration</div>
+                        <div class="skill-item">Docker/Kubernetes</div>
+                        <div class="skill-item">AWS/GCP</div>
+                        <div class="skill-item">Network Security</div>
+                        <div class="skill-item">CI/CD</div>
+                        <div class="skill-item">IaC (Terraform)</div>
+                        <div class="skill-item">Monitoring</div>
+                        <div class="skill-item">Incident Response</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ventures Section -->
+    <section id="ventures" class="section ventures-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">My Ventures</h2>
+                <p class="section-subtitle">Building the future of security through innovation and community</p>
+            </div>
+            
+            <div class="ventures-container">
+                <div class="venture-card fade-in-up">
+                    <div class="venture-header">
+                        <div class="venture-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="venture-badge">Company</div>
+                    </div>
+                    <div class="venture-content">
+                        <h3 class="venture-title">Behelit Systems</h3>
+                        <p class="venture-tagline">Securing Physical Reality</p>
+                        <p class="venture-description">
+                            A security firm dedicated to securing the physical assets that traditional cybersecurity overlooks. 
+                            We combine elite human expertise with a proprietary, self-hosted AI platform to solve complex commercial security problems.
+                        </p>
+                        <div class="venture-features">
+                            <div class="feature">
+                                <i class="fas fa-robot"></i>
+                                <span>AI-Enhanced Security</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-shield"></i>
+                                <span>Physical Security</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-users"></i>
+                                <span>Elite Expertise</span>
+                            </div>
+                        </div>
+                        <a href="https://www.behelitsystems.com" class="venture-link" target="_blank">
+                            <span>Visit Website</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="venture-card fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="venture-header">
+                        <div class="venture-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="venture-badge">Community</div>
+                    </div>
+                    <div class="venture-content">
+                        <h3 class="venture-title">Cult of The LOLCOW (cLc)</h3>
+                        <p class="venture-tagline">Malaysia's Hardware Hacking Community</p>
+                        <p class="venture-description">
+                            As Malaysia's first and only open-source hardware hacking community, cLc provides a sanctuary for 
+                            curiosity-driven learning and acts as the R&D engine that drives our innovation.
+                        </p>
+                        <div class="venture-features">
+                            <div class="feature">
+                                <i class="fas fa-code"></i>
+                                <span>Open Source</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-microchip"></i>
+                                <span>Hardware Hacking</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>R&D Innovation</span>
+                            </div>
+                        </div>
+                        <a href="https://www.cultlolcow.com" class="venture-link" target="_blank">
+                            <span>Join the Community</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section contact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get In Touch</h2>
+                <p class="section-subtitle">Ready to collaborate on innovative security challenges</p>
+            </div>
+            
+            <div class="contact-container">
+                <div class="contact-content fade-in-up">
+                    <div class="contact-text">
+                        <p>
+                            I'm seeking strategic opportunities, including internships and collaborative projects. 
+                            If you're working on innovative challenges at the intersection of hardware and software, 
+                            I'd love to connect and explore how we can build more secure systems together.
+                        </p>
+                    </div>
+                    
+                    <div class="contact-methods">
+                        <a href="mailto:chewzhanhongint@gmail.com" class="contact-method">
+                            <div class="method-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="method-content">
+                                <h4>Email</h4>
+                                <p>chewzhanhongint@gmail.com</p>
+                            </div>
+                        </a>
+                        
+                        <a href="https://www.behelitsystems.com" class="contact-method" target="_blank">
+                            <div class="method-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="method-content">
+                                <h4>Behelit Systems</h4>
+                                <p>behelitsystems.com</p>
+                            </div>
+                        </a>
+                        
+                        <a href="https://www.cultlolcow.com" class="contact-method" target="_blank">
+                            <div class="method-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="method-content">
+                                <h4>Cult of LOLCOW</h4>
+                                <p>cultlolcow.com</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="border-t border-color">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex justify-center space-x-6 mb-4">
-                <a href="https://github.com/gluppler" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors" title="GitHub">
-                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
-                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
-                    </svg>
-                </a>
-                <a href="https://www.linkedin.com/in/gabechewzhanhong" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors" title="LinkedIn">
-                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                    </svg>
-                </a>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-text">
+                    <p>&copy; 2025 Chew Zhan Hong (Gabe). All rights reserved.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="mailto:chewzhanhongint@gmail.com">Email</a>
+                    <a href="https://www.behelitsystems.com" target="_blank">Behelit Systems</a>
+                    <a href="https://www.cultlolcow.com" target="_blank">Cult of LOLCOW</a>
+                </div>
             </div>
-            <p class="opacity-80">&copy; 2025 Chew Zhan Hong (Gabe). All Rights Reserved.</p>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
 </body>
 </html>
