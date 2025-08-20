@@ -304,7 +304,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 If you have any questions or need help customizing the portfolio:
 
-- **Email**: contact@gabechew.dev
+- **Email**: chewzhanhongint@gmail.com
 - **GitHub Issues**: [Create an issue](https://github.com/gluppler/GabeChewZhanHong/issues)
 - **Documentation**: Check the inline code comments
 
