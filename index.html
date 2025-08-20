@@ -3,392 +3,977 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chew Zhan Hong (Gabe) - Security Specialist & Founder</title>
-    <meta name="description" content="Founder of Behelit Systems, Hardware & Physical Security Specialist, Ranked #1 on TryHackMe Malaysia">
-    <meta name="keywords" content="cybersecurity, hardware security, penetration testing, blockchain developer">
-    
-    <!-- Fonts -->
+    <title>Gabe Chew Zhan Hong - Portfolio</title>
+    <link rel="icon" href="./public/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/animations.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
-</head>
-<body>
-    <!-- Animated Background -->
-    <div class="bg-animation">
-        <div class="floating-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-            <div class="shape shape-4"></div>
-            <div class="shape shape-5"></div>
-        </div>
-        <div class="grid-overlay"></div>
-    </div>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for Theme System */
+        :root {
+            /* Light Theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --accent-primary: #2563eb;
+            --accent-secondary: #1e40af;
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
 
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #2563eb;
+            --border-light: #334155;
+            --border-medium: #475569;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            transition: all 0.3s ease;
+        }
+
+        /* Grid System - Swiss Design Inspired */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        /* Swiss Grid Layout */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .col-12 { grid-column: span 12; }
+        .col-6 { grid-column: span 6; }
+        .col-4 { grid-column: span 4; }
+        .col-3 { grid-column: span 3; }
+
+        @media (max-width: 768px) {
+            .col-6, .col-4, .col-3 {
+                grid-column: span 12;
+            }
+        }
+
+        /* Navigation */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--accent-primary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--border-medium);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-primary);
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-medium);
+        }
+
+        .btn-outline:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--accent-primary);
+            border-radius: 2px;
+        }
+
+        /* Card Components */
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-primary);
+        }
+
+        .card-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .card-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .card-footer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* Project Cards */
+        .project-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            background: var(--accent-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .skill-item {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .skill-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .profile-image {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .about-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+
+        /* Contact Section */
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                border: 1px solid var(--border-light);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body data-theme="light">
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <nav class="nav">
         <div class="nav-container">
-            <div class="nav-logo">
-                <span class="logo-text">Gabe<span class="accent">.</span></span>
-            </div>
-            
-            <ul class="nav-menu" id="nav-menu">
-                <li class="nav-item">
-                    <a href="#home" class="nav-link" data-section="home">
-                        <i class="fas fa-home"></i>
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#about" class="nav-link" data-section="about">
-                        <i class="fas fa-user"></i>
-                        <span>About</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#experience" class="nav-link" data-section="experience">
-                        <i class="fas fa-briefcase"></i>
-                        <span>Experience</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#skills" class="nav-link" data-section="skills">
-                        <i class="fas fa-code"></i>
-                        <span>Skills</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#ventures" class="nav-link" data-section="ventures">
-                        <i class="fas fa-rocket"></i>
-                        <span>Ventures</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#contact" class="nav-link" data-section="contact">
-                        <i class="fas fa-envelope"></i>
-                        <span>Contact</span>
-                    </a>
+            <a href="#" class="nav-logo">GC</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#projects" class="nav-link">Projects</a></li>
+                <li><a href="#writeups" class="nav-link">Write-ups</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <span id="themeIcon">🌙</span>
+                    </button>
                 </li>
             </ul>
-            
-            <div class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="hero-container">
+        <div class="container">
             <div class="hero-content">
-                <div class="hero-badge fade-in-up" style="animation-delay: 0.2s;">
-                    <i class="fas fa-trophy"></i>
-                    <span>Ranked #1 on TryHackMe Malaysia</span>
-                </div>
-                
-                <h1 class="hero-title fade-in-up" style="animation-delay: 0.4s;">
-                    <span class="typing-text">Chew Zhan Hong</span>
-                    <span class="title-accent">(Gabe)</span>
-                </h1>
-                
-                <div class="hero-roles fade-in-up" style="animation-delay: 0.6s;">
-                    <div class="role-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Security Specialist</span>
-                    </div>
-                    <div class="role-separator">•</div>
-                    <div class="role-item">
-                        <i class="fas fa-building"></i>
-                        <span>Founder, Behelit Systems</span>
-                    </div>
-                    <div class="role-separator">•</div>
-                    <div class="role-item">
-                        <i class="fas fa-users"></i>
-                        <span>Cult of the LOLCOW</span>
-                    </div>
-                </div>
-                
-                <p class="hero-subtitle fade-in-up" style="animation-delay: 0.8s;">
-                    Final-Year Computer Science Student specializing in Hardware & Physical Security. 
-                    20 years of hands-on experience in breaking and securing systems.
+                <h1 class="hero-title">Gabe Chew Zhan Hong</h1>
+                <p class="hero-subtitle">
+                    Full-Stack Developer & Security Researcher specializing in modern web technologies 
+                    and cybersecurity solutions. Passionate about creating impactful digital experiences.
                 </p>
-                
-                <div class="hero-cta fade-in-up" style="animation-delay: 1s;">
-                    <a href="#contact" class="btn btn-primary">
-                        <span>Get In Touch</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                    <a href="#about" class="btn btn-secondary">
-                        <span>Learn More</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </a>
-                </div>
-                
-                <div class="hero-social fade-in-up" style="animation-delay: 1.2s;">
-                    <a href="mailto:chewzhanhongint@gmail.com" class="social-link" aria-label="Email">
-                        <i class="fas fa-envelope"></i>
-                    </a>
-                    <a href="https://www.behelitsystems.com" class="social-link" target="_blank" aria-label="Behelit Systems">
-                        <i class="fas fa-globe"></i>
-                    </a>
-                    <a href="https://www.cultlolcow.com" class="social-link" target="_blank" aria-label="Cult of LOLCOW">
-                        <i class="fas fa-users"></i>
-                    </a>
-                </div>
+                <div class="hero-cta">
+                    <a href="mailto:contact@example.com" class="social-link" target="_blank" aria-label="Email">
+                    <span>✉️</span>
+                </a>
+                <a href="https://twitter.com" class="social-link" target="_blank" aria-label="Twitter">
+                    <span>🐦</span>
+                </a>
             </div>
-            
-            <div class="hero-visual fade-in-right" style="animation-delay: 1.4s;">
-                <div class="profile-container">
-                    <div class="profile-glow"></div>
-                    <img src="public/profile.jpeg" alt="Chew Zhan Hong (Gabe)" class="profile-image">
-                    <div class="profile-ring"></div>
-                </div>
+            <p>&copy; 2025 Gabe Chew Zhan Hong. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modal for Write-ups -->
+    <div id="writeupModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="writeupContent">
+                <!-- Write-up content will be loaded here -->
             </div>
         </div>
-        
-        <div class="scroll-indicator">
-            <div class="scroll-line"></div>
-            <div class="scroll-text">Scroll</div>
+    </div>
+
+    <script>
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        // Check for saved theme preference or default to 'light'
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', currentTheme);
+        updateThemeIcon(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+        }
+
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Smooth Scrolling for Navigation Links
+        document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Close mobile menu if open
+                navLinks.classList.remove('active');
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Scroll-based Navigation Highlighting
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const scrollPosition = window.scrollY + 100;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                const sectionId = section.getAttribute('id');
+                
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    
+                    const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                    }
+                }
+            });
+        });
+
+        // Contact Form Handling
+        const contactForm = document.getElementById('contactForm');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(contactForm);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const message = formData.get('message');
+            
+            // Simple form validation and submission simulation
+            if (name && email && message) {
+                alert('Thank you for your message! I\'ll get back to you soon.');
+                contactForm.reset();
+            } else {
+                alert('Please fill in all fields.');
+            }
+        });
+
+        // Write-up Modal Functions
+        function loadWriteup(slug) {
+            const modal = document.getElementById('writeupModal');
+            const content = document.getElementById('writeupContent');
+            
+            // Sample content - in real implementation, this would fetch from markdown files
+            const sampleContent = {
+                'assembly-deep-dive': {
+                    title: 'Assembly Deep Dive: Understanding Low-Level Computing',
+                    date: 'August 15, 2025',
+                    content: `
+                        <h1>Assembly Deep Dive: Understanding Low-Level Computing</h1>
+                        <p><em>Published on August 15, 2025</em></p>
+                        
+                        <h2>Introduction</h2>
+                        <p>Assembly language represents the lowest level of programming accessible to most developers, sitting just above machine code in the abstraction hierarchy. This write-up explores the fundamental concepts of assembly programming and its relevance in modern computing.</p>
+                        
+                        <h2>Key Concepts</h2>
+                        <p>Understanding assembly requires grasping several core concepts:</p>
+                        <ul>
+                            <li><strong>Registers:</strong> High-speed storage locations within the CPU</li>
+                            <li><strong>Instructions:</strong> Basic operations that the processor can execute</li>
+                            <li><strong>Memory Addressing:</strong> Methods for accessing data in memory</li>
+                            <li><strong>Stack Operations:</strong> Managing the call stack for function calls</li>
+                        </ul>
+                        
+                        <h2>Practical Applications</h2>
+                        <p>While high-level languages dominate modern development, assembly knowledge remains crucial for:</p>
+                        <ul>
+                            <li>Performance optimization in critical code paths</li>
+                            <li>Understanding security vulnerabilities</li>
+                            <li>Embedded systems programming</li>
+                            <li>Reverse engineering and malware analysis</li>
+                        </ul>
+                        
+                        <h2>Conclusion</h2>
+                        <p>Assembly language programming provides invaluable insights into how computers actually work at the hardware level. This knowledge enhances our ability to write efficient code and understand system behavior.</p>
+                    `
+                },
+                'the-needle-writeup': {
+                    title: 'The Needle CTF Writeup: Advanced Penetration Testing',
+                    date: 'August 10, 2025',
+                    content: `
+                        <h1>The Needle CTF Writeup: Advanced Penetration Testing</h1>
+                        <p><em>Published on August 10, 2025</em></p>
+                        
+                        <h2>Challenge Overview</h2>
+                        <p>"The Needle" was a challenging CTF that required multiple exploitation techniques and creative thinking to solve. The challenge simulated a real-world penetration testing scenario.</p>
+                        
+                        <h2>Initial Reconnaissance</h2>
+                        <p>The first step involved thorough reconnaissance using various tools:</p>
+                        <ul>
+                            <li>Port scanning with Nmap</li>
+                            <li>Service enumeration</li>
+                            <li>Web application analysis</li>
+                            <li>Directory brute-forcing</li>
+                        </ul>
+                        
+                        <h2>Exploitation Phase</h2>
+                        <p>After identifying potential vulnerabilities, I proceeded with the exploitation phase, which involved:</p>
+                        <ul>
+                            <li>SQL injection to bypass authentication</li>
+                            <li>File upload vulnerability exploitation</li>
+                            <li>Privilege escalation through misconfigured services</li>
+                        </ul>
+                        
+                        <h2>Lessons Learned</h2>
+                        <p>This challenge reinforced several important security concepts and the importance of defense in depth.</p>
+                    `
+                },
+                'web-security-2025': {
+                    title: 'Modern Web Security: Best Practices for 2025',
+                    date: 'August 5, 2025',
+                    content: `
+                        <h1>Modern Web Security: Best Practices for 2025</h1>
+                        <p><em>Published on August 5, 2025</em></p>
+                        
+                        <h2>Introduction</h2>
+                        <p>As web applications become increasingly complex, security considerations must evolve to address new threats and vulnerabilities. This guide covers essential security practices for modern web development.</p>
+                        
+                        <h2>Authentication & Authorization</h2>
+                        <p>Robust authentication mechanisms are the foundation of web security:</p>
+                        <ul>
+                            <li>Multi-factor authentication implementation</li>
+                            <li>Secure session management</li>
+                            <li>JWT token security best practices</li>
+                            <li>OAuth 2.0 and OpenID Connect</li>
+                        </ul>
+                        
+                        <h2>Common Vulnerabilities</h2>
+                        <p>Understanding and preventing common security issues:</p>
+                        <ul>
+                            <li>Cross-Site Scripting (XSS) prevention</li>
+                            <li>SQL injection mitigation</li>
+                            <li>Cross-Site Request Forgery (CSRF) protection</li>
+                            <li>Insecure deserialization</li>
+                        </ul>
+                        
+                        <h2>Security Headers</h2>
+                        <p>Implementing proper HTTP security headers to enhance client-side security.</p>
+                        
+                        <h2>Conclusion</h2>
+                        <p>Security is an ongoing process that requires constant vigilance and adaptation to new threats.</p>
+                    `
+                }
+            };
+            
+            const writeup = sampleContent[slug];
+            if (writeup) {
+                content.innerHTML = writeup.content;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('writeupModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('writeupModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                closeModal();
+            }
+        });
+
+        // Escape key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Animation on Scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document.querySelectorAll('.card, .section').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Dynamic Projects Loading (placeholder for future implementation)
+        function loadProjects() {
+            // This would typically fetch from a JSON file or API
+            // For now, the projects are hardcoded in HTML
+            console.log('Projects loaded from static content');
+        }
+
+        // Dynamic Write-ups Loading (placeholder for future implementation)
+        function loadWriteups() {
+            // This would typically fetch from writeups.json
+            // For now, the write-ups are hardcoded in HTML
+            console.log('Write-ups loaded from static content');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+            loadWriteups();
+            
+            // Add loading animation to elements
+            setTimeout(() => {
+                document.querySelectorAll('.card').forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 300);
+        });
+
+        // Performance optimization: Debounced scroll handler
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Apply debounced scroll handler
+        const debouncedScrollHandler = debounce(() => {
+            // Additional scroll-based functionality can be added here
+        }, 100);
+
+        window.addEventListener('scroll', debouncedScrollHandler);
+    </script>
+</body>
+</html>="#projects" class="btn btn-primary">View My Work</a>
+                    <a href="./public/ResumeCV.pdf" class="btn btn-outline" target="_blank">Download Resume</a>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- About Section -->
-    <section id="about" class="section about-section">
+    <section id="about" class="section">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">About Me</h2>
-                <p class="section-subtitle">Passionate about security, driven by curiosity</p>
-            </div>
-            
+            <h2 class="section-title">About Me</h2>
             <div class="about-content">
-                <div class="about-text">
-                    <div class="about-story">
-                        <div class="story-item fade-in-up">
-                            <div class="story-icon">
-                                <i class="fas fa-bolt"></i>
-                            </div>
-                            <div class="story-content">
-                                <h3>The Beginning</h3>
-                                <p>My passion for security didn't start in a classroom; it began 20 years ago with a relentless curiosity to understand how physical systems work by taking them apart.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="story-item fade-in-up" style="animation-delay: 0.2s;">
-                            <div class="story-icon">
-                                <i class="fas fa-microchip"></i>
-                            </div>
-                            <div class="story-content">
-                                <h3>The Journey</h3>
-                                <p>This deep, hands-on journey into hardware, firmware, and signal manipulation has given me a unique perspective on real-world attack surfaces.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="story-item fade-in-up" style="animation-delay: 0.4s;">
-                            <div class="story-icon">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <div class="story-content">
-                                <h3>The Present</h3>
-                                <p>Now, as a final-year Computer Science student at Sunway University, I am formalizing this deep, practical knowledge and applying it to the next generation of security challenges.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="story-item fade-in-up" style="animation-delay: 0.6s;">
-                            <div class="story-icon">
-                                <i class="fas fa-target"></i>
-                            </div>
-                            <div class="story-content">
-                                <h3>The Mission</h3>
-                                <p>I am driven by the challenge of understanding how systems break and using that knowledge to build more resilient defenses.</p>
-                            </div>
-                        </div>
-                    </div>
+                <div>
+                    <img src="./public/profile.jpeg" alt="Gabe Chew Zhan Hong" class="profile-image">
                 </div>
-                
-                <div class="about-stats">
-                    <div class="stat-grid">
-                        <div class="stat-item fade-in-up" style="animation-delay: 0.8s;">
-                            <div class="stat-number">20+</div>
-                            <div class="stat-label">Years Experience</div>
-                        </div>
-                        <div class="stat-item fade-in-up" style="animation-delay: 1s;">
-                            <div class="stat-number">#1</div>
-                            <div class="stat-label">TryHackMe Malaysia</div>
-                        </div>
-                        <div class="stat-item fade-in-up" style="animation-delay: 1.2s;">
-                            <div class="stat-number">2</div>
-                            <div class="stat-label">Founded Companies</div>
-                        </div>
-                        <div class="stat-item fade-in-up" style="animation-delay: 1.4s;">
-                            <div class="stat-number">500+</div>
-                            <div class="stat-label">Support Tickets</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Experience Section -->
-    <section id="experience" class="section experience-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Experience & Education</h2>
-                <p class="section-subtitle">Building expertise through hands-on experience and continuous learning</p>
-            </div>
-            
-            <div class="experience-container">
-                <!-- Professional Experience -->
-                <div class="experience-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-briefcase"></i>
-                        Professional Experience
-                    </h3>
-                    
-                    <div class="timeline">
-                        <div class="timeline-item fade-in-up">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <div class="timeline-header">
-                                    <h4 class="timeline-title">Founder & CEO</h4>
-                                    <div class="timeline-meta">
-                                        <span class="timeline-company">Behelit Systems</span>
-                                        <span class="timeline-date">Jul 2025 - Present</span>
-                                    </div>
-                                </div>
-                                <p class="timeline-description">
-                                    Defining strategic vision, leading security engagements, and driving R&D in custom exploit development and AI-enhanced security.
-                                </p>
-                                <div class="timeline-tags">
-                                    <span class="tag">Leadership</span>
-                                    <span class="tag">AI Security</span>
-                                    <span class="tag">R&D</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-item fade-in-up" style="animation-delay: 0.2s;">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <div class="timeline-header">
-                                    <h4 class="timeline-title">IT Consultant</h4>
-                                    <div class="timeline-meta">
-                                        <span class="timeline-company">AIA Malaysia</span>
-                                        <span class="timeline-date">Apr 2023 - Sep 2023</span>
-                                    </div>
-                                </div>
-                                <p class="timeline-description">
-                                    Provided expert-level technical support, managed over 500 support tickets, and ensured minimal downtime for business operations.
-                                </p>
-                                <div class="timeline-tags">
-                                    <span class="tag">Technical Support</span>
-                                    <span class="tag">Problem Solving</span>
-                                    <span class="tag">System Management</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-item fade-in-up" style="animation-delay: 0.4s;">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <div class="timeline-header">
-                                    <h4 class="timeline-title">Blockchain Developer Intern</h4>
-                                    <div class="timeline-meta">
-                                        <span class="timeline-company">Gameconomy</span>
-                                        <span class="timeline-date">May 2022 - Aug 2022</span>
-                                    </div>
-                                </div>
-                                <p class="timeline-description">
-                                    Enhanced smart contracts, developed a blockscout explorer UI, and deployed an IBFT Private Whitelist Network.
-                                </p>
-                                <div class="timeline-tags">
-                                    <span class="tag">Blockchain</span>
-                                    <span class="tag">Smart Contracts</span>
-                                    <span class="tag">Web Development</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Education -->
-                <div class="experience-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-graduation-cap"></i>
-                        Education & Certifications
-                    </h3>
-                    
-                    <div class="education-grid">
-                        <div class="education-item fade-in-up">
-                            <div class="education-icon">
-                                <i class="fas fa-university"></i>
-                            </div>
-                            <div class="education-content">
-                                <h4>BSc in Computer Science</h4>
-                                <p class="education-institution">Sunway University & Lancaster University</p>
-                                <span class="education-date">2023 - 2027</span>
-                            </div>
-                        </div>
-                        
-                        <div class="education-item fade-in-up" style="animation-delay: 0.1s;">
-                            <div class="education-icon">
-                                <i class="fas fa-certificate"></i>
-                            </div>
-                            <div class="education-content">
-                                <h4>Diploma in Information Technology</h4>
-                                <p class="education-institution">HELP University</p>
-                                <span class="education-date">2020 - 2022</span>
-                            </div>
-                        </div>
-                        
-                        <div class="education-item fade-in-up" style="animation-delay: 0.2s;">
-                            <div class="education-icon">
-                                <i class="fas fa-award"></i>
-                            </div>
-                            <div class="education-content">
-                                <h4>Certificate in Information Technology</h4>
-                                <p class="education-institution">APU / APIIT</p>
-                                <span class="education-date">2018 - 2020</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="certifications">
-                        <h4 class="cert-title">Professional Certifications</h4>
-                        <div class="cert-grid">
-                            <div class="cert-item fade-in-up">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>Offensive Pentesting Certificate</span>
-                            </div>
-                            <div class="cert-item fade-in-up" style="animation-delay: 0.1s;">
-                                <i class="fas fa-bug"></i>
-                                <span>Jr Penetration Tester Certificate</span>
-                            </div>
-                            <div class="cert-item fade-in-up" style="animation-delay: 0.2s;">
-                                <i class="fas fa-globe"></i>
-                                <span>Web Application Pentesting Certificate</span>
-                            </div>
-                            <div class="cert-item fade-in-up" style="animation-delay: 0.3s;">
-                                <i class="fas fa-eye"></i>
-                                <span>SOC Level 1 Certificate</span>
-                            </div>
-                            <div class="cert-item fade-in-up" style="animation-delay: 0.4s;">
-                                <i class="fas fa-lock"></i>
-                                <span>Cyber Security 101 Certificate</span>
-                            </div>
-                        </div>
+                <div>
+                    <div class="about-text">
+                        <p>
+                            I'm a passionate developer with expertise in full-stack development, cybersecurity, 
+                            and modern web technologies. With a strong foundation in both frontend and backend 
+                            development, I create robust, scalable solutions that solve real-world problems.
+                        </p>
+                        <p>
+                            My journey in technology spans across various domains including web development, 
+                            security research, and system architecture. I'm constantly learning and adapting 
+                            to new technologies to deliver cutting-edge solutions.
+                        </p>
+                        <p>
+                            When I'm not coding, you can find me exploring new technologies, contributing to 
+                            open-source projects, or sharing knowledge through technical write-ups and community engagement.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -396,169 +981,146 @@
     </section>
 
     <!-- Skills Section -->
-    <section id="skills" class="section skills-section">
+    <section class="section" style="background: var(--bg-secondary);">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Core Expertise & Technologies</h2>
-                <p class="section-subtitle">Comprehensive skill set spanning security, development, and infrastructure</p>
+            <h2 class="section-title">Technical Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-item">
+                    <div class="skill-icon">⚛️</div>
+                    <div class="skill-name">React/Next.js</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🟢</div>
+                    <div class="skill-name">Node.js</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🐍</div>
+                    <div class="skill-name">Python</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🔒</div>
+                    <div class="skill-name">Cybersecurity</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🗄️</div>
+                    <div class="skill-name">Databases</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">☁️</div>
+                    <div class="skill-name">Cloud Services</div>
+                </div>
             </div>
-            
-            <div class="skills-container">
-                <div class="skill-category fade-in-up">
-                    <div class="skill-header">
-                        <div class="skill-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h3>Security Expertise</h3>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <div class="container">
+            <h2 class="section-title">Featured Projects</h2>
+            <div class="grid grid-3" id="projectsGrid">
+                <!-- Projects will be loaded dynamically -->
+                <div class="card project-card">
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=200&fit=crop" alt="Project 1" class="project-image">
+                    <div class="card-header">
+                        <h3 class="card-title">Example Project 1</h3>
+                        <p class="card-subtitle">Full-Stack Web Application</p>
                     </div>
-                    <div class="skill-list">
-                        <div class="skill-item">Penetration Testing</div>
-                        <div class="skill-item">Hardware Security</div>
-                        <div class="skill-item">Physical Security</div>
-                        <div class="skill-item">Firmware Analysis</div>
-                        <div class="skill-item">Signal Manipulation</div>
-                        <div class="skill-item">Exploit Development</div>
-                        <div class="skill-item">OSINT</div>
-                        <div class="skill-item">SOC Operations</div>
+                    <div class="card-content">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <div class="project-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">Node.js</span>
+                            <span class="tag">MongoDB</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="https://github.com/gluppler" class="btn btn-primary" target="_blank">View on GitHub</a>
                     </div>
                 </div>
                 
-                <div class="skill-category fade-in-up" style="animation-delay: 0.2s;">
-                    <div class="skill-header">
-                        <div class="skill-icon">
-                            <i class="fas fa-microchip"></i>
-                        </div>
-                        <h3>Systems & Low-Level</h3>
+                <div class="card project-card">
+                    <img src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=600&h=200&fit=crop" alt="Project 2" class="project-image">
+                    <div class="card-header">
+                        <h3 class="card-title">Security Analysis Tool</h3>
+                        <p class="card-subtitle">Cybersecurity Research</p>
                     </div>
-                    <div class="skill-list">
-                        <div class="skill-item">Assembly Language</div>
-                        <div class="skill-item">Reverse Engineering</div>
-                        <div class="skill-item">Embedded Systems</div>
-                        <div class="skill-item">IoT Security</div>
-                        <div class="skill-item">Binary Analysis</div>
-                        <div class="skill-item">Memory Forensics</div>
-                        <div class="skill-item">Hardware Debugging</div>
-                        <div class="skill-item">JTAG/SWD</div>
+                    <div class="card-content">
+                        <p>Advanced security analysis tool for vulnerability assessment and penetration testing. Built with Python and modern security frameworks.</p>
+                        <div class="project-tags">
+                            <span class="tag">Python</span>
+                            <span class="tag">Security</span>
+                            <span class="tag">CLI</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="https://github.com/gluppler" class="btn btn-primary" target="_blank">View on GitHub</a>
                     </div>
                 </div>
                 
-                <div class="skill-category fade-in-up" style="animation-delay: 0.4s;">
-                    <div class="skill-header">
-                        <div class="skill-icon">
-                            <i class="fas fa-code"></i>
+                <div class="card project-card">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=200&fit=crop" alt="Project 3" class="project-image">
+                    <div class="card-header">
+                        <h3 class="card-title">Data Visualization Dashboard</h3>
+                        <p class="card-subtitle">Analytics & Insights</p>
+                    </div>
+                    <div class="card-content">
+                        <p>Interactive dashboard for real-time data visualization and business intelligence. Features advanced charting and filtering capabilities.</p>
+                        <div class="project-tags">
+                            <span class="tag">JavaScript</span>
+                            <span class="tag">D3.js</span>
+                            <span class="tag">API</span>
                         </div>
-                        <h3>Web & Scripting</h3>
                     </div>
-                    <div class="skill-list">
-                        <div class="skill-item">Python</div>
-                        <div class="skill-item">JavaScript</div>
-                        <div class="skill-item">C/C++</div>
-                        <div class="skill-item">Go</div>
-                        <div class="skill-item">Rust</div>
-                        <div class="skill-item">Web3/Solidity</div>
-                        <div class="skill-item">React</div>
-                        <div class="skill-item">Node.js</div>
-                    </div>
-                </div>
-                
-                <div class="skill-category fade-in-up" style="animation-delay: 0.6s;">
-                    <div class="skill-header">
-                        <div class="skill-icon">
-                            <i class="fas fa-server"></i>
-                        </div>
-                        <h3>Infrastructure</h3>
-                    </div>
-                    <div class="skill-list">
-                        <div class="skill-item">Linux Administration</div>
-                        <div class="skill-item">Docker/Kubernetes</div>
-                        <div class="skill-item">AWS/GCP</div>
-                        <div class="skill-item">Network Security</div>
-                        <div class="skill-item">CI/CD</div>
-                        <div class="skill-item">IaC (Terraform)</div>
-                        <div class="skill-item">Monitoring</div>
-                        <div class="skill-item">Incident Response</div>
+                    <div class="card-footer">
+                        <a href="https://github.com/gluppler" class="btn btn-primary" target="_blank">View on GitHub</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Ventures Section -->
-    <section id="ventures" class="section ventures-section">
+    <!-- Write-ups Section -->
+    <section id="writeups" class="section" style="background: var(--bg-secondary);">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">My Ventures</h2>
-                <p class="section-subtitle">Building the future of security through innovation and community</p>
-            </div>
-            
-            <div class="ventures-container">
-                <div class="venture-card fade-in-up">
-                    <div class="venture-header">
-                        <div class="venture-icon">
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <div class="venture-badge">Company</div>
+            <h2 class="section-title">Technical Write-ups</h2>
+            <div class="grid grid-2" id="writeupsGrid">
+                <!-- Write-ups will be loaded dynamically -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Assembly Deep Dive: Understanding Low-Level Computing</h3>
+                        <p class="card-subtitle">August 15, 2025 • 8 min read</p>
                     </div>
-                    <div class="venture-content">
-                        <h3 class="venture-title">Behelit Systems</h3>
-                        <p class="venture-tagline">Securing Physical Reality</p>
-                        <p class="venture-description">
-                            A security firm dedicated to securing the physical assets that traditional cybersecurity overlooks. 
-                            We combine elite human expertise with a proprietary, self-hosted AI platform to solve complex commercial security problems.
-                        </p>
-                        <div class="venture-features">
-                            <div class="feature">
-                                <i class="fas fa-robot"></i>
-                                <span>AI-Enhanced Security</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-shield"></i>
-                                <span>Physical Security</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-users"></i>
-                                <span>Elite Expertise</span>
-                            </div>
-                        </div>
-                        <a href="https://www.behelitsystems.com" class="venture-link" target="_blank">
-                            <span>Visit Website</span>
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
+                    <div class="card-content">
+                        <p>An in-depth exploration of assembly language programming, covering fundamental concepts, architecture-specific implementations, and practical applications in modern computing.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-outline" onclick="loadWriteup('assembly-deep-dive')">Read More</a>
                     </div>
                 </div>
                 
-                <div class="venture-card fade-in-up" style="animation-delay: 0.3s;">
-                    <div class="venture-header">
-                        <div class="venture-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="venture-badge">Community</div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">The Needle CTF Writeup: Advanced Penetration Testing</h3>
+                        <p class="card-subtitle">August 10, 2025 • 12 min read</p>
                     </div>
-                    <div class="venture-content">
-                        <h3 class="venture-title">Cult of The LOLCOW (cLc)</h3>
-                        <p class="venture-tagline">Malaysia's Hardware Hacking Community</p>
-                        <p class="venture-description">
-                            As Malaysia's first and only open-source hardware hacking community, cLc provides a sanctuary for 
-                            curiosity-driven learning and acts as the R&D engine that drives our innovation.
-                        </p>
-                        <div class="venture-features">
-                            <div class="feature">
-                                <i class="fas fa-code"></i>
-                                <span>Open Source</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-microchip"></i>
-                                <span>Hardware Hacking</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-lightbulb"></i>
-                                <span>R&D Innovation</span>
-                            </div>
-                        </div>
-                        <a href="https://www.cultlolcow.com" class="venture-link" target="_blank">
-                            <span>Join the Community</span>
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
+                    <div class="card-content">
+                        <p>Comprehensive walkthrough of "The Needle" capture-the-flag challenge, detailing reconnaissance techniques, vulnerability exploitation, and privilege escalation methods.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-outline" onclick="loadWriteup('the-needle-writeup')">Read More</a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Modern Web Security: Best Practices for 2025</h3>
+                        <p class="card-subtitle">August 5, 2025 • 10 min read</p>
+                    </div>
+                    <div class="card-content">
+                        <p>Comprehensive guide to implementing robust security measures in modern web applications, covering authentication, authorization, and common vulnerability prevention.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-outline" onclick="loadWriteup('web-security-2025')">Read More</a>
                     </div>
                 </div>
             </div>
@@ -566,76 +1128,35 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="section contact-section">
+    <section id="contact" class="section">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Get In Touch</h2>
-                <p class="section-subtitle">Ready to collaborate on innovative security challenges</p>
-            </div>
-            
-            <div class="contact-container">
-                <div class="contact-content fade-in-up">
-                    <div class="contact-text">
-                        <p>
-                            I'm seeking strategic opportunities, including internships and collaborative projects. 
-                            If you're working on innovative challenges at the intersection of hardware and software, 
-                            I'd love to connect and explore how we can build more secure systems together.
-                        </p>
-                    </div>
-                    
-                    <div class="contact-methods">
-                        <a href="mailto:chewzhanhongint@gmail.com" class="contact-method">
-                            <div class="method-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="method-content">
-                                <h4>Email</h4>
-                                <p>chewzhanhongint@gmail.com</p>
-                            </div>
-                        </a>
-                        
-                        <a href="https://www.behelitsystems.com" class="contact-method" target="_blank">
-                            <div class="method-icon">
-                                <i class="fas fa-building"></i>
-                            </div>
-                            <div class="method-content">
-                                <h4>Behelit Systems</h4>
-                                <p>behelitsystems.com</p>
-                            </div>
-                        </a>
-                        
-                        <a href="https://www.cultlolcow.com" class="contact-method" target="_blank">
-                            <div class="method-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="method-content">
-                                <h4>Cult of LOLCOW</h4>
-                                <p>cultlolcow.com</p>
-                            </div>
-                        </a>
-                    </div>
+            <h2 class="section-title">Get In Touch</h2>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" id="name" name="name" class="form-input" required>
                 </div>
-            </div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea id="message" name="message" class="form-input form-textarea" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-text">
-                    <p>&copy; 2025 Chew Zhan Hong (Gabe). All rights reserved.</p>
-                </div>
-                <div class="footer-links">
-                    <a href="mailto:chewzhanhongint@gmail.com">Email</a>
-                    <a href="https://www.behelitsystems.com" target="_blank">Behelit Systems</a>
-                    <a href="https://www.cultlolcow.com" target="_blank">Cult of LOLCOW</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="js/main.js"></script>
-</body>
-</html>
+            <div class="social-links">
+                <a href="https://github.com/gluppler" class="social-link" target="_blank" aria-label="GitHub">
+                    <span>📱</span>
+                </a>
+                <a href="https://linkedin.com" class="social-link" target="_blank" aria-label="LinkedIn">
+                    <span>💼</span>
+                </a>
+                <a href
