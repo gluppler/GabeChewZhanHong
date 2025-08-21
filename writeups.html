@@ -3,169 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technical Write-ups | Gabe Chew Zhan Hong</title>
-    <meta name="description" content="Security research, vulnerability analysis, and technical documentation by Gabe Chew Zhan Hong">
-    <link rel="icon" href="./public/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="./css/animations.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <a href="index.html" class="logo-text">GCZ</a>
-            </div>
-            <div class="nav-menu">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="index.html#about" class="nav-link">About</a>
-                <a href="index.html#experience" class="nav-link">Experience</a>
-                <a href="index.html#projects" class="nav-link">Projects</a>
-                <a href="writeups.html" class="nav-link active">Write-ups</a>
-                <a href="index.html#contact" class="nav-link">Contact</a>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                    <i class="fas fa-sun"></i>
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
-            <div class="nav-toggle" id="navToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
+    <title>Writeups | Gabe Chew Zhan Hong</title>
+    <meta name="description" content="Technical writeups, CTF solutions, and security research by Gabe Chew Zhan Hong - Hardware Security Specialist & Cybersecurity Expert.">
+    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Writeups specific styles */
+        .writeups-hero {
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--bg-secondary) 100%);
+            padding: var(--spacing-5xl) 0 var(--spacing-4xl);
+            position: relative;
+            overflow: hidden;
+        }
 
-    <!-- Hero Section -->
-    <section class="writeups-hero">
-        <div class="container">
-            <div class="writeups-hero-content">
-                <h1 class="writeups-hero-title">Technical Write-ups</h1>
-                <p class="writeups-hero-description">
-                    Security research, vulnerability analysis, and technical documentation covering hardware hacking, 
-                    physical security, and offensive security techniques.
-                </p>
-                <div class="writeups-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalWriteups">12</span>
-                        <span class="stat-label">Articles</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalViews">15.2K</span>
-                        <span class="stat-label">Views</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="avgReadTime">8</span>
-                        <span class="stat-label">Min Read</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        .writeups-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(255, 107, 53, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
 
-    <!-- Filters Section -->
-    <section class="writeups-filters">
-        <div class="container">
-            <div class="filters-container">
-                <div class="filter-search">
-                    <input type="text" id="searchInput" placeholder="Search write-ups..." class="search-input">
-                    <i class="fas fa-search search-icon"></i>
-                </div>
-                <div class="filter-tags" id="filterTags">
-                    <button class="filter-tag active" data-filter="all">All</button>
-                    <button class="filter-tag" data-filter="hardware">Hardware</button>
-                    <button class="filter-tag" data-filter="security">Security</button>
-                    <button class="filter-tag" data-filter="rf">RF/Wireless</button>
-                    <button class="filter-tag" data-filter="exploitation">Exploitation</button>
-                    <button class="filter-tag" data-filter="physical">Physical</button>
-                    <button class="filter-tag" data-filter="firmware">Firmware</button>
-                </div>
-            </div>
-        </div>
-    </section>
+        .writeups-header {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
 
-    <!-- Write-ups Grid -->
-    <section class="writeups-content">
-        <div class="container">
-            <div class="writeups-grid" id="writeups-grid">
-                <!-- Loading skeleton -->
-                <div class="loading-container" id="loading-container">
-                    <div class="loading-skeleton writeup-card-skeleton"></div>
-                    <div class="loading-skeleton writeup-card-skeleton"></div>
-                    <div class="loading-skeleton writeup-card-skeleton"></div>
-                </div>
-            </div>
-            
-            <div class="no-results" id="no-results" style="display: none;">
-                <div class="no-results-content">
-                    <i class="fas fa-search no-results-icon"></i>
-                    <h3>No write-ups found</h3>
-                    <p>Try adjusting your search or filters</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        .writeups-title {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-lg);
+        }
 
-    <!-- Newsletter Section -->
-    <section class="newsletter-section">
-        <div class="container">
-            <div class="newsletter-content">
-                <div class="newsletter-text">
-                    <h3>Stay Updated</h3>
-                    <p>Get notified when I publish new security research and technical write-ups</p>
-                </div>
-                <div class="newsletter-form">
-                    <form id="newsletter-form" class="newsletter-input-group">
-                        <input type="email" placeholder="Enter your email" class="newsletter-input" required>
-                        <button type="submit" class="btn btn-primary">Subscribe</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
+        .writeups-subtitle {
+            font-size: var(--font-size-xl);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto var(--spacing-xl);
+            line-height: var(--line-height-relaxed);
+        }
 
-    <!-- Modal for Write-up Content -->
-    <div class="modal" id="writeup-modal">
-        <div class="modal-overlay" id="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modal-title"></h2>
-                <button class="modal-close" id="modal-close" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body" id="modal-body">
-                <div class="loading-spinner">
-                    <div class="loading-dot"></div>
-                    <div class="loading-dot"></div>
-                    <div class="loading-dot"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+        .writeups-filters {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-2xl);
+            flex-wrap: wrap;
+        }
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-text">
-                    <p>&copy; 2025 Gabe Chew Zhan Hong. All rights reserved.</p>
-                    <p>Securing the physical reality of digital systems.</p>
-                </div>
-                <div class="footer-links">
-                    <a href="index.html">Back to Portfolio</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+        .filter-btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-xl);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+        }
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/5.1.1/marked.min.js"></script>
-    <script src="./js/script.js"></script>
-    <script src="./js/writeups.js"></script>
-</body>
-</html>
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .writeups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-2xl);
+        }
+
+        .writeup-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .writeup-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .writeup-header {
+            padding: var(--spacing-xl);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .writeup-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            transition: transform var(--transition-slow);
+        }
+
+        .writeup-card:hover .writeup-header::before {
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+
+        .writeup-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-sm);
+            position: relative;
+            z-index: 1;
+        }
+
+        .writeup-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .writeup-date {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .writeup-difficulty {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-sm);
+        }
+
+        .writeup-content {
+            padding: var(--spacing-xl);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        .writeup-description {
+            color: var(--text-secondary);
+            line-height: var(--line-height-relaxed);
+            flex: 1;
+        }
+
+        .writeup-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .writeup-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            font-family: var(--font-family-mono);
+        }
+
+        .writeup-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .writeup-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: all var(--transition-fast);
+            font-size: var(--font-size-sm);
+        }
+
+        .writeup-btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .writeup-btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .writeup-btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .writeup-btn-secondary:hover {
+            background: var(--surface-hover);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-4xl);
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: var(--font-size-4xl);
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .empty-state h3 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-
