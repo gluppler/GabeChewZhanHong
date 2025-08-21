@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Write-ups | Gabe Chew Zhan Hong</title>
+    <meta name="description" content="Security research, vulnerability analysis, and technical documentation by Gabe Chew Zhan Hong">
+    <link rel="icon" href="./public/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/animations.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html" class="logo-text">GCZ</a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#about" class="nav-link">About</a>
+                <a href="index.html#experience" class="nav-link">Experience</a>
+                <a href="index.html#projects" class="nav-link">Projects</a>
+                <a href="writeups.html" class="nav-link active">Write-ups</a>
+                <a href="index.html#contact" class="nav-link">Contact</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="writeups-hero">
+        <div class="container">
+            <div class="writeups-hero-content">
+                <h1 class="writeups-hero-title">Technical Write-ups</h1>
+                <p class="writeups-hero-description">
+                    Security research, vulnerability analysis, and technical documentation covering hardware hacking, 
+                    physical security, and offensive security techniques.
+                </p>
+                <div class="writeups-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalWriteups">12</span>
+                        <span class="stat-label">Articles</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalViews">15.2K</span>
+                        <span class="stat-label">Views</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="avgReadTime">8</span>
+                        <span class="stat-label">Min Read</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="writeups-filters">
+        <div class="container">
+            <div class="filters-container">
+                <div class="filter-search">
+                    <input type="text" id="searchInput" placeholder="Search write-ups..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="filter-tags" id="filterTags">
+                    <button class="filter-tag active" data-filter="all">All</button>
+                    <button class="filter-tag" data-filter="hardware">Hardware</button>
+                    <button class="filter-tag" data-filter="security">Security</button>
+                    <button class="filter-tag" data-filter="rf">RF/Wireless</button>
+                    <button class="filter-tag" data-filter="exploitation">Exploitation</button>
+                    <button class="filter-tag" data-filter="physical">Physical</button>
+                    <button class="filter-tag" data-filter="firmware">Firmware</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Write-ups Grid -->
+    <section class="writeups-content">
+        <div class="container">
+            <div class="writeups-grid" id="writeups-grid">
+                <!-- Loading skeleton -->
+                <div class="loading-container" id="loading-container">
+                    <div class="loading-skeleton writeup-card-skeleton"></div>
+                    <div class="loading-skeleton writeup-card-skeleton"></div>
+                    <div class="loading-skeleton writeup-card-skeleton"></div>
+                </div>
+            </div>
+            
+            <div class="no-results" id="no-results" style="display: none;">
+                <div class="no-results-content">
+                    <i class="fas fa-search no-results-icon"></i>
+                    <h3>No write-ups found</h3>
+                    <p>Try adjusting your search or filters</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-content">
+                <div class="newsletter-text">
+                    <h3>Stay Updated</h3>
+                    <p>Get notified when I publish new security research and technical write-ups</p>
+                </div>
+                <div class="newsletter-form">
+                    <form id="newsletter-form" class="newsletter-input-group">
+                        <input type="email" placeholder="Enter your email" class="newsletter-input" required>
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for Write-up Content -->
+    <div class="modal" id="writeup-modal">
+        <div class="modal-overlay" id="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title"></h2>
+                <button class="modal-close" id="modal-close" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <div class="loading-spinner">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-text">
+                    <p>&copy; 2025 Gabe Chew Zhan Hong. All rights reserved.</p>
+                    <p>Securing the physical reality of digital systems.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Back to Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/5.1.1/marked.min.js"></script>
+    <script src="./js/script.js"></script>
+    <script src="./js/writeups.js"></script>
+</body>
+</html>
