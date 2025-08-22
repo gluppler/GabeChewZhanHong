@@ -17,22 +17,22 @@ A modern, responsive portfolio website built with Swiss Design principles, featu
 ## 🏗️ Project Structure
 
 ```
-portfolio/
-├── index.html                 # Main HTML file
+GabeChewZhanHong/
+├── index.html
+├── writeups.html
 ├── css/
-│   ├── styles.css            # Main stylesheet with Swiss grid system
-│   └── animations.css        # Animation library
+│   ├── styles.css
+│   └── animations.css
 ├── js/
-│   └── script.js            # JavaScript functionality
-├── writeups/
-│   ├── writeups.json        # Write-ups configuration
-│   ├── assembly-deep-dive.md # Sample writeup
-│   └── ...                  # Additional writeups
+│   └── script.js
+│   └── writeups.js
 ├── public/
-│   ├── favicon.ico          # Site favicon
-│   ├── profile.jpeg         # Profile image
-│   └── ResumeCV.pdf         # Resume/CV file
-└── README.md               # This file
+│   ├── favicon.ico
+│   ├── profile.webp
+│   └── ChewZhanHongCV.pdf
+└── writeups/
+    ├── writeups.json
+    └── [your writeup .md files]
 ```
 
 ## 🚀 Quick Start

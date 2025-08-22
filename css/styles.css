@@ -146,7 +146,7 @@ body {
   box-shadow: var(--shadow-lg);
   cursor: pointer;
   transition: all var(--transition-normal);
-  z-index: var(--z-nav);
+  z-index: 101;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -265,6 +265,7 @@ body {
   border: none;
   cursor: pointer;
   padding: var(--spacing-sm);
+  z-index: 101;
 }
 
 .nav-toggle span {
@@ -1495,10 +1496,36 @@ body {
   
   .nav-links {
     display: none;
+    position: absolute;
+    top: 4rem;
+    left: 0;
+    width: 100%;
+    background: var(--surface-color);
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-lg) 0;
+    box-shadow: var(--shadow-md);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .nav-links.active {
+    display: flex;
   }
   
   .nav-toggle {
     display: flex;
+  }
+  
+  .nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  
+  .nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
   }
   
   .hero {

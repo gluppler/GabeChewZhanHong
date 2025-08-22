@@ -65,7 +65,7 @@ class NavigationManager {
     this.setupActiveSection();
   }
 
-  setupScrollEffect() {
+setupScrollEffect() {
     let lastScrollY = window.scrollY;
     
     window.addEventListener('scroll', () => {
@@ -85,7 +85,7 @@ class NavigationManager {
       }
       
       lastScrollY = currentScrollY;
-    }, { passive: true });
+    }, { passive: true }); // This is the added part
   }
 
   setupSmoothScrolling() {

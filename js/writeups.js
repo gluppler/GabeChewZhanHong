@@ -1,1127 +1,736 @@
-// ===== WRITEUPS PAGE FUNCTIONALITY =====
-class WriteupManager {
+/**
+ * Writeups Manager - Handles writeup display, filtering, and interactions
+ * @author Gabe Chew Zhan Hong
+ */
+
+class WriteupsManager {
     constructor() {
-        this.writeups = [];
-        this.filteredWriteups = [];
+        this.writeups = [
+            {
+                id: 1,
+                title: "ARM64 Buffer Overflow Exploitation",
+                description: "Deep dive into ARM64 architecture vulnerabilities, exploring stack-based buffer overflows and ROP chain construction in modern ARM64 systems. Covers bypass techniques for modern mitigations like ASLR and DEP.",
+                date: "2024-12-15",
+                difficulty: "Hard",
+                tags: ["ARM64", "Buffer Overflow", "ROP", "Exploitation"],
+                category: "hardware",
+                featured: true,
+                readTime: "15 min",
+                slug: "arm64-buffer-overflow-exploitation"
+            },
+            {
+                id: 2,
+                title: "IoT Device Hardware Analysis",
+                description: "Complete hardware teardown and security analysis of a popular IoT device. Covers firmware extraction, UART analysis, and discovering critical vulnerabilities in embedded systems.",
+                date: "2024-11-28",
+                difficulty: "Medium",
+                tags: ["IoT", "Hardware", "Firmware", "UART", "Embedded"],
+                category: "hardware",
+                featured: true,
+                readTime: "20 min",
+                slug: "iot-device-hardware-analysis"
+            },
+            {
+                id: 3,
+                title: "HackTheBox: The Needle Writeup",
+                description: "Complete walkthrough of HackTheBox's 'The Needle' machine, featuring advanced Active Directory exploitation, Kerberoasting, and privilege escalation techniques in a Windows enterprise environment.",
+                date: "2024-11-10",
+                difficulty: "Hard",
+                tags: ["HackTheBox", "Active Directory", "Kerberoasting", "Windows"],
+                category: "ctf",
+                featured: false,
+                readTime: "25 min",
+                slug: "hackthebox-the-needle-writeup"
+            },
+            {
+                id: 4,
+                title: "Modern Web Application Security Testing",
+                description: "Comprehensive guide to testing modern web applications for security vulnerabilities. Covers OWASP Top 10, advanced injection techniques, and client-side security assessment methodologies.",
+                date: "2024-10-22",
+                difficulty: "Medium",
+                tags: ["Web Security", "OWASP", "Penetration Testing", "Burp Suite"],
+                category: "web",
+                featured: false,
+                readTime: "18 min",
+                slug: "modern-web-application-security-testing"
+            },
+            {
+                id: 5,
+                title: "Android Malware Reverse Engineering",
+                description: "Step-by-step analysis of a sophisticated Android malware sample. Covers static and dynamic analysis techniques, unpacking, and understanding malicious behavior patterns.",
+                date: "2024-10-05",
+                difficulty: "Hard",
+                tags: ["Android", "Malware", "Reverse Engineering", "Mobile Security"],
+                category: "mobile",
+                featured: true,
+                readTime: "30 min",
+                slug: "android-malware-reverse-engineering"
+            },
+            {
+                id: 6,
+                title: "Social Engineering OSINT Investigation",
+                description: "Real-world case study of a comprehensive OSINT investigation for social engineering assessment. Demonstrates advanced reconnaissance techniques and information gathering methodologies.",
+                date: "2024-09-18",
+                difficulty: "Medium",
+                tags: ["OSINT", "Social Engineering", "Reconnaissance", "Investigation"],
+                category: "osint",
+                featured: false,
+                readTime: "22 min",
+                slug: "social-engineering-osint-investigation"
+            },
+            {
+                id: 7,
+                title: "Machine Learning Model Poisoning Attack",
+                description: "Exploring adversarial attacks against machine learning models. Demonstrates data poisoning techniques and their impact on model behavior in real-world AI systems.",
+                date: "2024-09-03",
+                difficulty: "Hard",
+                tags: ["AI Security", "ML Poisoning", "Adversarial AI", "Model Security"],
+                category: "ai-ml",
+                featured: true,
+                readTime: "28 min",
+                slug: "machine-learning-model-poisoning-attack"
+            },
+            {
+                id: 8,
+                title: "Advanced Binary Exploitation Techniques",
+                description: "Modern binary exploitation techniques including heap exploitation, format string vulnerabilities, and advanced ROP/JOP techniques. Covers modern mitigation bypasses.",
+                date: "2024-08-15",
+                difficulty: "Expert",
+                tags: ["Binary Exploitation", "Heap", "ROP", "JOP", "Mitigations"],
+                category: "reversing",
+                featured: false,
+                readTime: "35 min",
+                slug: "advanced-binary-exploitation-techniques"
+            }
+        ];
+        
+        this.filteredWriteups = [...this.writeups];
         this.currentFilter = 'all';
-        this.searchQuery = '';
-        this.modal = null;
+        this.searchTerm = '';
+        this.searchTimeout = null;
+        
+        // DOM element references
+        this.elements = {};
         
         this.init();
     }
-    
-    async init() {
-        this.setupDOM();
+
+    /**
+     * Initialize the writeups manager
+     */
+    init() {
+        // Cache DOM elements
+        this.cacheElements();
+        
+        // Setup event listeners and initial render
         this.setupEventListeners();
-        await this.loadWriteups();
-        this.setupSearch();
-        this.setupFilters();
-        this.setupModal();
-        this.handleDeepLinks();
+        this.renderWriteups();
+        this.setupAnimations();
     }
-    
-    setupDOM() {
+
+    /**
+     * Cache frequently used DOM elements
+     */
+    cacheElements() {
         this.elements = {
-            grid: document.getElementById('writeups-grid'),
-            loading: document.getElementById('loading-container'),
-            noResults: document.getElementById('no-results'),
-            searchInput: document.getElementById('searchInput'),
-            filterTags: document.getElementById('filterTags'),
-            modal: document.getElementById('writeup-modal'),
-            modalTitle: document.getElementById('modal-title'),
-            modalBody: document.getElementById('modal-body'),
-            modalClose: document.getElementById('modal-close'),
-            modalOverlay: document.getElementById('modal-overlay'),
-            totalWriteups: document.getElementById('totalWriteups'),
-            totalViews: document.getElementById('totalViews'),
-            avgReadTime: document.getElementById('avgReadTime')
+            writeupsGrid: document.getElementById('writeups-grid'),
+            emptyState: document.getElementById('empty-state'),
+            searchInput: document.getElementById('search-input'),
+            filterButtons: document.querySelectorAll('.filter-btn')
         };
     }
-    
+
+    /**
+     * Setup all event listeners
+     */
     setupEventListeners() {
-        // Newsletter form
-        const newsletterForm = document.getElementById('newsletter-form');
-        newsletterForm?.addEventListener('submit', this.handleNewsletterSubmit.bind(this));
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', this.handleKeydown.bind(this));
+        this.setupFilters();
+        this.setupSearch();
     }
-    
-    async loadWriteups() {
-        try {
-            const response = await fetch('./writeups/writeups.json');
-            if (!response.ok) throw new Error('Failed to load writeups');
-            
-            const data = await response.json();
-            this.writeups = data.writeups || this.generatePlaceholderWriteups();
-            
-        } catch (error) {
-            console.warn('Could not load writeups JSON, using placeholders:', error);
-            this.writeups = this.generatePlaceholderWriteups();
-        }
-        
-        this.filteredWriteups = [...this.writeups];
-        this.updateStats();
-        this.renderWriteups();
-        this.hideLoading();
-    }
-    
-    generatePlaceholderWriteups() {
-        return [
-            {
-                slug: "example-1",
-                title: "Building a Comprehensive Hardware Exploitation Framework",
-                date: "August 20, 2025",
-                description: "A deep dive into creating a modular framework for hardware security assessment, covering firmware analysis, JTAG debugging, and embedded system exploitation techniques.",
-                tags: ["hardware", "security", "exploitation", "firmware"],
-                featured: true,
-                readTime: 12,
-                views: 2847
-            },
-            {
-                slug: "rf-signal-analysis-sdr",
-                title: "Advanced RF Signal Analysis with Software-Defined Radio",
-                date: "August 18, 2025",
-                description: "Exploring SDR techniques for analyzing and exploiting wireless protocols, including Bluetooth Low Energy, WiFi, and proprietary RF communications.",
-                tags: ["rf", "sdr", "wireless", "security"],
-                featured: true,
-                readTime: 15,
-                views: 3421
-            },
-            {
-                slug: "physical-pentest-methodology",
-                title: "Modern Physical Penetration Testing Methodology",
-                date: "August 15, 2025",
-                description: "A comprehensive guide to physical security assessments, covering lock picking, RFID cloning, social engineering, and covert entry techniques.",
-                tags: ["physical", "security", "pentest", "methodology"],
-                featured: true,
-                readTime: 10,
-                views: 1932
-            },
-            {
-                slug: "firmware-reverse-engineering",
-                title: "Firmware Reverse Engineering: From Binary to Vulnerability",
-                date: "August 12, 2025",
-                description: "Step-by-step process of reverse engineering embedded firmware, identifying vulnerabilities, and developing proof-of-concept exploits.",
-                tags: ["firmware", "reverse-engineering", "exploitation", "security"],
-                featured: false,
-                readTime: 18,
-                views: 2156
-            },
-            {
-                slug: "iot-device-security-assessment",
-                title: "IoT Device Security Assessment Framework",
-                date: "August 10, 2025",
-                description: "Systematic approach to evaluating IoT device security, including network analysis, firmware extraction, and hardware-based attacks.",
-                tags: ["iot", "security", "hardware", "assessment"],
-                featured: false,
-                readTime: 8,
-                views: 1678
-            },
-            {
-                slug: "social-engineering-physical-access",
-                title: "Social Engineering for Physical Access Control",
-                date: "August 8, 2025",
-                description: "Advanced social engineering techniques specifically designed for gaining physical access to restricted areas during security assessments.",
-                tags: ["social-engineering", "physical", "security", "access-control"],
-                featured: false,
-                readTime: 6,
-                views: 987
-            },
-            {
-                slug: "bluetooth-le-exploitation",
-                title: "Bluetooth Low Energy Security: Attacks and Defenses",
-                date: "August 5, 2025",
-                description: "Comprehensive analysis of BLE security mechanisms, common attack vectors, and practical exploitation techniques.",
-                tags: ["bluetooth", "wireless", "security", "exploitation"],
-                featured: false,
-                readTime: 11,
-                views: 1543
-            },
-            {
-                slug: "embedded-linux-rootkit",
-                title: "Developing Embedded Linux Rootkits for Red Team Operations",
-                date: "August 2, 2025",
-                description: "Creating persistent access mechanisms in embedded Linux systems through kernel-level rootkit development.",
-                tags: ["linux", "rootkit", "embedded", "red-team"],
-                featured: false,
-                readTime: 14,
-                views: 2089
-            }
-        ];
-    }
-    
-    updateStats() {
-        const totalViews = this.writeups.reduce((sum, w) => sum + (w.views || 0), 0);
-        const avgReadTime = Math.round(this.writeups.reduce((sum, w) => sum + (w.readTime || 8), 0) / this.writeups.length);
-        
-        this.animateCounter(this.elements.totalWriteups, this.writeups.length);
-        this.animateCounter(this.elements.totalViews, totalViews, (num) => this.formatNumber(num));
-        this.animateCounter(this.elements.avgReadTime, avgReadTime);
-    }
-    
-    animateCounter(element, target, formatter = (n) => n) {
-        if (!element) return;
-        
-        let current = 0;
-        const increment = target / 30;
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                current = target;
-                clearInterval(timer);
-            }
-            element.textContent = formatter(Math.floor(current));
-        }, 50);
-    }
-    
-    formatNumber(num) {
-        if (num >= 1000) {
-            return (num / 1000).toFixed(1) + 'K';
-        }
-        return num.toString();
-    }
-    
-    setupSearch() {
-        this.elements.searchInput?.addEventListener('input', 
-            this.debounce((e) => {
-                this.searchQuery = e.target.value.toLowerCase();
-                this.applyFilters();
-            }, 300)
-        );
-    }
-    
-    setupFilters() {
-        const filterButtons = this.elements.filterTags?.querySelectorAll('.filter-tag');
-        filterButtons?.forEach(button => {
-            button.addEventListener('click', () => {
-                // Update active state
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                
-                // Apply filter
-                this.currentFilter = button.dataset.filter;
-                this.applyFilters();
-            });
-        });
-    }
-    
-    applyFilters() {
-        this.filteredWriteups = this.writeups.filter(writeup => {
-            const matchesSearch = this.searchQuery === '' || 
-                writeup.title.toLowerCase().includes(this.searchQuery) ||
-                writeup.description.toLowerCase().includes(this.searchQuery) ||
-                writeup.tags.some(tag => tag.toLowerCase().includes(this.searchQuery));
-            
-            const matchesFilter = this.currentFilter === 'all' || 
-                writeup.tags.includes(this.currentFilter);
-            
-            return matchesSearch && matchesFilter;
-        });
-        
-        this.renderWriteups();
-    }
-    
+
+    /**
+     * Render writeups to the DOM
+     */
     renderWriteups() {
-        if (!this.elements.grid) return;
-        
-        if (this.filteredWriteups.length === 0) {
-            this.elements.grid.innerHTML = '';
-            this.elements.noResults.style.display = 'block';
+        const { writeupsGrid, emptyState } = this.elements;
+
+        if (!writeupsGrid || !emptyState) {
+            console.error('Required DOM elements not found');
             return;
         }
-        
-        this.elements.noResults.style.display = 'none';
-        
-        this.elements.grid.innerHTML = this.filteredWriteups.map((writeup, index) => `
-            <article class="writeup-card reveal" data-aos="fade-up" data-aos-delay="${index * 50}">
-                <div class="writeup-header">
-                    <div class="writeup-meta">
-                        <span class="writeup-date">
-                            <i class="fas fa-calendar"></i>
-                            ${writeup.date}
-                        </span>
-                        <span class="writeup-read-time">
-                            <i class="fas fa-clock"></i>
-                            ${writeup.readTime || 8} min read
-                        </span>
-                        ${writeup.views ? `
-                            <span class="writeup-views">
-                                <i class="fas fa-eye"></i>
-                                ${this.formatNumber(writeup.views)}
-                            </span>
-                        ` : ''}
-                    </div>
-                    ${writeup.featured ? '<span class="writeup-featured">Featured</span>' : ''}
-                </div>
-                
-                <h3 class="writeup-title">${writeup.title}</h3>
-                <p class="writeup-description">${writeup.description}</p>
-                
-                <div class="writeup-tags">
-                    ${writeup.tags.map(tag => `
-                        <span class="writeup-tag" data-tag="${tag}">${tag}</span>
-                    `).join('')}
-                </div>
-                
-                <div class="writeup-footer">
-                    <button class="writeup-read-btn" data-slug="${writeup.slug}">
-                        Read Full Article <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <div class="writeup-actions">
-                        <button class="writeup-action" data-action="share" data-slug="${writeup.slug}" aria-label="Share">
-                            <i class="fas fa-share-alt"></i>
-                        </button>
-                        <button class="writeup-action" data-action="bookmark" data-slug="${writeup.slug}" aria-label="Bookmark">
-                            <i class="fas fa-bookmark"></i>
-                        </button>
-                    </div>
-                </div>
-            </article>
-        `).join('');
-        
-        // Add event listeners to new elements
-        this.setupWriteupCardListeners();
-        
-        // Trigger animations
-        this.triggerAnimations();
-    }
-    
-    setupWriteupCardListeners() {
-        // Read buttons
-        document.querySelectorAll('.writeup-read-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const slug = e.target.dataset.slug;
-                this.openWriteup(slug);
-            });
-        });
-        
-        // Tag filters
-        document.querySelectorAll('.writeup-tag').forEach(tag => {
-            tag.addEventListener('click', (e) => {
-                const tagValue = e.target.dataset.tag;
-                this.setFilter(tagValue);
-            });
-        });
-        
-        // Action buttons
-        document.querySelectorAll('.writeup-action').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const action = e.target.closest('.writeup-action').dataset.action;
-                const slug = e.target.closest('.writeup-action').dataset.slug;
-                this.handleWriteupAction(action, slug);
-            });
-        });
-    }
-    
-    setFilter(tag) {
-        // Update filter UI
-        const filterButtons = this.elements.filterTags?.querySelectorAll('.filter-tag');
-        filterButtons?.forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.filter === tag);
-        });
-        
-        this.currentFilter = tag;
-        this.applyFilters();
-    }
-    
-    setupModal() {
-        // Close modal listeners
-        this.elements.modalClose?.addEventListener('click', () => this.closeModal());
-        this.elements.modalOverlay?.addEventListener('click', () => this.closeModal());
-        
-        // ESC key to close modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.closeModal();
-        });
-    }
-    
-    async openWriteup(slug) {
-        const writeup = this.writeups.find(w => w.slug === slug);
-        if (!writeup) return;
-        
-        // Update URL
-        window.history.pushState({writeup: slug}, '', `#${slug}`);
-        
-        // Show modal
-        this.elements.modal.classList.add('active');
-        this.elements.modalTitle.textContent = writeup.title;
-        this.elements.modalBody.innerHTML = '<div class="loading-spinner"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
-        
-        document.body.style.overflow = 'hidden';
-        
-        try {
-            // Try to load markdown file
-            const response = await fetch(`./writeups/${slug}.md`);
-            if (response.ok) {
-                const markdown = await response.text();
-                const html = marked.parse(markdown);
-                this.elements.modalBody.innerHTML = html;
-            } else {
-                // Fallback to generated content
-                this.elements.modalBody.innerHTML = this.generateWriteupContent(writeup);
-            }
-            
-            // Highlight code blocks
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAllUnder(this.elements.modalBody);
-            }
-            
-        } catch (error) {
-            console.error('Error loading writeup:', error);
-            this.elements.modalBody.innerHTML = this.generateWriteupContent(writeup);
+
+        if (this.filteredWriteups.length === 0) {
+            writeupsGrid.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
         }
+
+        writeupsGrid.style.display = 'grid';
+        emptyState.style.display = 'none';
+
+        const writeupsHTML = this.filteredWriteups.map((writeup, index) => 
+            this.createWriteupCard(writeup, index)
+        ).join('');
+
+        writeupsGrid.innerHTML = writeupsHTML;
     }
-    
-    generateWriteupContent(writeup) {
+
+    /**
+     * Create HTML for a writeup card
+     * @param {Object} writeup - Writeup data
+     * @param {number} index - Index for animation delay
+     * @returns {string} HTML string
+     */
+    createWriteupCard(writeup, index) {
+        const difficultyIcon = this.getDifficultyIcon(writeup.difficulty);
+        const tagsHTML = writeup.tags.map(tag => 
+            `<span class="writeup-tag">${this.escapeHtml(tag)}</span>`
+        ).join('');
+
         return `
-            <div class="writeup-content">
-                <div class="writeup-meta-full">
-                    <span class="writeup-date">${writeup.date}</span>
-                    <span class="writeup-read-time">${writeup.readTime || 8} min read</span>
-                    ${writeup.views ? `<span class="writeup-views">${this.formatNumber(writeup.views)} views</span>` : ''}
-                </div>
-                
-                <div class="writeup-tags-full">
-                    ${writeup.tags.map(tag => `<span class="writeup-tag">${tag}</span>`).join('')}
-                </div>
-                
-                <div class="writeup-body">
-                    <h2>Overview</h2>
-                    <p>${writeup.description}</p>
-                    
-                    <h2>Technical Details</h2>
-                    <p>This is a placeholder for the full technical write-up. In a real implementation, this content would be loaded from markdown files or a content management system.</p>
-                    
-                    <h3>Key Findings</h3>
-                    <ul>
-                        <li>Detailed analysis of security vulnerabilities</li>
-                        <li>Proof-of-concept exploit development</li>
-                        <li>Recommendations for remediation</li>
-                        <li>Impact assessment and risk analysis</li>
-                    </ul>
-                    
-                    <h3>Code Example</h3>
-                    <pre><code class="language-python">
-# Example security assessment script
-import socket
-import sys
-
-def scan_target(host, port):
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
-        result = sock.connect_ex((host, port))
-        sock.close()
-        return result == 0
-    except Exception as e:
-        return False
-
-# Usage example
-if __name__ == "__main__":
-    target_host = "192.168.1.100"
-    target_port = 22
-    
-    if scan_target(target_host, target_port):
-        print(f"Port {target_port} is open on {target_host}")
-    else:
-        print(f"Port {target_port} is closed on {target_host}")
-                    </code></pre>
-                    
-                    <h2>Conclusion</h2>
-                    <p>This research demonstrates the importance of comprehensive security assessment methodologies in identifying and mitigating potential vulnerabilities in modern systems.</p>
-                    
-                    <div class="writeup-footer-full">
-                        <div class="writeup-author">
-                            <strong>Author:</strong> Gabe Chew Zhan Hong<br>
-                            <strong>Published:</strong> ${writeup.date}
+            <div class="writeup-card reveal" style="animation-delay: ${index * 0.1}s">
+                ${writeup.featured ? '<div class="featured-badge">Featured</div>' : ''}
+                <div class="writeup-header">
+                    <h3 class="writeup-title">${this.escapeHtml(writeup.title)}</h3>
+                    <div class="writeup-meta">
+                        <div class="writeup-date">
+                            <i class="fas fa-calendar"></i>
+                            <span>${this.formatDate(writeup.date)}</span>
                         </div>
+                        <div class="writeup-difficulty">
+                            <i class="fas fa-${difficultyIcon}"></i>
+                            <span>${writeup.difficulty}</span>
+                        </div>
+                        <div class="writeup-difficulty">
+                            <i class="fas fa-clock"></i>
+                            <span>${writeup.readTime}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="writeup-content">
+                    <p class="writeup-description">${this.escapeHtml(writeup.description)}</p>
+                    <div class="writeup-tags">
+                        ${tagsHTML}
+                    </div>
+                    <div class="writeup-actions">
+                        <button class="writeup-btn writeup-btn-primary" 
+                                onclick="window.writeupsManager.readWriteup('${writeup.slug}')"
+                                data-slug="${writeup.slug}">
+                            <i class="fas fa-book-open"></i>
+                            Read Writeup
+                        </button>
+                        <button class="writeup-btn writeup-btn-secondary" 
+                                onclick="window.writeupsManager.shareWriteup('${writeup.slug}')"
+                                data-slug="${writeup.slug}">
+                            <i class="fas fa-share"></i>
+                            Share
+                        </button>
                     </div>
                 </div>
             </div>
         `;
     }
-    
-    closeModal() {
-        this.elements.modal?.classList.remove('active');
-        document.body.style.overflow = '';
+
+    /**
+     * Setup filter functionality
+     */
+    setupFilters() {
+        const { filterButtons } = this.elements;
         
-        // Update URL
-        window.history.pushState({}, '', window.location.pathname);
-    }
-    
-    handleWriteupAction(action, slug) {
-        switch (action) {
-            case 'share':
-                this.shareWriteup(slug);
-                break;
-            case 'bookmark':
-                this.bookmarkWriteup(slug);
-                break;
-        }
-    }
-    
-    shareWriteup(slug) {
-        const url = `${window.location.origin}${window.location.pathname}#${slug}`;
-        
-        if (navigator.share) {
-            const writeup = this.writeups.find(w => w.slug === slug);
-            navigator.share({
-                title: writeup?.title || 'Technical Write-up',
-                text: writeup?.description || 'Security research by Gabe Chew Zhan Hong',
-                url: url
+        filterButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleFilterClick(button, filterButtons);
             });
-        } else {
-            navigator.clipboard.writeText(url).then(() => {
-                this.showToast('Link copied to clipboard!');
-            }).catch(() => {
-                this.showToast('Unable to copy link');
-            });
-        }
+        });
     }
-    
-    bookmarkWriteup(slug) {
-        const bookmarks = JSON.parse(localStorage.getItem('bookmarked-writeups') || '[]');
-        const isBookmarked = bookmarks.includes(slug);
+
+    /**
+     * Handle filter button click
+     * @param {HTMLElement} clickedButton - The clicked filter button
+     * @param {NodeList} allButtons - All filter buttons
+     */
+    handleFilterClick(clickedButton, allButtons) {
+        // Update active state
+        allButtons.forEach(btn => btn.classList.remove('active'));
+        clickedButton.classList.add('active');
         
-        if (isBookmarked) {
-            const index = bookmarks.indexOf(slug);
-            bookmarks.splice(index, 1);
-            this.showToast('Removed from bookmarks');
-        } else {
-            bookmarks.push(slug);
-            this.showToast('Added to bookmarks');
-        }
-        
-        localStorage.setItem('bookmarked-writeups', JSON.stringify(bookmarks));
-        this.updateBookmarkIcons();
+        // Update filter and re-render
+        this.currentFilter = clickedButton.dataset.filter;
+        this.filterWriteups();
     }
-    
-    updateBookmarkIcons() {
-        const bookmarks = JSON.parse(localStorage.getItem('bookmarked-writeups') || '[]');
-        document.querySelectorAll('.writeup-action[data-action="bookmark"]').forEach(btn => {
-            const slug = btn.dataset.slug;
-            const icon = btn.querySelector('i');
-            if (bookmarks.includes(slug)) {
-                icon.className = 'fas fa-bookmark';
-                btn.classList.add('active');
-            } else {
-                icon.className = 'far fa-bookmark';
-                btn.classList.remove('active');
+
+    /**
+     * Setup search functionality
+     */
+    setupSearch() {
+        const { searchInput } = this.elements;
+        
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.searchTerm = e.target.value.toLowerCase().trim();
+                this.filterWriteups();
+            }, 300);
+        });
+
+        // Handle search on Enter key
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                clearTimeout(this.searchTimeout);
+                this.searchTerm = e.target.value.toLowerCase().trim();
+                this.filterWriteups();
             }
         });
     }
-    
-    showToast(message) {
+
+    /**
+     * Filter writeups based on current filter and search term
+     */
+    filterWriteups() {
+        this.filteredWriteups = this.writeups.filter(writeup => {
+            const matchesFilter = this.currentFilter === 'all' || writeup.category === this.currentFilter;
+            const matchesSearch = this.matchesSearchTerm(writeup);
+            
+            return matchesFilter && matchesSearch;
+        });
+
+        this.renderWriteups();
+        this.setupAnimations();
+    }
+
+    /**
+     * Check if writeup matches search term
+     * @param {Object} writeup - Writeup to check
+     * @returns {boolean} True if matches search
+     */
+    matchesSearchTerm(writeup) {
+        if (!this.searchTerm) return true;
+
+        const searchFields = [
+            writeup.title,
+            writeup.description,
+            ...writeup.tags,
+            writeup.difficulty
+        ];
+
+        return searchFields.some(field => 
+            field.toLowerCase().includes(this.searchTerm)
+        );
+    }
+
+    /**
+     * Setup animations for writeup cards
+     */
+    setupAnimations() {
+        const cards = document.querySelectorAll('.writeup-card');
+        
+        cards.forEach(card => {
+            // Remove existing event listeners to prevent duplicates
+            card.removeEventListener('mouseenter', this.handleCardMouseEnter);
+            card.removeEventListener('mouseleave', this.handleCardMouseLeave);
+            
+            // Add new event listeners
+            card.addEventListener('mouseenter', this.handleCardMouseEnter);
+            card.addEventListener('mouseleave', this.handleCardMouseLeave);
+        });
+    }
+
+    /**
+     * Handle card mouse enter
+     * @param {Event} e - Mouse event
+     */
+    handleCardMouseEnter(e) {
+        e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+    }
+
+    /**
+     * Handle card mouse leave
+     * @param {Event} e - Mouse event
+     */
+    handleCardMouseLeave(e) {
+        e.currentTarget.style.transform = 'translateY(0) scale(1)';
+    }
+
+    /**
+     * Format date string to readable format
+     * @param {string} dateString - Date string to format
+     * @returns {string} Formatted date
+     */
+    formatDate(dateString) {
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return dateString;
+        }
+    }
+
+    /**
+     * Get difficulty icon based on difficulty level
+     * @param {string} difficulty - Difficulty level
+     * @returns {string} Font Awesome icon name
+     */
+    getDifficultyIcon(difficulty) {
+        const iconMap = {
+            'Easy': 'signal',
+            'Medium': 'signal',
+            'Hard': 'signal',
+            'Expert': 'fire'
+        };
+        return iconMap[difficulty] || 'signal';
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     * @param {string} text - Text to escape
+     * @returns {string} Escaped text
+     */
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    /**
+     * Handle reading a writeup
+     * @param {string} slug - Writeup slug
+     */
+    readWriteup(slug) {
+        const writeup = this.writeups.find(w => w.slug === slug);
+        if (!writeup) {
+            console.error('Writeup not found:', slug);
+            return;
+        }
+
+        // In production, this would navigate to the writeup page
+        // For demo purposes, show a modal
+        this.showWriteupModal(writeup);
+    }
+
+    /**
+     * Show writeup modal (demo functionality)
+     * @param {Object} writeup - Writeup data
+     */
+    showWriteupModal(writeup) {
+        const modal = this.createModal(writeup);
+        document.body.appendChild(modal);
+
+        // Focus management
+        modal.focus();
+        
+        // Close on escape key
+        const closeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.closeModal(modal);
+                document.removeEventListener('keydown', closeHandler);
+            }
+        };
+        document.addEventListener('keydown', closeHandler);
+
+        // Auto-remove after animation
+        setTimeout(() => {
+            if (modal.parentNode) {
+                modal.classList.add('fade-in');
+            }
+        }, 10);
+    }
+
+    /**
+     * Create modal element
+     * @param {Object} writeup - Writeup data
+     * @returns {HTMLElement} Modal element
+     */
+    createModal(writeup) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-labelledby', 'modal-title');
+        modal.setAttribute('tabindex', '-1');
+
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">${this.escapeHtml(writeup.title)}</h2>
+                    <button class="modal-close" aria-label="Close modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="writeup-preview">
+                        <div class="writeup-meta-full">
+                            <span><i class="fas fa-calendar"></i> ${this.formatDate(writeup.date)}</span>
+                            <span><i class="fas fa-signal"></i> ${writeup.difficulty}</span>
+                            <span><i class="fas fa-clock"></i> ${writeup.readTime}</span>
+                        </div>
+                        <p>${this.escapeHtml(writeup.description)}</p>
+                        <div class="writeup-tags">
+                            ${writeup.tags.map(tag => `<span class="writeup-tag">${this.escapeHtml(tag)}</span>`).join('')}
+                        </div>
+                        <div class="placeholder-content">
+                            <h3>Writeup Content</h3>
+                            <p>This is a placeholder for the writeup content. In a real implementation, this would load the full writeup content from:</p>
+                            <code>writeups/${writeup.slug}.md</code>
+                            <p>The writeup would include detailed technical analysis, code examples, screenshots, and step-by-step explanations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.setupModalStyles(modal);
+        this.setupModalEvents(modal);
+
+        return modal;
+    }
+
+    /**
+     * Setup modal styles
+     * @param {HTMLElement} modal - Modal element
+     */
+    setupModalStyles(modal) {
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.style.cssText = `
+            background: var(--surface-color);
+            border-radius: var(--border-radius-xl);
+            padding: var(--spacing-2xl);
+            max-height: 80vh;
+            max-width: 800px;
+            width: 90%;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-color);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        `;
+    }
+
+    /**
+     * Setup modal event listeners
+     * @param {HTMLElement} modal - Modal element
+     */
+    setupModalEvents(modal) {
+        const closeButton = modal.querySelector('.modal-close');
+        
+        closeButton.addEventListener('click', () => this.closeModal(modal));
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeModal(modal);
+            }
+        });
+    }
+
+    /**
+     * Close modal with animation
+     * @param {HTMLElement} modal - Modal element to close
+     */
+    closeModal(modal) {
+        modal.style.opacity = '0';
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+            if (modal.parentNode) {
+                modal.remove();
+            }
+        }, 300);
+    }
+
+    /**
+     * Handle sharing a writeup
+     * @param {string} slug - Writeup slug
+     */
+    shareWriteup(slug) {
+        const writeup = this.writeups.find(w => w.slug === slug);
+        if (!writeup) {
+            console.error('Writeup not found:', slug);
+            return;
+        }
+
+        const url = `${window.location.origin}/writeups/${slug}`;
+        const text = `Check out this writeup: ${writeup.title}`;
+
+        if (navigator.share && navigator.canShare) {
+            navigator.share({
+                title: writeup.title,
+                text: text,
+                url: url
+            }).catch(error => {
+                console.log('Error sharing:', error);
+                this.fallbackShare(text, url);
+            });
+        } else {
+            this.fallbackShare(text, url);
+        }
+    }
+
+    /**
+     * Fallback share method using clipboard
+     * @param {string} text - Text to share
+     * @param {string} url - URL to share
+     */
+    fallbackShare(text, url) {
+        const shareText = `${text} - ${url}`;
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareText)
+                .then(() => this.showToast('Link copied to clipboard!'))
+                .catch(() => this.showToast('Unable to copy link'));
+        } else {
+            // Even more fallback for older browsers
+            this.legacyCopyToClipboard(shareText);
+        }
+    }
+
+    /**
+     * Legacy clipboard copy for older browsers
+     * @param {string} text - Text to copy
+     */
+    legacyCopyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.top = '-1000px';
+        textArea.style.left = '-1000px';
+        
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            this.showToast('Link copied to clipboard!');
+        } catch (error) {
+            this.showToast('Unable to copy link');
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
+    /**
+     * Show toast notification
+     * @param {string} message - Message to show
+     * @param {number} duration - Duration in milliseconds
+     */
+    showToast(message, duration = 3000) {
         const toast = document.createElement('div');
-        toast.className = 'toast';
         toast.textContent = message;
+        toast.className = 'toast-notification';
+        
+        toast.style.cssText = `
+            position: fixed;
+            bottom: var(--spacing-xl);
+            right: var(--spacing-xl);
+            background: var(--primary-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        
         document.body.appendChild(toast);
         
-        setTimeout(() => toast.classList.add('show'), 10);
+        // Animate in
         setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => document.body.removeChild(toast), 300);
-        }, 3000);
-    }
-    
-    handleDeepLinks() {
-        const hash = window.location.hash.substring(1);
-        if (hash) {
-            // Wait for writeups to load, then open the specified one
+            toast.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Animate out and remove
+        setTimeout(() => {
+            toast.style.transform = 'translateX(100%)';
             setTimeout(() => {
-                this.openWriteup(hash);
-            }, 500);
-        }
-    }
-    
-    handleNewsletterSubmit(e) {
-        e.preventDefault();
-        const email = e.target.querySelector('input[type="email"]').value;
-        
-        // Simulate newsletter signup
-        this.showToast('Thanks for subscribing! You\'ll receive updates on new write-ups.');
-        e.target.reset();
-        
-        // In a real implementation, this would make an API call
-        console.log('Newsletter signup:', email);
-    }
-    
-    handleKeydown(e) {
-        // Keyboard shortcuts
-        if (e.ctrlKey || e.metaKey) {
-            switch (e.key) {
-                case 'k':
-                    e.preventDefault();
-                    this.elements.searchInput?.focus();
-                    break;
-            }
-        }
-    }
-    
-    hideLoading() {
-        this.elements.loading?.style.setProperty('display', 'none');
-    }
-    
-    triggerAnimations() {
-        // Trigger reveal animations for new elements
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('revealed');
+                if (toast.parentNode) {
+                    toast.remove();
                 }
-            });
-        }, { threshold: 0.1 });
+            }, 300);
+        }, duration);
+    }
+
+    /**
+     * Get writeup by slug
+     * @param {string} slug - Writeup slug
+     * @returns {Object|null} Writeup object or null
+     */
+    getWriteup(slug) {
+        return this.writeups.find(w => w.slug === slug) || null;
+    }
+
+    /**
+     * Add new writeup (for dynamic content)
+     * @param {Object} writeup - Writeup data
+     */
+    addWriteup(writeup) {
+        if (!writeup.id) {
+            writeup.id = Math.max(...this.writeups.map(w => w.id)) + 1;
+        }
         
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        this.writeups.push(writeup);
+        this.filterWriteups();
     }
+
+    /**
+     * Remove writeup by ID
+     * @param {number} id - Writeup ID
+     */
+    removeWriteup(id) {
+        this.writeups = this.writeups.filter(w => w.id !== id);
+        this.filterWriteups();
+    }
+
+    /**
+     * Update writeup
+     * @param {number} id - Writeup ID
+     * @param {Object} updates - Updates to apply
+     */
+    updateWriteup(id, updates) {
+        const index = this.writeups.findIndex(w => w.id === id);
+        if (index !== -1) {
+            this.writeups[index] = { ...this.writeups[index], ...updates };
+            this.filterWriteups();
+        }
+    }
+}
+
+// Initialize writeups manager when DOM is loaded
+let writeupsManager = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    writeupsManager = new WriteupsManager();
     
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-}
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new WriteupManager());
-} else {
-    new WriteupManager();
-}
-
-// Additional CSS for writeups page functionality
-const writeupStyles = `
-.writeups-hero {
-    padding: calc(80px + 4rem) 0 4rem;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-    text-align: center;
-}
-
-.writeups-hero-title {
-    font-size: var(--text-5xl);
-    font-weight: 800;
-    margin-bottom: var(--space-6);
-    background: linear-gradient(135deg, var(--text-primary), var(--color-primary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.writeups-hero-description {
-    font-size: var(--text-lg);
-    color: var(--text-secondary);
-    max-width: 600px;
-    margin: 0 auto var(--space-12);
-    line-height: 1.6;
-}
-
-.writeups-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-8);
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.writeups-filters {
-    padding: var(--space-8) 0;
-    background-color: var(--bg-secondary);
-    border-bottom: var(--border-width) solid var(--border-color);
-}
-
-.filters-container {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: var(--space-8);
-    align-items: center;
-}
-
-.filter-search {
-    position: relative;
-}
-
-.search-input {
-    width: 100%;
-    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-12);
-    border: var(--border-width) solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: var(--text-base);
-    transition: all var(--transition-base);
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-}
-
-.search-icon {
-    position: absolute;
-    left: var(--space-4);
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: var(--text-sm);
-}
-
-.filter-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    justify-content: flex-end;
-}
-
-.filter-tag {
-    padding: var(--space-2) var(--space-4);
-    background-color: var(--bg-primary);
-    color: var(--text-secondary);
-    border: var(--border-width) solid var(--border-color);
-    border-radius: var(--border-radius);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.filter-tag:hover,
-.filter-tag.active {
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    border-color: var(--color-primary);
-}
-
-.writeups-content {
-    padding: var(--space-16) 0;
-}
-
-.writeup-card {
-    background-color: var(--bg-secondary);
-    border-radius: var(--border-radius-xl);
-    padding: var(--space-6);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-base);
-    height: fit-content;
-}
-
-.writeup-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-}
-
-.writeup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: var(--space-4);
-}
-
-.writeup-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-}
-
-.writeup-meta span {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-}
-
-.writeup-featured {
-    padding: var(--space-1) var(--space-3);
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    font-size: var(--text-xs);
-    font-weight: 600;
-    border-radius: var(--border-radius);
-}
-
-.writeup-title {
-    font-size: var(--text-xl);
-    font-weight: 700;
-    margin-bottom: var(--space-3);
-    color: var(--text-primary);
-    line-height: 1.3;
-}
-
-.writeup-description {
-    color: var(--text-secondary);
-    margin-bottom: var(--space-6);
-    line-height: 1.6;
-}
-
-.writeup-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-6);
-}
-
-.writeup-tag {
-    padding: var(--space-1) var(--space-2);
-    background-color: var(--bg-tertiary);
-    color: var(--text-muted);
-    font-size: var(--text-xs);
-    font-weight: 500;
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.writeup-tag:hover {
-    background-color: var(--color-primary);
-    color: var(--color-white);
-}
-
-.writeup-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.writeup-read-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    border: none;
-    border-radius: var(--border-radius);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.writeup-read-btn:hover {
-    background-color: var(--color-primary-dark);
-    transform: translateX(2px);
-}
-
-.writeup-actions {
-    display: flex;
-    gap: var(--space-2);
-}
-
-.writeup-action {
-    width: 36px;
-    height: 36px;
-    background-color: transparent;
-    color: var(--text-muted);
-    border: var(--border-width) solid var(--border-color);
-    border-radius: var(--border-radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.writeup-action:hover,
-.writeup-action.active {
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    border-color: var(--color-primary);
-}
-
-.loading-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: var(--grid-gap);
-}
-
-.writeup-card-skeleton {
-    height: 300px;
-    border-radius: var(--border-radius-xl);
-}
-
-.no-results {
-    text-align: center;
-    padding: var(--space-16) 0;
-}
-
-.no-results-icon {
-    font-size: var(--text-6xl);
-    color: var(--text-muted);
-    margin-bottom: var(--space-6);
-}
-
-.no-results h3 {
-    font-size: var(--text-2xl);
-    margin-bottom: var(--space-4);
-}
-
-.no-results p {
-    color: var(--text-secondary);
-}
-
-.newsletter-section {
-    background-color: var(--bg-secondary);
-    padding: var(--space-16) 0;
-    border-top: var(--border-width) solid var(--border-color);
-}
-
-.newsletter-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--grid-gap);
-    align-items: center;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.newsletter-text h3 {
-    font-size: var(--text-2xl);
-    font-weight: 700;
-    margin-bottom: var(--space-4);
-}
-
-.newsletter-text p {
-    color: var(--text-secondary);
-}
-
-.newsletter-input-group {
-    display: flex;
-    gap: var(--space-3);
-}
-
-.newsletter-input {
-    flex: 1;
-    padding: var(--space-3) var(--space-4);
-    border: var(--border-width) solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: var(--text-base);
-}
-
-.newsletter-input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-}
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: var(--z-modal);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: all var(--transition-base);
-}
-
-.modal.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(4px);
-}
-
-.modal-content {
-    position: relative;
-    width: 90%;
-    max-width: 800px;
-    max-height: 90%;
-    background-color: var(--bg-primary);
-    border-radius: var(--border-radius-xl);
-    box-shadow: var(--shadow-xl);
-    overflow: hidden;
-    transform: scale(0.9);
-    transition: transform var(--transition-base);
-}
+    // Make available globally for onclick handlers
+    window.writeupsManager = writeupsManager;
+});
 
-.modal.active .modal-content {
-    transform: scale(1);
+// Export for module systems (if needed)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = WriteupsManager;
 }
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-6);
-    border-bottom: var(--border-width) solid var(--border-color);
-}
-
-.modal-title {
-    font-size: var(--text-2xl);
-    font-weight: 700;
-    margin: 0;
-}
-
-.modal-close {
-    width: 40px;
-    height: 40px;
-    background-color: transparent;
-    color: var(--text-muted);
-    border: none;
-    border-radius: var(--border-radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.modal-close:hover {
-    background-color: var(--bg-tertiary);
-    color: var(--text-primary);
-}
-
-.modal-body {
-    padding: var(--space-6);
-    max-height: calc(90vh - 120px);
-    overflow-y: auto;
-}
-
-.writeup-content h2,
-.writeup-content h3 {
-    color: var(--text-primary);
-    margin-top: var(--space-8);
-    margin-bottom: var(--space-4);
-}
-
-.writeup-content pre {
-    background-color: var(--bg-tertiary);
-    padding: var(--space-4);
-    border-radius: var(--border-radius);
-    overflow-x: auto;
-    margin: var(--space-6) 0;
-}
-
-.writeup-content code {
-    background-color: var(--bg-tertiary);
-    padding: var(--space-1) var(--space-2);
-    border-radius: var(--border-radius-sm);
-    font-family: var(--font-family-mono);
-    font-size: var(--text-sm);
-}
-
-.writeup-content pre code {
-    background-color: transparent;
-    padding: 0;
-}
-
-.writeup-meta-full {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    margin-bottom: var(--space-6);
-    padding-bottom: var(--space-4);
-    border-bottom: var(--border-width) solid var(--border-color);
-}
-
-.writeup-tags-full {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-8);
-}
-
-.writeup-footer-full {
-    margin-top: var(--space-8);
-    padding-top: var(--space-6);
-    border-top: var(--border-width) solid var(--border-color);
-}
-
-.writeup-author {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-.toast {
-    position: fixed;
-    bottom: var(--space-6);
-    right: var(--space-6);
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    padding: var(--space-4) var(--space-6);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-lg);
-    z-index: var(--z-tooltip);
-    transform: translateY(100px);
-    opacity: 0;
-    transition: all var(--transition-base);
-}
-
-.toast.show {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-@media (max-width: 768px) {
-    .writeups-hero-title {
-        font-size: var(--text-4xl);
-    }
-    
-    .writeups-stats {
-        grid-template-columns: 1fr;
-        gap: var(--space-4);
-    }
-    
-    .filters-container {
-        grid-template-columns: 1fr;
-        gap: var(--space-4);
-    }
-    
-    .filter-tags {
-        justify-content: flex-start;
-    }
-    
-    .newsletter-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-    
-    .newsletter-input-group {
-        flex-direction: column;
-    }
-    
-    .modal-content {
-        width: 95%;
-    }
-    
-    .writeup-footer {
-        flex-direction: column;
-        gap: var(--space-4);
-        align-items: stretch;
-    }
-    
-    .writeup-actions {
-        justify-content: center;
-    }
-}
-`;
-
-// Inject additional styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = writeupStyles;
-document.head.appendChild(styleSheet);

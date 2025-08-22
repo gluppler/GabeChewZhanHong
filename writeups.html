@@ -210,6 +210,8 @@
             font-weight: var(--font-weight-medium);
             transition: all var(--transition-fast);
             font-size: var(--font-size-sm);
+            border: none;
+            cursor: pointer;
         }
 
         .writeup-btn-primary {
@@ -250,4 +252,334 @@
             font-size: var(--font-size-xl);
             font-weight: var(--font-weight-semibold);
             color: var(--text-secondary);
-            margin-bottom: var(--spacing-
+            margin-bottom: var(--spacing-md);
+        }
+
+        .search-box {
+            max-width: 400px;
+            margin: 0 auto var(--spacing-xl);
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-xl);
+            padding-left: var(--spacing-3xl);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-xl);
+            background: var(--surface-color);
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: var(--secondary-color);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            z-index: 2;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.fade-in {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            border-radius: var(--border-radius-xl);
+            padding: var(--spacing-2xl);
+            max-height: 80vh;
+            max-width: 800px;
+            width: 90%;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-color);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.fade-in .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: var(--font-size-2xl);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            color: var(--text-secondary);
+            line-height: var(--line-height-relaxed);
+        }
+
+        .writeup-meta-full {
+            display: flex;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius-md);
+            flex-wrap: wrap;
+        }
+
+        .writeup-meta-full span {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            color: var(--text-secondary);
+        }
+
+        .placeholder-content {
+            margin-top: var(--spacing-xl);
+            padding: var(--spacing-xl);
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius-lg);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .placeholder-content h3 {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .placeholder-content code {
+            background: var(--bg-tertiary);
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            display: block;
+            margin: var(--spacing-md) 0;
+            font-family: var(--font-family-mono);
+            color: var(--primary-color);
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: var(--spacing-xl);
+            right: var(--spacing-xl);
+            background: var(--primary-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        @media (max-width: 768px) {
+            .writeups-hero {
+                padding: var(--spacing-3xl) 0 var(--spacing-2xl);
+            }
+            
+            .writeups-title {
+                font-size: var(--font-size-3xl);
+            }
+            
+            .writeups-filters {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: var(--spacing-sm);
+            }
+            
+            .filter-btn {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            
+            .writeups-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .writeup-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-sm);
+            }
+            
+            .writeup-actions {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: var(--spacing-md);
+                padding: var(--spacing-lg);
+            }
+
+            .writeup-meta-full {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+
+            .toast-notification {
+                right: var(--spacing-md);
+                left: var(--spacing-md);
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+    </button>
+
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="nav-logo">GC</span>
+                <span class="nav-name">Gabe Chew</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#experience" class="nav-link">Experience</a></li>
+                <li><a href="index.html#projects" class="nav-link">Projects</a></li>
+                <li><a href="index.html#ventures" class="nav-link">Ventures</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+                <li><a href="writeups.html" class="nav-link active">Writeups</a></li>
+            </ul>
+            <button class="nav-toggle" id="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Writeups Hero Section -->
+    <section class="writeups-hero">
+        <div class="container">
+            <div class="writeups-header">
+                <h1 class="writeups-title animate-fade-up">Technical Writeups</h1>
+                <p class="writeups-subtitle animate-fade-up" style="animation-delay: 0.1s;">
+                    In-depth analysis of cybersecurity challenges, CTF solutions, and hardware security research. 
+                    Documenting the journey from curiosity to exploitation.
+                </p>
+                
+                <!-- Search Box -->
+                <div class="search-box animate-fade-up" style="animation-delay: 0.2s;">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" class="search-input" placeholder="Search writeups..." autocomplete="off">
+                </div>
+
+                <!-- Filters -->
+                <div class="writeups-filters animate-fade-up" style="animation-delay: 0.3s;">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="hardware">Hardware</button>
+                    <button class="filter-btn" data-filter="ctf">CTF</button>
+                    <button class="filter-btn" data-filter="web">Web Security</button>
+                    <button class="filter-btn" data-filter="mobile">Mobile</button>
+                    <button class="filter-btn" data-filter="reversing">Reverse Engineering</button>
+                    <button class="filter-btn" data-filter="osint">OSINT</button>
+                    <button class="filter-btn" data-filter="ai-ml">AI/ML Security</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Writeups Content -->
+    <section class="section">
+        <div class="container">
+            <div class="writeups-grid" id="writeups-grid">
+                <!-- Writeups will be dynamically loaded here -->
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>No writeups found</h3>
+                <p>Try adjusting your search terms or filters.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>&copy; 2025 Gabe Chew Zhan Hong. All rights reserved.</p>
+                </div>
+                <div class="footer-right">
+                    <p>Built with passion for security and innovation</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+    <script src="js/writeups.js"></script>
+</body>
+</html>

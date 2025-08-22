@@ -12,20 +12,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Theme Toggle -->
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
         <i class="fas fa-moon"></i>
         <i class="fas fa-sun"></i>
     </button>
 
-    <!-- Navigation -->
     <nav class="nav" id="nav">
         <div class="nav-container">
             <div class="nav-brand">
                 <span class="nav-logo">GC</span>
                 <span class="nav-name">Gabe Chew</span>
             </div>
-            <ul class="nav-links">
+            <ul class="nav-links" id="nav-links">
                 <li><a href="#home" class="nav-link active">Home</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="#experience" class="nav-link">Experience</a></li>
@@ -34,7 +32,7 @@
                 <li><a href="#contact" class="nav-link">Contact</a></li>
                 <li><a href="writeups.html" class="nav-link">Writeups</a></li>
             </ul>
-            <button class="nav-toggle" id="nav-toggle">
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -42,7 +40,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-grid">
             <div class="hero-content">
@@ -102,7 +99,7 @@
             </div>
             <div class="hero-visual">
                 <div class="hero-image-container animate-fade-up" style="animation-delay: 0.6s;">
-                    <img src="public/profile.jpeg" alt="Gabe Chew Zhan Hong" class="hero-image">
+                    <img src="./public/profile.webp" alt="Gabe Chew Zhan Hong" class="hero-image" loading="lazy">
                     <div class="hero-image-overlay"></div>
                 </div>
                 <div class="hero-floating-cards">
@@ -127,7 +124,6 @@
         </div>
     </section>
 
-    <!-- About Section -->
     <section id="about" class="section about">
         <div class="container">
             <div class="section-header">
@@ -266,7 +262,6 @@
         </div>
     </section>
 
-    <!-- Experience Section -->
     <section id="experience" class="section experience">
         <div class="container">
             <div class="section-header">
@@ -336,7 +331,7 @@
                 </div>
             </div>
             
-            <div class="education-grid">
+            <div class="education-section">
                 <h3 class="education-title">Education</h3>
                 <div class="education-cards">
                     <div class="education-card">
@@ -374,7 +369,6 @@
         </div>
     </section>
 
-    <!-- Projects Section -->
     <section id="projects" class="section projects">
         <div class="container">
             <div class="section-header">
@@ -386,12 +380,10 @@
             </div>
             
             <div class="projects-grid" id="projects-grid">
-                <!-- Project cards will be dynamically generated -->
-            </div>
+                </div>
         </div>
     </section>
 
-    <!-- Ventures Section -->
     <section id="ventures" class="section ventures">
         <div class="container">
             <div class="section-header">
@@ -465,7 +457,7 @@
                             </div>
                             <div class="feature">
                                 <i class="fas fa-shield-virus"></i>
-                                <span>Anti-Scam Operations</span>
+                                <span>Open-Source Collaboration</span>
                             </div>
                         </div>
                         <a href="https://www.cultlolcow.com" target="_blank" class="venture-cta">
@@ -478,7 +470,6 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
     <section id="contact" class="section contact">
         <div class="container">
             <div class="section-header">
@@ -557,7 +548,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -571,7 +561,6 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="js/script.js"></script>
 </body>
 </html>
