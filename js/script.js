@@ -1,1254 +1,900 @@
-// ===== THEME MANAGEMENT =====
-class ThemeManager {
-  constructor() {
-    this.theme = localStorage.getItem('theme') || 
-                 (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    this.init();
-  }
+/**
+ * Portfolio Website JavaScript
+ * Author: Gabe Chew Zhan Hong
+ * Description: Interactive functionality for portfolio website
+ */
 
-  init() {
-    this.applyTheme();
-    this.setupToggle();
-    this.setupSystemThemeDetection();
-  }
-
-  applyTheme() {
-    document.documentElement.setAttribute('data-theme', this.theme);
-    localStorage.setItem('theme', this.theme);
-  }
-
-  toggleTheme() {
-    this.theme = this.theme === 'light' ? 'dark' : 'light';
-    this.applyTheme();
-    this.animateThemeTransition();
-  }
-
-  setupToggle() {
-    const toggle = document.getElementById('theme-toggle');
-    if (toggle) {
-      toggle.addEventListener('click', () => this.toggleTheme());
-    }
-  }
-
-  setupSystemThemeDetection() {
-    window.matchMedia('(prefers-color-scheme: dark)')
-          .addEventListener('change', (e) => {
-            if (!localStorage.getItem('theme')) {
-              this.theme = e.matches ? 'dark' : 'light';
-              this.applyTheme();
-            }
-          });
-  }
-
-  animateThemeTransition() {
-    document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
-    setTimeout(() => {
-      document.body.style.transition = '';
-    }, 300);
-  }
-}
-
-// ===== NAVIGATION MANAGEMENT =====
-class NavigationManager {
-  constructor() {
-    this.nav = document.getElementById('nav');
-    this.navToggle = document.getElementById('nav-toggle');
-    this.navLinks = document.querySelectorAll('.nav-link');
-    this.isMenuOpen = false;
-    this.init();
-  }
-
-  init() {
-    this.setupScrollEffect();
-    this.setupSmoothScrolling();
-    this.setupMobileMenu();
-    this.setupActiveSection();
-  }
-
-  setupScrollEffect() {
-    let lastScrollY = window.scrollY;
-    
-    window.addEventListener('scroll', () => {
-      const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > 100) {
-        this.nav.classList.add('scrolled');
-      } else {
-        this.nav.classList.remove('scrolled');
-      }
-      
-      // Auto-hide navigation on scroll down, show on scroll up
-      if (currentScrollY > lastScrollY && currentScrollY > 200) {
-        this.nav.style.transform = 'translateY(-100%)';
-      } else {
-        this.nav.style.transform = 'translateY(0)';
-      }
-      
-      lastScrollY = currentScrollY;
-    }, { passive: true });
-  }
-
-  setupSmoothScrolling() {
-    this.navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        const href = link.getAttribute('href');
-        
-        if (href.startsWith('#')) {
-          e.preventDefault();
-          const target = document.querySelector(href);
-          
-          if (target) {
-            const offsetTop = target.offsetTop - 80;
-            window.scrollTo({
-              top: offsetTop,
-              behavior: 'smooth'
-            });
-          }
-          
-          // Close mobile menu if open
-          if (this.isMenuOpen) {
-            this.toggleMobileMenu();
-          }
-        }
-      });
-    });
-  }
-
-  setupMobileMenu() {
-    if (this.navToggle) {
-      this.navToggle.addEventListener('click', () => this.toggleMobileMenu());
-    }
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (this.isMenuOpen && !this.nav.contains(e.target)) {
-        this.toggleMobileMenu();
-      }
-    });
-  }
-
-  toggleMobileMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
-    this.navToggle.classList.toggle('active');
-    
-    const navLinks = document.querySelector('.nav-links');
-    if (navLinks) {
-      navLinks.classList.toggle('active');
-    }
-  }
-
-  setupActiveSection() {
-    const sections = document.querySelectorAll('section[id]');
-    
-    const observerOptions = {
-      root: null,
-      rootMargin: '-20% 0px -70% 0px',
-      threshold: 0
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          this.setActiveNavLink(entry.target.id);
-        }
-      });
-    }, observerOptions);
-    
-    sections.forEach(section => observer.observe(section));
-  }
-
-  setActiveNavLink(sectionId) {
-    this.navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === `#${sectionId}`) {
-        link.classList.add('active');
-      }
-    });
-  }
-}
-
-// ===== SCROLL ANIMATIONS =====
-class ScrollAnimations {
-  constructor() {
-    this.animatedElements = document.querySelectorAll('.animate-on-scroll, .reveal, .reveal-left, .reveal-right, .reveal-scale');
-    this.init();
-  }
-
-  init() {
-    this.setupIntersectionObserver();
-    this.setupParallaxEffect();
-  }
-
-  setupIntersectionObserver() {
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px 0px -100px 0px',
-      threshold: 0.1
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animated', 'revealed');
-          
-          // Stagger animation for child elements
-          const children = entry.target.querySelectorAll('.stagger-item');
-          children.forEach((child, index) => {
-            setTimeout(() => {
-              child.classList.add('animated');
-            }, index * 100);
-          });
-        }
-      });
-    }, observerOptions);
-
-    this.animatedElements.forEach(element => observer.observe(element));
-  }
-
-  setupParallaxEffect() {
-    const parallaxElements = document.querySelectorAll('.parallax-element');
-    
-    if (parallaxElements.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      window.addEventListener('scroll', () => {
-        const scrollY = window.pageYOffset;
-        
-        parallaxElements.forEach(element => {
-          const speed = element.dataset.speed || 0.5;
-          const yPos = -(scrollY * speed);
-          element.style.transform = `translateY(${yPos}px)`;
-        });
-      }, { passive: true });
-    }
-  }
-}
-
-// ===== PROJECTS MANAGER =====
-class ProjectsManager {
-  constructor() {
-    this.projectsContainer = document.getElementById('projects-grid');
-    this.projects = [
-      {
-        title: 'HelloARM64',
-        subtitle: 'ARM64 Architecture Exploration',
-        description: 'A comprehensive repository exploring the fundamentals of ARM64 architecture, including assembly language programming, reverse engineering techniques, and low-level system programming. Features practical examples and detailed documentation for learning ARM64 development.',
-        tech: ['Assembly', 'ARM64', 'C', 'Reverse Engineering', 'Low-level Programming'],
-        github: 'https://github.com/gluppler/HelloARM64',
-        featured: true
-      },
-      {
-        title: 'HelloCPP',
-        subtitle: 'Modern C++ Projects',
-        description: 'A collection of advanced C++ projects demonstrating modern C++ features, design patterns, and best practices. Includes implementations of data structures, algorithms, and system-level programming concepts with comprehensive examples.',
-        tech: ['C++', 'STL', 'Modern C++', 'Design Patterns', 'Performance Optimization'],
-        github: 'https://github.com/gluppler/HelloCPP',
-        featured: true
-      },
-      {
-        title: 'HelloGolang',
-        subtitle: 'Go Systems Programming',
-        description: 'A repository of Go projects focused on concurrency, networking, and systems programming. Demonstrates Go\'s powerful concurrency model, network programming capabilities, and system-level interactions with practical examples.',
-        tech: ['Go', 'Concurrency', 'Networking', 'Systems Programming', 'Microservices'],
-        github: 'https://github.com/gluppler/HelloGolang',
-        featured: true
-      },
-      {
-        title: 'HelloPython-AI-ML',
-        subtitle: 'AI & Machine Learning',
-        description: 'A showcase of Python-based AI and Machine Learning projects, including custom models, data analysis pipelines, and practical implementations. Features neural networks, data visualization, and advanced ML algorithms with real-world applications.',
-        tech: ['Python', 'TensorFlow', 'PyTorch', 'Scikit-learn', 'Data Analysis', 'Neural Networks'],
-        github: 'https://github.com/gluppler/HelloPython-AI-ML',
-        featured: true
-      },
-      {
-        title: 'HelloContainers',
-        subtitle: 'Container Orchestration',
-        description: 'A comprehensive repository dedicated to containerization technologies like Docker and Kubernetes, with a strong focus on security and orchestration. Includes best practices for container security, deployment strategies, and scalable architectures.',
-        tech: ['Docker', 'Kubernetes', 'Container Security', 'DevOps', 'Orchestration'],
-        github: 'https://github.com/gluppler/HelloContainers',
-        featured: true
-      },
-      {
-        title: 'Cybersecurity-Lab',
-        subtitle: 'Self-hosted Security Lab',
-        description: 'A comprehensive, self-hosted cybersecurity lab environment for practicing offensive and defensive security techniques. Features vulnerable applications, network simulation, and hands-on exercises for security professionals and students.',
-        tech: ['Security Testing', 'Network Security', 'Penetration Testing', 'Vulnerability Assessment', 'Lab Environment'],
-        github: 'https://github.com/gluppler/Cybersecurity-Lab',
-        featured: true
-      }
-    ];
-    this.init();
-  }
-
-  init() {
-    this.renderProjects();
-    this.setupProjectAnimations();
-  }
-
-  renderProjects() {
-    if (!this.projectsContainer) {
-        console.error('Projects container not found!');
-        return;
-    }
-
-    const projectsHTML = this.projects.map((project, index) => `
-      <div class="project-card reveal" style="animation-delay: ${index * 0.1}s">
-        <div class="project-header">
-          <h3 class="project-title">${project.title}</h3>
-          <p class="project-subtitle">${project.subtitle}</p>
-        </div>
-        <div class="project-content">
-          <p class="project-description">${project.description}</p>
-          <div class="project-tech">
-            ${project.tech.map(tech => `<span class="project-tech-tag">${tech}</span>`).join('')}
-          </div>
-          <div class="project-actions">
-            <a href="${project.github}" target="_blank" rel="noopener noreferrer" class="project-btn project-btn-primary">
-              <i class="fab fa-github"></i>
-              View Repository
-            </a>
-            <a href="#" class="project-btn project-btn-secondary project-details-btn" data-project-title="${project.title}">
-              <i class="fas fa-info-circle"></i>
-              Learn More
-            </a>
-          </div>
-        </div>
-      </div>
-    `).join('');
-
-    this.projectsContainer.innerHTML = projectsHTML;
-
-    // Add event listeners after rendering the HTML
-    this.projectsContainer.querySelectorAll('.project-details-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const projectTitle = e.currentTarget.dataset.projectTitle;
-            this.showProjectDetails(projectTitle);
-        });
-    });
-  }
-
-  setupProjectAnimations() {
-    const projectCards = document.querySelectorAll('.project-card');
-    
-    projectCards.forEach(card => {
-      card.addEventListener('mouseenter', () => {
-        card.style.transform = 'translateY(-8px) scale(1.02)';
-      });
-      
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'translateY(0) scale(1)';
-      });
-    });
-  }
-
-  showProjectDetails(projectTitle) {
-    const project = this.projects.find(p => p.title === projectTitle);
-    if (project) {
-      // Create a modal or detailed view
-      this.createProjectModal(project);
-    }
-  }
-
-  createProjectModal(project) {
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>${project.title}</h2>
-          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <h3>${project.subtitle}</h3>
-          <p>${project.description}</p>
-          <div class="modal-tech">
-            <h4>Technologies Used:</h4>
-            <div class="tech-tags">
-              ${project.tech.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
-            </div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <a href="${project.github}" target="_blank" class="btn btn-primary">
-            <i class="fab fa-github"></i>
-            View on GitHub
-          </a>
-        </div>
-      </div>
-    `;
-
-    // Add modal styles
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-    `;
-
-    const modalContent = modal.querySelector('.modal-content');
-    modalContent.style.cssText = `
-      background: var(--surface-color);
-      border-radius: var(--border-radius-xl);
-      padding: var(--spacing-2xl);
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-      margin: var(--spacing-lg);
-      box-shadow: var(--shadow-xl);
-      border: 1px solid var(--border-color);
-    `;
-
-    document.body.appendChild(modal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
-    });
-  }
-}
-
-// ===== TYPING ANIMATION =====
-class TypingAnimation {
-  constructor(element, texts, options = {}) {
-    this.element = element;
-    this.texts = texts;
-    this.options = {
-      typeSpeed: options.typeSpeed || 100,
-      deleteSpeed: options.deleteSpeed || 50,
-      pauseDelay: options.pauseDelay || 2000,
-      loop: options.loop !== false,
-      ...options
-    };
-    this.currentTextIndex = 0;
-    this.currentCharIndex = 0;
-    this.isDeleting = false;
-    this.init();
-  }
-
-  init() {
-    this.type();
-  }
-
-  type() {
-    const currentText = this.texts[this.currentTextIndex];
-    
-    if (this.isDeleting) {
-      this.element.textContent = currentText.substring(0, this.currentCharIndex - 1);
-      this.currentCharIndex--;
-    } else {
-      this.element.textContent = currentText.substring(0, this.currentCharIndex + 1);
-      this.currentCharIndex++;
-    }
-
-    let typeSpeed = this.isDeleting ? this.options.deleteSpeed : this.options.typeSpeed;
-
-    if (!this.isDeleting && this.currentCharIndex === currentText.length) {
-      typeSpeed = this.options.pauseDelay;
-      this.isDeleting = true;
-    } else if (this.isDeleting && this.currentCharIndex === 0) {
-      this.isDeleting = false;
-      this.currentTextIndex = (this.currentTextIndex + 1) % this.texts.length;
-    }
-
-    setTimeout(() => this.type(), typeSpeed);
-  }
-}
-
-// ===== PARTICLE SYSTEM =====
-class ParticleSystem {
-  constructor(container) {
-    this.container = container;
-    this.particles = [];
-    this.particleCount = 50;
-    this.init();
-  }
-
-  init() {
-    this.createParticles();
-    this.animate();
-  }
-
-  createParticles() {
-    for (let i = 0; i < this.particleCount; i++) {
-      this.createParticle();
-    }
-  }
-
-  createParticle() {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
-    
-    const size = Math.random() * 4 + 2;
-    const xPos = Math.random() * 100;
-    const animationDuration = Math.random() * 10 + 10;
-    const delay = Math.random() * 10;
-
-    particle.style.cssText = `
-      width: ${size}px;
-      height: ${size}px;
-      left: ${xPos}%;
-      animation-duration: ${animationDuration}s;
-      animation-delay: ${delay}s;
-    `;
-
-    this.container.appendChild(particle);
-    this.particles.push(particle);
-
-    // Remove particle after animation
-    setTimeout(() => {
-      if (particle.parentNode) {
-        particle.parentNode.removeChild(particle);
-      }
-      this.createParticle(); // Create new particle
-    }, (animationDuration + delay) * 1000);
-  }
-
-  animate() {
-    // Continuous animation loop
-    requestAnimationFrame(() => this.animate());
-  }
-}
-
-// ===== PERFORMANCE MONITOR =====
-class PerformanceMonitor {
-  constructor() {
-    this.metrics = {
-      fps: 0,
-      memory: 0,
-      loadTime: 0
-    };
-    this.init();
-  }
-
-  init() {
-    this.measureLoadTime();
-    this.startFPSMonitor();
-    this.monitorMemory();
-  }
-
-  measureLoadTime() {
-    window.addEventListener('load', () => {
-      const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-      this.metrics.loadTime = loadTime;
-      console.log(`Page load time: ${loadTime}ms`);
-    });
-  }
-
-  startFPSMonitor() {
-    let lastTime = performance.now();
-    let frames = 0;
-
-    const countFPS = (currentTime) => {
-      frames++;
-      if (currentTime >= lastTime + 1000) {
-        this.metrics.fps = Math.round((frames * 1000) / (currentTime - lastTime));
-        frames = 0;
-        lastTime = currentTime;
-      }
-      requestAnimationFrame(countFPS);
-    };
-
-    requestAnimationFrame(countFPS);
-  }
-
-  monitorMemory() {
-    if ('memory' in performance) {
-      setInterval(() => {
-        this.metrics.memory = performance.memory.usedJSHeapSize / 1048576; // MB
-      }, 5000);
-    }
-  }
-
-  getMetrics() {
-    return this.metrics;
-  }
-}
-
-// ===== INTERSECTION OBSERVER UTILITIES =====
-class IntersectionObserverManager {
-  constructor() {
-    this.observers = new Map();
-    this.init();
-  }
-
-  init() {
-    this.setupCounterAnimation();
-    this.setupProgressBars();
-    this.setupTimelineAnimation();
-  }
-
-  createObserver(options, callback) {
-    return new IntersectionObserver(callback, {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1,
-      ...options
-    });
-  }
-
-  setupCounterAnimation() {
-    const counters = document.querySelectorAll('[data-count]');
-    
-    if (counters.length) {
-      const observer = this.createObserver({}, (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            this.animateCounter(entry.target);
-            observer.unobserve(entry.target);
-          }
-        });
-      });
-
-      counters.forEach(counter => observer.observe(counter));
-    }
-  }
-
-  animateCounter(element) {
-    const target = parseInt(element.dataset.count);
-    const duration = parseInt(element.dataset.duration) || 2000;
-    const increment = target / (duration / 16); // 60fps
-    let current = 0;
-
-    const updateCounter = () => {
-      if (current < target) {
-        current += increment;
-        element.textContent = Math.floor(current);
-        requestAnimationFrame(updateCounter);
-      } else {
-        element.textContent = target;
-      }
-    };
-
-    updateCounter();
-  }
-
-  setupProgressBars() {
-    const progressBars = document.querySelectorAll('.skill-progress');
-    
-    if (progressBars.length) {
-      const observer = this.createObserver({}, (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate');
-            observer.unobserve(entry.target);
-          }
-        });
-      });
-
-      progressBars.forEach(bar => observer.observe(bar));
-    }
-  }
-
-  setupTimelineAnimation() {
-    const timelineItems = document.querySelectorAll('.timeline-item');
-    
-    if (timelineItems.length) {
-      const observer = this.createObserver({ threshold: 0.2 }, (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate');
-          }
-        });
-      });
-
-      timelineItems.forEach(item => observer.observe(item));
-    }
-  }
-}
-
-// ===== CURSOR EFFECTS =====
-class CursorEffects {
-  constructor() {
-    this.cursor = null;
-    this.cursorFollower = null;
-    this.init();
-  }
-
-  init() {
-    if (window.innerWidth > 768 && !('ontouchstart' in window)) {
-      this.createCursor();
-      this.setupCursorMovement();
-      this.setupCursorInteractions();
-    }
-  }
-
-  createCursor() {
-    // Main cursor
-    this.cursor = document.createElement('div');
-    this.cursor.className = 'custom-cursor';
-    this.cursor.style.cssText = `
-      position: fixed;
-      width: 8px;
-      height: 8px;
-      background: var(--primary-color);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transition: all 0.1s ease;
-      mix-blend-mode: difference;
-    `;
-
-    // Cursor follower
-    this.cursorFollower = document.createElement('div');
-    this.cursorFollower.className = 'cursor-follower';
-    this.cursorFollower.style.cssText = `
-      position: fixed;
-      width: 30px;
-      height: 30px;
-      border: 2px solid var(--primary-color);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transition: all 0.3s ease;
-      opacity: 0.5;
-    `;
-
-    document.body.appendChild(this.cursor);
-    document.body.appendChild(this.cursorFollower);
-  }
-
-  setupCursorMovement() {
-    let mouseX = 0, mouseY = 0;
-    let cursorX = 0, cursorY = 0;
-    let followerX = 0, followerY = 0;
-
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-
-    const animateCursor = () => {
-      // Cursor movement
-      cursorX += (mouseX - cursorX) * 0.9;
-      cursorY += (mouseY - cursorY) * 0.9;
-      
-      // Follower movement (slower)
-      followerX += (mouseX - followerX) * 0.1;
-      followerY += (mouseY - followerY) * 0.1;
-
-      if (this.cursor) {
-        this.cursor.style.left = cursorX + 'px';
-        this.cursor.style.top = cursorY + 'px';
-      }
-
-      if (this.cursorFollower) {
-        this.cursorFollower.style.left = followerX - 15 + 'px';
-        this.cursorFollower.style.top = followerY - 15 + 'px';
-      }
-
-      requestAnimationFrame(animateCursor);
-    };
-
-    animateCursor();
-  }
-
-  setupCursorInteractions() {
-    const interactiveElements = document.querySelectorAll('a, button, .btn, .nav-link, .social-link');
-
-    interactiveElements.forEach(element => {
-      element.addEventListener('mouseenter', () => {
-        this.cursor.style.transform = 'scale(1.5)';
-        this.cursorFollower.style.transform = 'scale(1.5)';
-        this.cursorFollower.style.opacity = '1';
-      });
-
-      element.addEventListener('mouseleave', () => {
-        this.cursor.style.transform = 'scale(1)';
-        this.cursorFollower.style.transform = 'scale(1)';
-        this.cursorFollower.style.opacity = '0.5';
-      });
-    });
-  }
-}
-
-// ===== LAZY LOADING =====
-class LazyLoader {
-  constructor() {
-    this.images = document.querySelectorAll('img[data-src]');
-    this.init();
-  }
-
-  init() {
-    if ('IntersectionObserver' in window) {
-      this.setupIntersectionObserver();
-    } else {
-      this.loadAllImages();
-    }
-  }
-
-  setupIntersectionObserver() {
-    const imageObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          this.loadImage(entry.target);
-          imageObserver.unobserve(entry.target);
-        }
-      });
-    }, {
-      rootMargin: '50px'
-    });
-
-    this.images.forEach(img => imageObserver.observe(img));
-  }
-
-  loadImage(img) {
-    img.src = img.dataset.src;
-    img.classList.add('loaded');
-    img.removeAttribute('data-src');
-  }
-
-  loadAllImages() {
-    this.images.forEach(img => this.loadImage(img));
-  }
-}
-
-// ===== CONTACT FORM HANDLER =====
-class ContactFormHandler {
-  constructor() {
-    this.form = document.querySelector('.contact-form');
-    this.init();
-  }
-
-  init() {
-    if (this.form) {
-      this.setupFormValidation();
-      this.setupFormSubmission();
-    }
-  }
-
-  setupFormValidation() {
-    const inputs = this.form.querySelectorAll('input, textarea');
-    
-    inputs.forEach(input => {
-      input.addEventListener('blur', () => this.validateField(input));
-      input.addEventListener('input', () => this.clearErrors(input));
-    });
-  }
-
-  validateField(field) {
-    const value = field.value.trim();
-    let isValid = true;
-
-    // Clear previous errors
-    this.clearErrors(field);
-
-    // Required field validation
-    if (field.hasAttribute('required') && !value) {
-      this.showError(field, 'This field is required');
-      isValid = false;
-    }
-
-    // Email validation
-    if (field.type === 'email' && value) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
-        this.showError(field, 'Please enter a valid email address');
-        isValid = false;
-      }
-    }
-
-    return isValid;
-  }
-
-  showError(field, message) {
-    field.classList.add('error');
-    
-    let errorElement = field.parentNode.querySelector('.error-message');
-    if (!errorElement) {
-      errorElement = document.createElement('span');
-      errorElement.className = 'error-message';
-      field.parentNode.appendChild(errorElement);
-    }
-    
-    errorElement.textContent = message;
-  }
-
-  clearErrors(field) {
-    field.classList.remove('error');
-    const errorElement = field.parentNode.querySelector('.error-message');
-    if (errorElement) {
-      errorElement.remove();
-    }
-  }
-
-  setupFormSubmission() {
-    this.form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const formData = new FormData(this.form);
-      const isValid = this.validateForm();
-      
-      if (isValid) {
-        try {
-          await this.submitForm(formData);
-          this.showSuccess('Message sent successfully!');
-          this.form.reset();
-        } catch (error) {
-          this.showError(this.form, 'Failed to send message. Please try again.');
-        }
-      }
-    });
-  }
-
-  validateForm() {
-    const inputs = this.form.querySelectorAll('input, textarea');
-    let isValid = true;
-
-    inputs.forEach(input => {
-      if (!this.validateField(input)) {
-        isValid = false;
-      }
-    });
-
-    return isValid;
-  }
-
-  async submitForm(formData) {
-    // Simulate form submission
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // In a real implementation, you would send the data to your server
-        resolve();
-      }, 1000);
-    });
-  }
-
-  showSuccess(message) {
-    const successElement = document.createElement('div');
-    successElement.className = 'success-message';
-    successElement.textContent = message;
-    successElement.style.cssText = `
-      color: #10b981;
-      padding: 1rem;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: 0.5rem;
-      margin-top: 1rem;
-    `;
-    
-    this.form.appendChild(successElement);
-    
-    setTimeout(() => {
-      successElement.remove();
-    }, 5000);
-  }
-}
-
-// ===== PAGE LOADER =====
-class PageLoader {
-  constructor() {
-    this.loader = this.createLoader();
-    this.init();
-  }
-
-  createLoader() {
-    const loader = document.createElement('div');
-    loader.className = 'page-loader';
-    loader.innerHTML = `
-      <div class="loader-content">
-        <div class="loader-spinner"></div>
-        <p class="loader-text">Loading Experience...</p>
-      </div>
-    `;
-    
-    loader.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    `;
-
-    const spinner = loader.querySelector('.loader-spinner');
-    spinner.style.cssText = `
-      width: 50px;
-      height: 50px;
-      border: 3px solid var(--border-color);
-      border-top: 3px solid var(--primary-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 1rem;
-    `;
-
-    return loader;
-  }
-
-  init() {
-    document.body.appendChild(this.loader);
-    this.setupLoadingComplete();
-  }
-
-  setupLoadingComplete() {
-    const hideLoader = () => {
-      this.loader.style.opacity = '0';
-      this.loader.style.visibility = 'hidden';
-      
-      setTimeout(() => {
-        if (this.loader.parentNode) {
-          this.loader.parentNode.removeChild(this.loader);
-        }
-      }, 500);
-    };
-
-    // Hide loader when page is fully loaded
-    if (document.readyState === 'complete') {
-      setTimeout(hideLoader, 1000);
-    } else {
-      window.addEventListener('load', () => {
-        setTimeout(hideLoader, 1000);
-      });
-    }
-  }
-}
-
-// ===== MAIN APPLICATION =====
 class PortfolioApp {
   constructor() {
-    this.components = {};
     this.init();
   }
 
   init() {
-    // Initialize all components when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.initializeComponents());
+    this.bindEvents();
+    this.initTheme();
+    this.initScrollAnimations();
+    this.initNavigation();
+    this.initContactForm();
+    this.initSmoothScrolling();
+    this.initIntersectionObserver();
+    this.initParallaxEffects();
+  }
+
+  /**
+   * Bind all event listeners
+   */
+  bindEvents() {
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', this.toggleTheme.bind(this));
+    }
+
+    // Mobile navigation
+    const navToggle = document.getElementById('nav-toggle');
+    const navMenu = document.getElementById('nav-menu');
+    
+    if (navToggle && navMenu) {
+      navToggle.addEventListener('click', () => this.toggleMobileNav(navToggle, navMenu));
+    }
+
+    // Navigation links
+    const navLinks = document.querySelectorAll('.nav__link[href^="#"]');
+    navLinks.forEach(link => {
+      link.addEventListener('click', this.handleNavClick.bind(this));
+    });
+
+    // Window events
+    window.addEventListener('scroll', this.handleScroll.bind(this));
+    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener('load', this.handleLoad.bind(this));
+
+    // Form submission
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+    }
+
+    // Project card interactions
+    const projectCards = document.querySelectorAll('.project-card');
+    projectCards.forEach(card => {
+      card.addEventListener('mouseenter', this.handleProjectHover.bind(this));
+      card.addEventListener('mouseleave', this.handleProjectLeave.bind(this));
+    });
+  }
+
+  /**
+   * Initialize theme functionality
+   */
+  initTheme() {
+    // Check for saved theme or default to system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const theme = savedTheme || systemPreference;
+    
+    this.setTheme(theme);
+    this.updateThemeIcon(theme);
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        this.setTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+  }
+
+  /**
+   * Toggle between light and dark theme
+   */
+  toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    this.setTheme(newTheme);
+    this.updateThemeIcon(newTheme);
+    localStorage.setItem('theme', newTheme);
+  }
+
+  /**
+   * Set theme
+   */
+  setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  /**
+   * Update theme toggle icon
+   */
+  updateThemeIcon(theme) {
+    const themeIcon = document.querySelector('.theme-icon');
+    if (themeIcon) {
+      themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+  }
+
+  /**
+   * Initialize scroll animations
+   */
+  initScrollAnimations() {
+    // Add animation classes to elements
+    const animatedElements = [
+      { selector: '.hero__content > *', animation: 'fade-up' },
+      { selector: '.section__header', animation: 'fade-up' },
+      { selector: '.about__content', animation: 'fade-right' },
+      { selector: '.about__education', animation: 'fade-left' },
+      { selector: '.experience__item', animation: 'fade-up' },
+      { selector: '.project-card', animation: 'scale-up' },
+      { selector: '.skills__category', animation: 'fade-up' },
+      { selector: '.contact__content', animation: 'fade-right' },
+      { selector: '.contact__form', animation: 'fade-left' }
+    ];
+
+    animatedElements.forEach(({ selector, animation }) => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach((el, index) => {
+        el.classList.add('animate-on-scroll', animation);
+        el.style.animationDelay = `${index * 0.1}s`;
+      });
+    });
+  }
+
+  /**
+   * Initialize navigation functionality
+   */
+  initNavigation() {
+    // Update active nav link on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav__link[href^="#"]');
+
+    // Create intersection observer for nav highlighting
+    const navObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // Remove active class from all links
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Add active class to current section link
+            const activeLink = document.querySelector(`.nav__link[href="#${entry.target.id}"]`);
+            if (activeLink) {
+              activeLink.classList.add('active');
+            }
+          }
+        });
+      },
+      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' }
+    );
+
+    sections.forEach(section => navObserver.observe(section));
+  }
+
+  /**
+   * Toggle mobile navigation
+   */
+  toggleMobileNav(navToggle, navMenu) {
+    navToggle.classList.toggle('active');
+    navMenu.classList.toggle('active');
+    
+    // Prevent body scroll when menu is open
+    if (navMenu.classList.contains('active')) {
+      document.body.style.overflow = 'hidden';
     } else {
-      this.initializeComponents();
+      document.body.style.overflow = '';
     }
   }
 
-  initializeComponents() {
-    try {
-      // Core components
-      this.components.themeManager = new ThemeManager();
-      this.components.navigationManager = new NavigationManager();
-      this.components.scrollAnimations = new ScrollAnimations();
-      this.components.projectsManager = new ProjectsManager();
+  /**
+   * Handle navigation link clicks
+   */
+  handleNavClick(e) {
+    const href = e.currentTarget.getAttribute('href');
+    
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const targetId = href.substring(1);
+      const targetElement = document.getElementById(targetId);
       
-      // Enhanced features
-      this.components.intersectionObserverManager = new IntersectionObserverManager();
-      this.components.lazyLoader = new LazyLoader();
-      this.components.contactFormHandler = new ContactFormHandler();
-      this.components.cursorEffects = new CursorEffects();
-      
-      // Performance and effects
-      this.components.performanceMonitor = new PerformanceMonitor();
-      this.components.pageLoader = new PageLoader();
-      
-      // Initialize particle system if container exists
-      const particleContainer = document.querySelector('.particles-container');
-      if (particleContainer) {
-        this.components.particleSystem = new ParticleSystem(particleContainer);
-      }
-      
-      // Initialize typing animation if element exists
-      const typingElement = document.querySelector('.typing-text');
-      if (typingElement) {
-        this.components.typingAnimation = new TypingAnimation(
-          typingElement,
-          ['Security Specialist', 'Hardware Hacker', 'AI Security Expert', 'System Architect'],
-          { typeSpeed: 80, deleteSpeed: 40, pauseDelay: 2000 }
-        );
-      }
-
-      this.setupGlobalEventListeners();
-      this.setupKeyboardShortcuts();
-      
-      console.log('🚀 Portfolio App Initialized Successfully');
-    } catch (error) {
-      console.error('Error initializing portfolio app:', error);
-    }
-  }
-
-  setupGlobalEventListeners() {
-    // Handle visibility change for performance optimization
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        this.pauseAnimations();
-      } else {
-        this.resumeAnimations();
-      }
-    });
-
-    // Handle resize events
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        this.handleResize();
-      }, 250);
-    });
-
-    // Handle online/offline status
-    window.addEventListener('online', () => this.handleOnline());
-    window.addEventListener('offline', () => this.handleOffline());
-  }
-
-  setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
-      // Toggle theme with Ctrl/Cmd + D
-      if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-        e.preventDefault();
-        this.components.themeManager.toggleTheme();
-      }
-
-      // Quick navigation shortcuts
-      if (e.altKey) {
-        switch (e.key) {
-          case '1': this.scrollToSection('home'); break;
-          case '2': this.scrollToSection('about'); break;
-          case '3': this.scrollToSection('experience'); break;
-          case '4': this.scrollToSection('projects'); break;
-          case '5': this.scrollToSection('contact'); break;
+      if (targetElement) {
+        // Close mobile menu if open
+        const navMenu = document.getElementById('nav-menu');
+        const navToggle = document.getElementById('nav-toggle');
+        if (navMenu?.classList.contains('active')) {
+          navMenu.classList.remove('active');
+          navToggle?.classList.remove('active');
+          document.body.style.overflow = '';
         }
+
+        // Smooth scroll to target
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }
+  }
+
+  /**
+   * Initialize contact form
+   */
+  initContactForm() {
+    const formInputs = document.querySelectorAll('.form__input');
+    
+    formInputs.forEach(input => {
+      // Add placeholder for floating labels
+      if (!input.hasAttribute('placeholder')) {
+        input.setAttribute('placeholder', ' ');
+      }
+
+      // Handle input focus and blur
+      input.addEventListener('focus', () => {
+        input.parentElement.classList.add('focused');
+      });
+
+      input.addEventListener('blur', () => {
+        if (!input.value.trim()) {
+          input.parentElement.classList.remove('focused');
+        }
+      });
+
+      // Check if input has value on load
+      if (input.value.trim()) {
+        input.parentElement.classList.add('focused');
       }
     });
   }
 
-  scrollToSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
+  /**
+   * Handle form submission
+   */
+  handleFormSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    // Get form values
+    const name = formData.get('name') || document.getElementById('name').value;
+    const email = formData.get('email') || document.getElementById('email').value;
+    const message = formData.get('message') || document.getElementById('message').value;
+    
+    // Basic validation
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      this.showNotification('Please fill in all fields', 'error');
+      return;
+    }
+
+    if (!this.isValidEmail(email)) {
+      this.showNotification('Please enter a valid email address', 'error');
+      return;
+    }
+
+    // Show loading state
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Sending...';
+    submitButton.disabled = true;
+
+    // Simulate form submission (replace with actual form handling)
+    setTimeout(() => {
+      // Create mailto link
+      const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+      const mailtoLink = `mailto:chewzhanhongint@gmail.com?subject=${subject}&body=${body}`;
+      
+      // Open email client
+      window.location.href = mailtoLink;
+      
+      // Reset form
+      form.reset();
+      document.querySelectorAll('.form__group.focused').forEach(group => {
+        group.classList.remove('focused');
+      });
+      
+      // Reset button
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+      
+      this.showNotification('Thank you for your message! Your email client will open shortly.', 'success');
+    }, 1000);
+  }
+
+  /**
+   * Validate email format
+   */
+  isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  /**
+   * Show notification
+   */
+  showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+
+    // Create notification
+    const notification = document.createElement('div');
+    notification.className = `notification notification--${type}`;
+    notification.innerHTML = `
+      <span>${message}</span>
+      <button class="notification__close">&times;</button>
+    `;
+
+    // Add styles
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'error' ? '#ff4444' : type === 'success' ? '#22c55e' : '#3b82f6'};
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      animation: slideInFromRight 0.3s ease-out;
+      max-width: 400px;
+      font-weight: 500;
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.style.animation = 'slideOutToRight 0.3s ease-in';
+        setTimeout(() => notification.remove(), 300);
+      }
+    }, 5000);
+
+    // Close button
+    const closeBtn = notification.querySelector('.notification__close');
+    closeBtn.addEventListener('click', () => {
+      notification.style.animation = 'slideOutToRight 0.3s ease-in';
+      setTimeout(() => notification.remove(), 300);
+    });
+  }
+
+  /**
+   * Initialize smooth scrolling
+   */
+  initSmoothScrolling() {
+    // Add smooth scrolling behavior to the page
+    document.documentElement.style.scrollBehavior = 'smooth';
+  }
+
+  /**
+   * Initialize intersection observer for animations
+   */
+  initIntersectionObserver() {
+    const animationObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    // Observe all elements with animation classes
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach(el => animationObserver.observe(el));
+  }
+
+  /**
+   * Initialize parallax effects
+   */
+  initParallaxEffects() {
+    this.parallaxElements = [
+      { selector: '.hero__image-container', speed: 0.5 },
+      { selector: '.section__number', speed: 0.3 }
+    ];
+  }
+
+  /**
+   * Handle project card hover
+   */
+  handleProjectHover(e) {
+    const card = e.currentTarget;
+    const image = card.querySelector('.project-card__image');
+    
+    if (image) {
+      image.style.transform = 'scale(1.05) rotate(1deg)';
     }
   }
 
-  pauseAnimations() {
-    document.body.style.animationPlayState = 'paused';
+  /**
+   * Handle project card leave
+   */
+  handleProjectLeave(e) {
+    const card = e.currentTarget;
+    const image = card.querySelector('.project-card__image');
+    
+    if (image) {
+      image.style.transform = '';
+    }
   }
 
-  resumeAnimations() {
-    document.body.style.animationPlayState = 'running';
+  /**
+   * Handle scroll events
+   */
+  handleScroll() {
+    const scrollY = window.scrollY;
+    
+    // Update navigation background opacity
+    const nav = document.querySelector('.nav');
+    if (nav) {
+      if (scrollY > 50) {
+        nav.style.background = document.documentElement.getAttribute('data-theme') === 'dark' 
+          ? 'rgba(10, 10, 10, 0.98)' 
+          : 'rgba(255, 255, 255, 0.98)';
+      } else {
+        nav.style.background = document.documentElement.getAttribute('data-theme') === 'dark' 
+          ? 'rgba(10, 10, 10, 0.95)' 
+          : 'rgba(255, 255, 255, 0.95)';
+      }
+    }
+
+    // Parallax effects
+    this.parallaxElements.forEach(({ selector, speed }) => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(element => {
+        const rect = element.getBoundingClientRect();
+        const elementTop = rect.top + scrollY;
+        const elementCenter = elementTop + rect.height / 2;
+        const windowCenter = scrollY + window.innerHeight / 2;
+        const offset = (windowCenter - elementCenter) * speed;
+        
+        element.style.transform = `translateY(${offset}px)`;
+      });
+    });
+
+    // Update scroll progress
+    const scrollProgress = scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+    this.updateScrollProgress(scrollProgress);
   }
 
+  /**
+   * Update scroll progress indicator
+   */
+  updateScrollProgress(progress) {
+    let progressBar = document.querySelector('.scroll-progress');
+    
+    if (!progressBar) {
+      progressBar = document.createElement('div');
+      progressBar.className = 'scroll-progress';
+      progressBar.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: var(--color-accent);
+        z-index: 1060;
+        transition: width 0.1s ease-out;
+      `;
+      document.body.appendChild(progressBar);
+    }
+    
+    progressBar.style.width = `${progress * 100}%`;
+  }
+
+  /**
+   * Handle resize events
+   */
   handleResize() {
-    // Reinitialize cursor effects if needed
-    if (this.components.cursorEffects && window.innerWidth <= 768) {
-      this.components.cursorEffects = null;
-    } else if (!this.components.cursorEffects && window.innerWidth > 768) {
-      this.components.cursorEffects = new CursorEffects();
+    // Close mobile menu on resize
+    const navMenu = document.getElementById('nav-menu');
+    const navToggle = document.getElementById('nav-toggle');
+    
+    if (window.innerWidth > 768 && navMenu?.classList.contains('active')) {
+      navMenu.classList.remove('active');
+      navToggle?.classList.remove('active');
+      document.body.style.overflow = '';
     }
   }
 
-  handleOnline() {
-    console.log('Connection restored');
-    // Add online indicator or functionality
+  /**
+   * Handle page load
+   */
+  handleLoad() {
+    // Remove loading states
+    document.body.classList.add('loaded');
+    
+    // Trigger initial animations
+    setTimeout(() => {
+      const heroElements = document.querySelectorAll('.hero .animate-on-scroll');
+      heroElements.forEach(el => el.classList.add('animate'));
+    }, 100);
   }
 
-  handleOffline() {
-    console.log('Connection lost');
-    // Add offline indicator or functionality
-  }
-
-  // Public API methods
-  getComponent(name) {
-    return this.components[name];
-  }
-
-  getAllComponents() {
-    return this.components;
-  }
-
-  destroy() {
-    // Clean up all components and event listeners
-    Object.values(this.components).forEach(component => {
-      if (component && typeof component.destroy === 'function') {
-        component.destroy();
-      }
-    });
-  }
-}
-
-// ===== GLOBAL UTILITIES =====
-const utils = {
-  debounce: (func, wait, immediate) => {
+  /**
+   * Utility: Debounce function
+   */
+  debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
       const later = () => {
-        timeout = null;
-        if (!immediate) func(...args);
+        clearTimeout(timeout);
+        func(...args);
       };
-      const callNow = immediate && !timeout;
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
-      if (callNow) func(...args);
     };
-  },
+  }
 
-  throttle: (func, limit) => {
+  /**
+   * Utility: Throttle function
+   */
+  throttle(func, limit) {
     let inThrottle;
-    return function(...args) {
+    return function() {
+      const args = arguments;
+      const context = this;
       if (!inThrottle) {
-        func.apply(this, args);
+        func.apply(context, args);
         inThrottle = true;
         setTimeout(() => inThrottle = false, limit);
       }
     };
-  },
-
-  lerp: (start, end, factor) => {
-    return start + (end - start) * factor;
-  },
-
-  clamp: (value, min, max) => {
-    return Math.min(Math.max(value, min), max);
-  },
-
-  randomBetween: (min, max) => {
-    return Math.random() * (max - min) + min;
-  },
-
-  easeOutCubic: (t) => {
-    return 1 - Math.pow(1 - t, 3);
-  },
-
-  isElementInViewport: (el, threshold = 0) => {
-    const rect = el.getBoundingClientRect();
-    return (
-      rect.top >= -threshold &&
-      rect.left >= -threshold &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) + threshold &&
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth) + threshold
-    );
   }
-};
 
-// ===== INITIALIZE APPLICATION =====
-let portfolioApp;
-let projectsManager;
+  /**
+   * Initialize typing animation for hero title
+   */
+  initTypingAnimation() {
+    const titleLines = document.querySelectorAll('.hero__title-line');
+    
+    titleLines.forEach((line, index) => {
+      const text = line.textContent;
+      line.textContent = '';
+      line.style.borderRight = '2px solid var(--color-accent)';
+      
+      setTimeout(() => {
+        this.typeText(line, text, () => {
+          // Remove cursor after typing
+          setTimeout(() => {
+            line.style.borderRight = 'none';
+          }, 1000);
+        });
+      }, index * 1000);
+    });
+  }
 
-// Initialize the application
-portfolioApp = new PortfolioApp();
+  /**
+   * Type text animation
+   */
+  typeText(element, text, callback) {
+    let i = 0;
+    const timer = setInterval(() => {
+      element.textContent += text.charAt(i);
+      i++;
+      if (i > text.length - 1) {
+        clearInterval(timer);
+        if (callback) callback();
+      }
+    }, 100);
+  }
 
-// This makes the 'Learn More' buttons work correctly.
-projectsManager = portfolioApp.getComponent('projectsManager');
+  /**
+   * Initialize particle background
+   */
+  initParticleBackground() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
 
-// Export for global access
-window.portfolioApp = portfolioApp;
-window.projectsManager = projectsManager;
-window.utils = utils;
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '0';
+    
+    hero.style.position = 'relative';
+    hero.appendChild(canvas);
 
-// Add error handling for uncaught errors
-window.addEventListener('error', (e) => {
-  console.error('Uncaught error:', e.error);
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const particleCount = 50;
+
+    // Resize canvas
+    const resizeCanvas = () => {
+      canvas.width = hero.offsetWidth;
+      canvas.height = hero.offsetHeight;
+    };
+
+    // Create particles
+    const createParticles = () => {
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: Math.random() * 2 + 1,
+          opacity: Math.random() * 0.5 + 0.1
+        });
+      }
+    };
+
+    // Animate particles
+    const animateParticles = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(particle => {
+        // Update position
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        
+        // Bounce off edges
+        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+        
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 68, 68, ${particle.opacity})`;
+        ctx.fill();
+        
+        // Draw connections
+        particles.forEach(otherParticle => {
+          const distance = Math.sqrt(
+            Math.pow(particle.x - otherParticle.x, 2) + 
+            Math.pow(particle.y - otherParticle.y, 2)
+          );
+          
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(otherParticle.x, otherParticle.y);
+            ctx.strokeStyle = `rgba(255, 68, 68, ${0.1 * (1 - distance / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        });
+      });
+      
+      requestAnimationFrame(animateParticles);
+    };
+
+    resizeCanvas();
+    createParticles();
+    animateParticles();
+
+    window.addEventListener('resize', resizeCanvas);
+  }
+
+  /**
+   * Initialize lazy loading for images
+   */
+  initLazyLoading() {
+    const images = document.querySelectorAll('img[data-src]');
+    
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.classList.remove('lazy');
+          observer.unobserve(img);
+        }
+      });
+    });
+
+    images.forEach(img => {
+      img.classList.add('lazy');
+      imageObserver.observe(img);
+    });
+  }
+
+  /**
+   * Initialize keyboard navigation
+   */
+  initKeyboardNavigation() {
+    document.addEventListener('keydown', (e) => {
+      // ESC key to close mobile menu
+      if (e.key === 'Escape') {
+        const navMenu = document.getElementById('nav-menu');
+        const navToggle = document.getElementById('nav-toggle');
+        
+        if (navMenu?.classList.contains('active')) {
+          navMenu.classList.remove('active');
+          navToggle?.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+      
+      // Theme toggle with 'T' key
+      if (e.key === 't' || e.key === 'T') {
+        if (!e.target.matches('input, textarea')) {
+          this.toggleTheme();
+        }
+      }
+    });
+  }
+
+  /**
+   * Initialize scroll-to-top button
+   */
+  initScrollToTop() {
+    const scrollToTopBtn = document.createElement('button');
+    scrollToTopBtn.className = 'scroll-to-top';
+    scrollToTopBtn.innerHTML = '↑';
+    scrollToTopBtn.setAttribute('aria-label', 'Scroll to top');
+    
+    scrollToTopBtn.style.cssText = `
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    `;
+    
+    document.body.appendChild(scrollToTopBtn);
+    
+    // Show/hide based on scroll position
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        scrollToTopBtn.style.opacity = '1';
+        scrollToTopBtn.style.transform = 'translateY(0)';
+      } else {
+        scrollToTopBtn.style.opacity = '0';
+        scrollToTopBtn.style.transform = 'translateY(20px)';
+      }
+    });
+    
+    // Scroll to top on click
+    scrollToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+
+  /**
+   * Initialize preloader
+   */
+  initPreloader() {
+    const preloader = document.createElement('div');
+    preloader.className = 'preloader';
+    preloader.innerHTML = `
+      <div class="preloader__content">
+        <div class="preloader__logo">GCZ</div>
+        <div class="preloader__spinner"></div>
+      </div>
+    `;
+    
+    preloader.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--color-background);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    `;
+    
+    document.body.appendChild(preloader);
+    
+    // Hide preloader when page is loaded
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        preloader.style.opacity = '0';
+        preloader.style.visibility = 'hidden';
+        setTimeout(() => preloader.remove(), 500);
+      }, 1000);
+    });
+  }
+}
+
+// Initialize the application when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  new PortfolioApp();
 });
 
-window.addEventListener('unhandledrejection', (e) => {
-  console.error('Unhandled promise rejection:', e.reason);
-});
+// Add CSS for additional animations and components
+const additionalStyles = `
+  <style>
+    @keyframes slideInFromRight {
+      0% {
+        transform: translateX(100px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOutToRight {
+      0% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(100px);
+        opacity: 0;
+      }
+    }
+    
+    .notification {
+      font-family: var(--font-family-primary);
+    }
+    
+    .notification__close {
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      margin-left: auto;
+    }
+    
+    .lazy {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .lazy.loaded {
+      opacity: 1;
+    }
+    
+    .preloader__content {
+      text-align: center;
+    }
+    
+    .preloader__logo {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--color-accent);
+      margin-bottom: 2rem;
+    }
+    
+    .preloader__spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--color-border);
+      border-left-color: var(--color-accent);
+      border-radius: 50%;
+      margin: 0 auto;
+      animation: rotate 1s linear infinite;
+    }
+    
+    .scroll-to-top:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    .scroll-progress {
+      background: linear-gradient(90deg, var(--color-accent), var(--color-primary));
+    }
+  </style>
+`;
 
-console.log('🎯 Portfolio JavaScript Loaded Successfully');
+// Inject additional styles
+document.head.insertAdjacentHTML('beforeend', additionalStyles);

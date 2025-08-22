@@ -1,736 +1,886 @@
 /**
- * Writeups Manager - Handles writeup display, filtering, and interactions
- * @author Gabe Chew Zhan Hong
+ * Writeups Page JavaScript
+ * Author: Gabe Chew Zhan Hong
+ * Description: Interactive functionality for writeups page
  */
 
 class WriteupsManager {
-    constructor() {
-        this.writeups = [
-            {
-                id: 1,
-                title: "ARM64 Buffer Overflow Exploitation",
-                description: "Deep dive into ARM64 architecture vulnerabilities, exploring stack-based buffer overflows and ROP chain construction in modern ARM64 systems. Covers bypass techniques for modern mitigations like ASLR and DEP.",
-                date: "2024-12-15",
-                difficulty: "Hard",
-                tags: ["ARM64", "Buffer Overflow", "ROP", "Exploitation"],
-                category: "hardware",
-                featured: true,
-                readTime: "15 min",
-                slug: "arm64-buffer-overflow-exploitation"
-            },
-            {
-                id: 2,
-                title: "IoT Device Hardware Analysis",
-                description: "Complete hardware teardown and security analysis of a popular IoT device. Covers firmware extraction, UART analysis, and discovering critical vulnerabilities in embedded systems.",
-                date: "2024-11-28",
-                difficulty: "Medium",
-                tags: ["IoT", "Hardware", "Firmware", "UART", "Embedded"],
-                category: "hardware",
-                featured: true,
-                readTime: "20 min",
-                slug: "iot-device-hardware-analysis"
-            },
-            {
-                id: 3,
-                title: "HackTheBox: The Needle Writeup",
-                description: "Complete walkthrough of HackTheBox's 'The Needle' machine, featuring advanced Active Directory exploitation, Kerberoasting, and privilege escalation techniques in a Windows enterprise environment.",
-                date: "2024-11-10",
-                difficulty: "Hard",
-                tags: ["HackTheBox", "Active Directory", "Kerberoasting", "Windows"],
-                category: "ctf",
-                featured: false,
-                readTime: "25 min",
-                slug: "hackthebox-the-needle-writeup"
-            },
-            {
-                id: 4,
-                title: "Modern Web Application Security Testing",
-                description: "Comprehensive guide to testing modern web applications for security vulnerabilities. Covers OWASP Top 10, advanced injection techniques, and client-side security assessment methodologies.",
-                date: "2024-10-22",
-                difficulty: "Medium",
-                tags: ["Web Security", "OWASP", "Penetration Testing", "Burp Suite"],
-                category: "web",
-                featured: false,
-                readTime: "18 min",
-                slug: "modern-web-application-security-testing"
-            },
-            {
-                id: 5,
-                title: "Android Malware Reverse Engineering",
-                description: "Step-by-step analysis of a sophisticated Android malware sample. Covers static and dynamic analysis techniques, unpacking, and understanding malicious behavior patterns.",
-                date: "2024-10-05",
-                difficulty: "Hard",
-                tags: ["Android", "Malware", "Reverse Engineering", "Mobile Security"],
-                category: "mobile",
-                featured: true,
-                readTime: "30 min",
-                slug: "android-malware-reverse-engineering"
-            },
-            {
-                id: 6,
-                title: "Social Engineering OSINT Investigation",
-                description: "Real-world case study of a comprehensive OSINT investigation for social engineering assessment. Demonstrates advanced reconnaissance techniques and information gathering methodologies.",
-                date: "2024-09-18",
-                difficulty: "Medium",
-                tags: ["OSINT", "Social Engineering", "Reconnaissance", "Investigation"],
-                category: "osint",
-                featured: false,
-                readTime: "22 min",
-                slug: "social-engineering-osint-investigation"
-            },
-            {
-                id: 7,
-                title: "Machine Learning Model Poisoning Attack",
-                description: "Exploring adversarial attacks against machine learning models. Demonstrates data poisoning techniques and their impact on model behavior in real-world AI systems.",
-                date: "2024-09-03",
-                difficulty: "Hard",
-                tags: ["AI Security", "ML Poisoning", "Adversarial AI", "Model Security"],
-                category: "ai-ml",
-                featured: true,
-                readTime: "28 min",
-                slug: "machine-learning-model-poisoning-attack"
-            },
-            {
-                id: 8,
-                title: "Advanced Binary Exploitation Techniques",
-                description: "Modern binary exploitation techniques including heap exploitation, format string vulnerabilities, and advanced ROP/JOP techniques. Covers modern mitigation bypasses.",
-                date: "2024-08-15",
-                difficulty: "Expert",
-                tags: ["Binary Exploitation", "Heap", "ROP", "JOP", "Mitigations"],
-                category: "reversing",
-                featured: false,
-                readTime: "35 min",
-                slug: "advanced-binary-exploitation-techniques"
-            }
-        ];
-        
-        this.filteredWriteups = [...this.writeups];
-        this.currentFilter = 'all';
-        this.searchTerm = '';
-        this.searchTimeout = null;
-        
-        // DOM element references
-        this.elements = {};
-        
-        this.init();
-    }
+  constructor() {
+    this.writeups = [];
+    this.filteredWriteups = [];
+    this.currentCategory = 'all';
+    this.currentSearch = '';
+    this.currentPage = 1;
+    this.writeupsPerPage = 6;
+    this.init();
+  }
 
-    /**
-     * Initialize the writeups manager
-     */
-    init() {
-        // Cache DOM elements
-        this.cacheElements();
-        
-        // Setup event listeners and initial render
-        this.setupEventListeners();
-        this.renderWriteups();
-        this.setupAnimations();
-    }
+  init() {
+    this.bindEvents();
+    this.loadWriteups();
+    this.initializeFilters();
+    this.initializeSearch();
+    this.initializeModal();
+  }
 
-    /**
-     * Cache frequently used DOM elements
-     */
-    cacheElements() {
-        this.elements = {
-            writeupsGrid: document.getElementById('writeups-grid'),
-            emptyState: document.getElementById('empty-state'),
-            searchInput: document.getElementById('search-input'),
-            filterButtons: document.querySelectorAll('.filter-btn')
-        };
-    }
+  /**
+   * Bind event listeners
+   */
+  bindEvents() {
+    // Filter buttons
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => this.handleFilterClick(e));
+    });
 
-    /**
-     * Setup all event listeners
-     */
-    setupEventListeners() {
-        this.setupFilters();
-        this.setupSearch();
-    }
-
-    /**
-     * Render writeups to the DOM
-     */
-    renderWriteups() {
-        const { writeupsGrid, emptyState } = this.elements;
-
-        if (!writeupsGrid || !emptyState) {
-            console.error('Required DOM elements not found');
-            return;
+    // Search input
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => this.handleSearch(e));
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
         }
-
-        if (this.filteredWriteups.length === 0) {
-            writeupsGrid.style.display = 'none';
-            emptyState.style.display = 'block';
-            return;
-        }
-
-        writeupsGrid.style.display = 'grid';
-        emptyState.style.display = 'none';
-
-        const writeupsHTML = this.filteredWriteups.map((writeup, index) => 
-            this.createWriteupCard(writeup, index)
-        ).join('');
-
-        writeupsGrid.innerHTML = writeupsHTML;
+      });
     }
 
-    /**
-     * Create HTML for a writeup card
-     * @param {Object} writeup - Writeup data
-     * @param {number} index - Index for animation delay
-     * @returns {string} HTML string
-     */
-    createWriteupCard(writeup, index) {
-        const difficultyIcon = this.getDifficultyIcon(writeup.difficulty);
-        const tagsHTML = writeup.tags.map(tag => 
-            `<span class="writeup-tag">${this.escapeHtml(tag)}</span>`
-        ).join('');
-
-        return `
-            <div class="writeup-card reveal" style="animation-delay: ${index * 0.1}s">
-                ${writeup.featured ? '<div class="featured-badge">Featured</div>' : ''}
-                <div class="writeup-header">
-                    <h3 class="writeup-title">${this.escapeHtml(writeup.title)}</h3>
-                    <div class="writeup-meta">
-                        <div class="writeup-date">
-                            <i class="fas fa-calendar"></i>
-                            <span>${this.formatDate(writeup.date)}</span>
-                        </div>
-                        <div class="writeup-difficulty">
-                            <i class="fas fa-${difficultyIcon}"></i>
-                            <span>${writeup.difficulty}</span>
-                        </div>
-                        <div class="writeup-difficulty">
-                            <i class="fas fa-clock"></i>
-                            <span>${writeup.readTime}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="writeup-content">
-                    <p class="writeup-description">${this.escapeHtml(writeup.description)}</p>
-                    <div class="writeup-tags">
-                        ${tagsHTML}
-                    </div>
-                    <div class="writeup-actions">
-                        <button class="writeup-btn writeup-btn-primary" 
-                                onclick="window.writeupsManager.readWriteup('${writeup.slug}')"
-                                data-slug="${writeup.slug}">
-                            <i class="fas fa-book-open"></i>
-                            Read Writeup
-                        </button>
-                        <button class="writeup-btn writeup-btn-secondary" 
-                                onclick="window.writeupsManager.shareWriteup('${writeup.slug}')"
-                                data-slug="${writeup.slug}">
-                            <i class="fas fa-share"></i>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
+    // Load more button
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => this.loadMoreWriteups());
     }
 
-    /**
-     * Setup filter functionality
-     */
-    setupFilters() {
-        const { filterButtons } = this.elements;
-        
-        filterButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handleFilterClick(button, filterButtons);
-            });
-        });
-    }
+    // Modal close events
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeModal();
+      }
+    });
+  }
 
-    /**
-     * Handle filter button click
-     * @param {HTMLElement} clickedButton - The clicked filter button
-     * @param {NodeList} allButtons - All filter buttons
-     */
-    handleFilterClick(clickedButton, allButtons) {
-        // Update active state
-        allButtons.forEach(btn => btn.classList.remove('active'));
-        clickedButton.classList.add('active');
-        
-        // Update filter and re-render
-        this.currentFilter = clickedButton.dataset.filter;
-        this.filterWriteups();
-    }
+  /**
+   * Load writeups data (simulate API call)
+   */
+  loadWriteups() {
+    // Simulate loading from writeups.json
+    this.writeups = [
+      {
+        id: 'example-1',
+        title: 'Advanced ARM64 Binary Analysis',
+        description: 'Deep dive into ARM64 assembly reverse engineering, exploring advanced anti-debugging techniques and custom exploit development for embedded systems.',
+        category: 'reverse-engineering',
+        platform: 'HackTheBox',
+        date: 'March 2025',
+        difficulty: 'hard',
+        tags: ['ARM64', 'Assembly', 'Anti-Debug', 'Embedded'],
+        featured: true,
+        content: `
+# Advanced ARM64 Binary Analysis
 
-    /**
-     * Setup search functionality
-     */
-    setupSearch() {
-        const { searchInput } = this.elements;
-        
-        if (!searchInput) return;
+## Overview
+This writeup covers an advanced reverse engineering challenge involving ARM64 architecture. The target binary implements several anti-debugging techniques and requires custom exploit development.
 
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(() => {
-                this.searchTerm = e.target.value.toLowerCase().trim();
-                this.filterWriteups();
-            }, 300);
-        });
+## Initial Analysis
+First, let's examine the binary structure:
 
-        // Handle search on Enter key
-        searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                clearTimeout(this.searchTimeout);
-                this.searchTerm = e.target.value.toLowerCase().trim();
-                this.filterWriteups();
-            }
-        });
-    }
+\`\`\`bash
+file challenge_binary
+objdump -d challenge_binary | head -50
+\`\`\`
 
-    /**
-     * Filter writeups based on current filter and search term
-     */
-    filterWriteups() {
-        this.filteredWriteups = this.writeups.filter(writeup => {
-            const matchesFilter = this.currentFilter === 'all' || writeup.category === this.currentFilter;
-            const matchesSearch = this.matchesSearchTerm(writeup);
-            
-            return matchesFilter && matchesSearch;
-        });
+The binary is stripped and implements several protection mechanisms:
+- Stack canaries
+- ASLR (Address Space Layout Randomization)  
+- Custom anti-debugging checks
+- Encrypted string literals
 
-        this.renderWriteups();
-        this.setupAnimations();
-    }
+## ARM64 Assembly Deep Dive
+The main function contains interesting ARM64 instructions:
 
-    /**
-     * Check if writeup matches search term
-     * @param {Object} writeup - Writeup to check
-     * @returns {boolean} True if matches search
-     */
-    matchesSearchTerm(writeup) {
-        if (!this.searchTerm) return true;
+\`\`\`assembly
+stp     x29, x30, [sp, #-16]!
+mov     x29, sp
+mov     w0, #0x1337
+bl      check_debugger
+cmp     w0, #0
+bne     exit_program
+\`\`\`
 
-        const searchFields = [
-            writeup.title,
-            writeup.description,
-            ...writeup.tags,
-            writeup.difficulty
-        ];
+## Anti-Debugging Techniques
+The binary implements multiple anti-debugging checks:
 
-        return searchFields.some(field => 
-            field.toLowerCase().includes(this.searchTerm)
-        );
-    }
+1. **PTRACE Detection**: Checks if a debugger is attached
+2. **Timing Attacks**: Measures execution time to detect single-stepping
+3. **Hardware Breakpoint Detection**: Monitors debug registers
 
-    /**
-     * Setup animations for writeup cards
-     */
-    setupAnimations() {
-        const cards = document.querySelectorAll('.writeup-card');
-        
-        cards.forEach(card => {
-            // Remove existing event listeners to prevent duplicates
-            card.removeEventListener('mouseenter', this.handleCardMouseEnter);
-            card.removeEventListener('mouseleave', this.handleCardMouseLeave);
-            
-            // Add new event listeners
-            card.addEventListener('mouseenter', this.handleCardMouseEnter);
-            card.addEventListener('mouseleave', this.handleCardMouseLeave);
-        });
-    }
+## Exploitation Strategy
+To bypass these protections, we need to:
 
-    /**
-     * Handle card mouse enter
-     * @param {Event} e - Mouse event
-     */
-    handleCardMouseEnter(e) {
-        e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
-    }
+1. Patch the anti-debugging checks
+2. Extract encrypted strings
+3. Identify the vulnerability
+4. Develop a custom exploit
 
-    /**
-     * Handle card mouse leave
-     * @param {Event} e - Mouse event
-     */
-    handleCardMouseLeave(e) {
-        e.currentTarget.style.transform = 'translateY(0) scale(1)';
-    }
+## Solution
+The final exploit leverages a buffer overflow in the input validation routine...
 
-    /**
-     * Format date string to readable format
-     * @param {string} dateString - Date string to format
-     * @returns {string} Formatted date
-     */
-    formatDate(dateString) {
-        try {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-        } catch (error) {
-            console.error('Error formatting date:', error);
-            return dateString;
-        }
-    }
+[Content continues...]
+        `
+      },
+      {
+        id: 'example-2',
+        title: 'IoT Device UART Exploitation',
+        description: 'Complete hardware teardown and UART interface exploitation of a popular IoT device, including firmware extraction and privilege escalation.',
+        category: 'hardware',
+        platform: 'Independent',
+        date: 'February 2025',
+        difficulty: 'medium',
+        tags: ['IoT', 'UART', 'Firmware', 'Hardware'],
+        featured: false,
+        content: `
+# IoT Device UART Exploitation
 
-    /**
-     * Get difficulty icon based on difficulty level
-     * @param {string} difficulty - Difficulty level
-     * @returns {string} Font Awesome icon name
-     */
-    getDifficultyIcon(difficulty) {
-        const iconMap = {
-            'Easy': 'signal',
-            'Medium': 'signal',
-            'Hard': 'signal',
-            'Expert': 'fire'
-        };
-        return iconMap[difficulty] || 'signal';
-    }
+## Hardware Analysis
+This research focuses on exploiting UART interfaces in IoT devices to gain unauthorized access and extract firmware.
 
-    /**
-     * Escape HTML to prevent XSS
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+## Equipment Used
+- Logic analyzer
+- UART-to-USB converter
+- Multimeter
+- Soldering equipment
+- Oscilloscope
 
-    /**
-     * Handle reading a writeup
-     * @param {string} slug - Writeup slug
-     */
-    readWriteup(slug) {
-        const writeup = this.writeups.find(w => w.slug === slug);
-        if (!writeup) {
-            console.error('Writeup not found:', slug);
-            return;
-        }
+## UART Interface Discovery
+Lorem ipsum dolor sit amet, consectetur adipiscing elit...
 
-        // In production, this would navigate to the writeup page
-        // For demo purposes, show a modal
-        this.showWriteupModal(writeup);
-    }
+[Detailed writeup content...]
+        `
+      },
+      {
+        id: 'example-3',
+        title: 'Custom ROP Chain Exploitation',
+        description: 'Advanced exploitation techniques using custom ROP chains to bypass modern protection mechanisms including ASLR, DEP, and stack canaries.',
+        category: 'pwn',
+        platform: 'HackTheBox',
+        date: 'January 2025',
+        difficulty: 'insane',
+        tags: ['ROP', 'Binary Exploitation', 'ASLR Bypass', 'Stack'],
+        featured: true,
+        content: `
+# Custom ROP Chain Exploitation
 
-    /**
-     * Show writeup modal (demo functionality)
-     * @param {Object} writeup - Writeup data
-     */
-    showWriteupModal(writeup) {
-        const modal = this.createModal(writeup);
-        document.body.appendChild(modal);
+## Challenge Overview
+This challenge presents a complex binary exploitation scenario requiring custom ROP chain construction to bypass multiple protection mechanisms.
 
-        // Focus management
-        modal.focus();
-        
-        // Close on escape key
-        const closeHandler = (e) => {
-            if (e.key === 'Escape') {
-                this.closeModal(modal);
-                document.removeEventListener('keydown', closeHandler);
-            }
-        };
-        document.addEventListener('keydown', closeHandler);
+## Protection Mechanisms
+- ASLR (Address Space Layout Randomization)
+- DEP/NX (Data Execution Prevention)
+- Stack Canaries
+- FORTIFY_SOURCE
 
-        // Auto-remove after animation
+## ROP Chain Construction
+Building a reliable ROP chain requires careful gadget selection and stack layout planning...
+
+[Detailed exploitation writeup...]
+        `
+      },
+      {
+        id: 'example-4',
+        title: 'Adversarial ML Attack Vectors',
+        description: 'Research into adversarial machine learning attacks, exploring poisoning techniques and model evasion strategies in production ML systems.',
+        category: 'ai-ml',
+        platform: 'Research',
+        date: 'December 2024',
+        difficulty: 'hard',
+        tags: ['Machine Learning', 'Adversarial', 'Model Poisoning', 'Research'],
+        featured: false,
+        content: `
+# Adversarial ML Attack Vectors
+
+## Introduction
+This research explores various attack vectors against machine learning systems in production environments.
+
+## Attack Categories
+1. **Evasion Attacks**: Manipulating input to fool trained models
+2. **Poisoning Attacks**: Corrupting training data
+3. **Model Extraction**: Stealing model parameters
+4. **Membership Inference**: Determining if data was used in training
+
+## Methodology
+Our research methodology includes...
+
+[Detailed research content...]
+        `
+      },
+      {
+        id: 'example-5',
+        title: 'Android Application Security Analysis',
+        description: 'Complete mobile application penetration testing workflow, from APK analysis to runtime manipulation and certificate pinning bypass.',
+        category: 'mobile',
+        platform: 'TryHackMe',
+        date: 'November 2024',
+        difficulty: 'medium',
+        tags: ['Android', 'APK Analysis', 'Frida', 'SSL Pinning'],
+        featured: false,
+        content: `
+# Android Application Security Analysis
+
+## APK Analysis Workflow
+This writeup demonstrates a comprehensive approach to Android application security testing.
+
+## Tools Used
+- APKTool
+- Jadx
+- Frida
+- Burp Suite
+- MobSF
+
+## Static Analysis
+First, we extract and analyze the APK:
+
+\`\`\`bash
+apktool d target_app.apk
+jadx -d output target_app.apk
+\`\`\`
+
+## Dynamic Analysis
+Using Frida for runtime manipulation:
+
+\`\`\`javascript
+Java.perform(function() {
+    var SSLPinning = Java.use("com.example.SSLPinning");
+    SSLPinning.checkCertificate.implementation = function() {
+        console.log("[+] SSL Pinning bypassed");
+        return true;
+    };
+});
+\`\`\`
+
+[Continued analysis...]
+        `
+      },
+      {
+        id: 'example-6',
+        title: 'Advanced OSINT Reconnaissance Techniques',
+        description: 'Comprehensive guide to open source intelligence gathering using modern tools and techniques for digital footprinting and reconnaissance.',
+        category: 'osint',
+        platform: 'TryHackMe',
+        date: 'October 2024',
+        difficulty: 'easy',
+        tags: ['OSINT', 'Reconnaissance', 'Digital Footprint', 'Intelligence'],
+        featured: false,
+        content: `
+# Advanced OSINT Reconnaissance Techniques
+
+## OSINT Methodology
+This writeup covers advanced techniques for gathering open source intelligence.
+
+## Tools and Resources
+- Maltego
+- theHarvester
+- Shodan
+- Google Dorking
+- Social Media Analysis
+
+## Information Gathering Process
+1. **Target Identification**
+2. **Footprinting**
+3. **Enumeration**
+4. **Analysis and Correlation**
+
+## Passive Reconnaissance
+Starting with passive information gathering:
+
+\`\`\`bash
+theHarvester -d target.com -b google,bing,linkedin
+nslookup target.com
+whois target.com
+\`\`\`
+
+[Detailed OSINT techniques...]
+        `
+      }
+    ];
+
+    // Add more example writeups
+    const additionalWriteups = [
+      {
+        id: 'example-7',
+        title: 'Buffer Overflow Fundamentals',
+        description: 'Introduction to stack-based buffer overflow exploitation with practical examples and mitigation techniques.',
+        category: 'pwn',
+        platform: 'TryHackMe',
+        date: 'September 2024',
+        difficulty: 'easy',
+        tags: ['Buffer Overflow', 'Stack', 'Exploitation', 'Fundamentals'],
+        featured: false,
+        content: 'Detailed buffer overflow writeup content...'
+      },
+      {
+        id: 'example-8',
+        title: 'Wireless Protocol Analysis',
+        description: 'Deep dive into wireless protocol security, including WiFi, Bluetooth, and Zigbee vulnerability assessment.',
+        category: 'hardware',
+        platform: 'Independent',
+        date: 'August 2024',
+        difficulty: 'hard',
+        tags: ['Wireless', 'Protocol Analysis', 'WiFi', 'Bluetooth'],
+        featured: false,
+        content: 'Detailed wireless security writeup content...'
+      }
+    ];
+
+    this.writeups = [...this.writeups, ...additionalWriteups];
+    this.filteredWriteups = [...this.writeups];
+    
+    this.renderWriteups();
+    this.updateStats();
+  }
+
+  /**
+   * Initialize filter functionality
+   */
+  initializeFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => {
+      if (btn.dataset.category === 'all') {
+        btn.classList.add('active');
+      }
+    });
+  }
+
+  /**
+   * Handle filter button clicks
+   */
+  handleFilterClick(e) {
+    const button = e.currentTarget;
+    const category = button.dataset.category;
+
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    button.classList.add('active');
+
+    // Update current category
+    this.currentCategory = category;
+    this.currentPage = 1;
+
+    // Apply filters
+    this.applyFilters();
+  }
+
+  /**
+   * Initialize search functionality
+   */
+  initializeSearch() {
+    const searchInput = document.getElementById('search-input');
+    
+    // Debounce search input
+    let searchTimeout;
+    searchInput?.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        this.handleSearch(e);
+      }, 300);
+    });
+  }
+
+  /**
+   * Handle search input
+   */
+  handleSearch(e) {
+    this.currentSearch = e.target.value.toLowerCase().trim();
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  /**
+   * Apply filters and search
+   */
+  applyFilters() {
+    this.filteredWriteups = this.writeups.filter(writeup => {
+      // Category filter
+      const categoryMatch = this.currentCategory === 'all' || 
+                           writeup.category === this.currentCategory;
+
+      // Search filter
+      const searchMatch = !this.currentSearch || 
+                         writeup.title.toLowerCase().includes(this.currentSearch) ||
+                         writeup.description.toLowerCase().includes(this.currentSearch) ||
+                         writeup.tags.some(tag => tag.toLowerCase().includes(this.currentSearch));
+
+      return categoryMatch && searchMatch;
+    });
+
+    this.renderWriteups();
+    this.updateLoadMoreButton();
+    this.showEmptyState(this.filteredWriteups.length === 0);
+  }
+
+  /**
+   * Render writeups to the grid
+   */
+  renderWriteups() {
+    const grid = document.getElementById('writeups-grid');
+    if (!grid) return;
+
+    // Clear existing cards
+    grid.innerHTML = '';
+
+    // Calculate writeups to show
+    const endIndex = this.currentPage * this.writeupsPerPage;
+    const writeupsToShow = this.filteredWriteups.slice(0, endIndex);
+
+    // Render each writeup card
+    writeupsToShow.forEach((writeup, index) => {
+      const card = this.createWriteupCard(writeup, index);
+      grid.appendChild(card);
+    });
+
+    // Trigger animations
+    setTimeout(() => {
+      const cards = grid.querySelectorAll('.writeup-card');
+      cards.forEach((card, index) => {
         setTimeout(() => {
-            if (modal.parentNode) {
-                modal.classList.add('fade-in');
-            }
-        }, 10);
+          card.classList.add('animate');
+        }, index * 100);
+      });
+    }, 50);
+  }
+
+  /**
+   * Create writeup card element
+   */
+  createWriteupCard(writeup, index) {
+    const card = document.createElement('article');
+    card.className = 'writeup-card animate-on-scroll scale-up';
+    card.dataset.category = writeup.category;
+    card.dataset.difficulty = writeup.difficulty;
+    
+    card.innerHTML = `
+      <div class="writeup-card__image">
+        <div class="writeup-card__placeholder">${this.getCategoryIcon(writeup.category)}</div>
+        <div class="writeup-card__difficulty">${writeup.difficulty}</div>
+      </div>
+      <div class="writeup-card__content">
+        <div class="writeup-card__meta">
+          <span class="writeup-card__platform">${writeup.platform}</span>
+          <span class="writeup-card__date">${writeup.date}</span>
+        </div>
+        <h3 class="writeup-card__title">${writeup.title}</h3>
+        <p class="writeup-card__description">${writeup.description}</p>
+        <div class="writeup-card__tags">
+          ${writeup.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+        </div>
+        <div class="writeup-card__actions">
+          <button class="btn btn--outline" onclick="writeupsManager.openWriteup('${writeup.id}')">
+            Read Writeup
+          </button>
+        </div>
+      </div>
+    `;
+
+    return card;
+  }
+
+  /**
+   * Get category icon
+   */
+  getCategoryIcon(category) {
+    const icons = {
+      'reverse-engineering': 'REV',
+      'pwn': 'PWN',
+      'hardware': 'HW',
+      'mobile': 'MOB',
+      'ai-ml': 'AI',
+      'osint': 'OSINT'
+    };
+    return icons[category] || 'SEC';
+  }
+
+  /**
+   * Load more writeups
+   */
+  loadMoreWriteups() {
+    this.currentPage++;
+    this.renderWriteups();
+    this.updateLoadMoreButton();
+  }
+
+  /**
+   * Update load more button visibility
+   */
+  updateLoadMoreButton() {
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const totalShown = this.currentPage * this.writeupsPerPage;
+    
+    if (loadMoreBtn) {
+      if (totalShown >= this.filteredWriteups.length) {
+        loadMoreBtn.style.display = 'none';
+      } else {
+        loadMoreBtn.style.display = 'inline-flex';
+        loadMoreBtn.textContent = `Load More (${Math.min(this.writeupsPerPage, this.filteredWriteups.length - totalShown)} more)`;
+      }
+    }
+  }
+
+  /**
+   * Show/hide empty state
+   */
+  showEmptyState(show) {
+    const emptyState = document.getElementById('empty-state');
+    const loadMore = document.querySelector('.load-more');
+    
+    if (emptyState) {
+      emptyState.style.display = show ? 'block' : 'none';
+    }
+    
+    if (loadMore) {
+      loadMore.style.display = show ? 'none' : 'block';
+    }
+  }
+
+  /**
+   * Update statistics
+   */
+  updateStats() {
+    const totalWriteupsEl = document.getElementById('total-writeups');
+    if (totalWriteupsEl) {
+      totalWriteupsEl.textContent = this.writeups.length;
+    }
+  }
+
+  /**
+   * Initialize modal functionality
+   */
+  initializeModal() {
+    const modal = document.getElementById('writeup-modal');
+    if (!modal) return;
+
+    // Close modal when clicking backdrop
+    const backdrop = modal.querySelector('.modal__backdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', () => this.closeModal());
     }
 
-    /**
-     * Create modal element
-     * @param {Object} writeup - Writeup data
-     * @returns {HTMLElement} Modal element
-     */
-    createModal(writeup) {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.setAttribute('role', 'dialog');
-        modal.setAttribute('aria-labelledby', 'modal-title');
-        modal.setAttribute('tabindex', '-1');
+    // Close modal with close button
+    const closeBtn = modal.querySelector('.modal__close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.closeModal());
+    }
+  }
 
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modal-title">${this.escapeHtml(writeup.title)}</h2>
-                    <button class="modal-close" aria-label="Close modal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="writeup-preview">
-                        <div class="writeup-meta-full">
-                            <span><i class="fas fa-calendar"></i> ${this.formatDate(writeup.date)}</span>
-                            <span><i class="fas fa-signal"></i> ${writeup.difficulty}</span>
-                            <span><i class="fas fa-clock"></i> ${writeup.readTime}</span>
-                        </div>
-                        <p>${this.escapeHtml(writeup.description)}</p>
-                        <div class="writeup-tags">
-                            ${writeup.tags.map(tag => `<span class="writeup-tag">${this.escapeHtml(tag)}</span>`).join('')}
-                        </div>
-                        <div class="placeholder-content">
-                            <h3>Writeup Content</h3>
-                            <p>This is a placeholder for the writeup content. In a real implementation, this would load the full writeup content from:</p>
-                            <code>writeups/${writeup.slug}.md</code>
-                            <p>The writeup would include detailed technical analysis, code examples, screenshots, and step-by-step explanations.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+  /**
+   * Open writeup modal
+   */
+  openWriteup(writeupId) {
+    const writeup = this.writeups.find(w => w.id === writeupId);
+    if (!writeup) return;
 
-        this.setupModalStyles(modal);
-        this.setupModalEvents(modal);
+    const modal = document.getElementById('writeup-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
 
-        return modal;
+    if (!modal || !modalTitle || !modalBody) return;
+
+    // Update modal content
+    modalTitle.textContent = writeup.title;
+    
+    // Convert markdown-like content to HTML
+    const htmlContent = this.markdownToHtml(writeup.content);
+    modalBody.innerHTML = `<div class="writeup-content">${htmlContent}</div>`;
+
+    // Show modal
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Focus trap for accessibility
+    modal.focus();
+  }
+
+  /**
+   * Close writeup modal
+   */
+  closeModal() {
+    const modal = document.getElementById('writeup-modal');
+    if (modal && modal.classList.contains('active')) {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  /**
+   * Convert basic markdown to HTML
+   */
+  markdownToHtml(markdown) {
+    if (!markdown) return '<p>Content not available.</p>';
+
+    let html = markdown
+      // Headers
+      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+      
+      // Code blocks
+      .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre><code class="language-${lang || 'text'}">${this.escapeHtml(code.trim())}</code></pre>`;
+      })
+      
+      // Inline code
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      
+      // Bold
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      
+      // Italic
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      
+      // Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+      
+      // Paragraphs
+      .split('\n\n')
+      .map(paragraph => {
+        paragraph = paragraph.trim();
+        if (!paragraph) return '';
+        if (paragraph.startsWith('<h') || paragraph.startsWith('<pre') || paragraph.startsWith('<ul') || paragraph.startsWith('<ol')) {
+          return paragraph;
+        }
+        return `<p>${paragraph.replace(/\n/g, '<br>')}</p>`;
+      })
+      .join('\n');
+
+    return html;
+  }
+
+  /**
+   * Escape HTML characters
+   */
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  /**
+   * Clear all filters
+   */
+  clearFilters() {
+    // Reset category filter
+    this.currentCategory = 'all';
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.category === 'all') {
+        btn.classList.add('active');
+      }
+    });
+
+    // Reset search
+    this.currentSearch = '';
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.value = '';
     }
 
-    /**
-     * Setup modal styles
-     * @param {HTMLElement} modal - Modal element
-     */
-    setupModalStyles(modal) {
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        `;
+    // Reset page
+    this.currentPage = 1;
 
-        const modalContent = modal.querySelector('.modal-content');
-        modalContent.style.cssText = `
-            background: var(--surface-color);
-            border-radius: var(--border-radius-xl);
-            padding: var(--spacing-2xl);
-            max-height: 80vh;
-            max-width: 800px;
-            width: 90%;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border-color);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        `;
-    }
+    // Apply filters
+    this.applyFilters();
+  }
 
-    /**
-     * Setup modal event listeners
-     * @param {HTMLElement} modal - Modal element
-     */
-    setupModalEvents(modal) {
-        const closeButton = modal.querySelector('.modal-close');
-        
-        closeButton.addEventListener('click', () => this.closeModal(modal));
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                this.closeModal(modal);
-            }
+  /**
+   * Get writeup by ID
+   */
+  getWriteup(id) {
+    return this.writeups.find(writeup => writeup.id === id);
+  }
+
+  /**
+   * Get writeups by category
+   */
+  getWriteupsByCategory(category) {
+    return this.writeups.filter(writeup => writeup.category === category);
+  }
+
+  /**
+   * Get featured writeups
+   */
+  getFeaturedWriteups() {
+    return this.writeups.filter(writeup => writeup.featured);
+  }
+
+  /**
+   * Search writeups
+   */
+  searchWriteups(query) {
+    const lowercaseQuery = query.toLowerCase();
+    return this.writeups.filter(writeup => 
+      writeup.title.toLowerCase().includes(lowercaseQuery) ||
+      writeup.description.toLowerCase().includes(lowercaseQuery) ||
+      writeup.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery)) ||
+      writeup.content.toLowerCase().includes(lowercaseQuery)
+    );
+  }
+
+  /**
+   * Sort writeups
+   */
+  sortWriteups(sortBy = 'date', order = 'desc') {
+    this.filteredWriteups.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortBy) {
+        case 'title':
+          aValue = a.title.toLowerCase();
+          bValue = b.title.toLowerCase();
+          break;
+        case 'difficulty':
+          const difficultyOrder = { 'easy': 1, 'medium': 2, 'hard': 3, 'insane': 4 };
+          aValue = difficultyOrder[a.difficulty];
+          bValue = difficultyOrder[b.difficulty];
+          break;
+        case 'platform':
+          aValue = a.platform.toLowerCase();
+          bValue = b.platform.toLowerCase();
+          break;
+        case 'date':
+        default:
+          aValue = new Date(a.date);
+          bValue = new Date(b.date);
+          break;
+      }
+      
+      if (order === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+    
+    this.renderWriteups();
+  }
+
+  /**
+   * Export writeups data
+   */
+  exportWriteups(format = 'json') {
+    const data = this.writeups.map(writeup => ({
+      id: writeup.id,
+      title: writeup.title,
+      description: writeup.description,
+      category: writeup.category,
+      platform: writeup.platform,
+      date: writeup.date,
+      difficulty: writeup.difficulty,
+      tags: writeup.tags,
+      featured: writeup.featured
+    }));
+
+    let content, filename, mimeType;
+
+    switch (format) {
+      case 'csv':
+        const headers = Object.keys(data[0]);
+        const csvRows = [headers.join(',')];
+        data.forEach(row => {
+          const values = headers.map(header => {
+            const value = row[header];
+            return Array.isArray(value) ? `"${value.join(', ')}"` : `"${value}"`;
+          });
+          csvRows.push(values.join(','));
         });
+        content = csvRows.join('\n');
+        filename = 'writeups.csv';
+        mimeType = 'text/csv';
+        break;
+      
+      case 'json':
+      default:
+        content = JSON.stringify(data, null, 2);
+        filename = 'writeups.json';
+        mimeType = 'application/json';
+        break;
     }
 
-    /**
-     * Close modal with animation
-     * @param {HTMLElement} modal - Modal element to close
-     */
-    closeModal(modal) {
-        modal.style.opacity = '0';
-        const modalContent = modal.querySelector('.modal-content');
-        modalContent.style.transform = 'scale(0.9)';
-        
-        setTimeout(() => {
-            if (modal.parentNode) {
-                modal.remove();
-            }
-        }, 300);
-    }
-
-    /**
-     * Handle sharing a writeup
-     * @param {string} slug - Writeup slug
-     */
-    shareWriteup(slug) {
-        const writeup = this.writeups.find(w => w.slug === slug);
-        if (!writeup) {
-            console.error('Writeup not found:', slug);
-            return;
-        }
-
-        const url = `${window.location.origin}/writeups/${slug}`;
-        const text = `Check out this writeup: ${writeup.title}`;
-
-        if (navigator.share && navigator.canShare) {
-            navigator.share({
-                title: writeup.title,
-                text: text,
-                url: url
-            }).catch(error => {
-                console.log('Error sharing:', error);
-                this.fallbackShare(text, url);
-            });
-        } else {
-            this.fallbackShare(text, url);
-        }
-    }
-
-    /**
-     * Fallback share method using clipboard
-     * @param {string} text - Text to share
-     * @param {string} url - URL to share
-     */
-    fallbackShare(text, url) {
-        const shareText = `${text} - ${url}`;
-        
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(shareText)
-                .then(() => this.showToast('Link copied to clipboard!'))
-                .catch(() => this.showToast('Unable to copy link'));
-        } else {
-            // Even more fallback for older browsers
-            this.legacyCopyToClipboard(shareText);
-        }
-    }
-
-    /**
-     * Legacy clipboard copy for older browsers
-     * @param {string} text - Text to copy
-     */
-    legacyCopyToClipboard(text) {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.top = '-1000px';
-        textArea.style.left = '-1000px';
-        
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        try {
-            document.execCommand('copy');
-            this.showToast('Link copied to clipboard!');
-        } catch (error) {
-            this.showToast('Unable to copy link');
-        }
-        
-        document.body.removeChild(textArea);
-    }
-
-    /**
-     * Show toast notification
-     * @param {string} message - Message to show
-     * @param {number} duration - Duration in milliseconds
-     */
-    showToast(message, duration = 3000) {
-        const toast = document.createElement('div');
-        toast.textContent = message;
-        toast.className = 'toast-notification';
-        
-        toast.style.cssText = `
-            position: fixed;
-            bottom: var(--spacing-xl);
-            right: var(--spacing-xl);
-            background: var(--primary-color);
-            color: white;
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-radius: var(--border-radius-lg);
-            z-index: 1000;
-            box-shadow: var(--shadow-lg);
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            max-width: 300px;
-            word-wrap: break-word;
-        `;
-        
-        document.body.appendChild(toast);
-        
-        // Animate in
-        setTimeout(() => {
-            toast.style.transform = 'translateX(0)';
-        }, 10);
-        
-        // Animate out and remove
-        setTimeout(() => {
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.remove();
-                }
-            }, 300);
-        }, duration);
-    }
-
-    /**
-     * Get writeup by slug
-     * @param {string} slug - Writeup slug
-     * @returns {Object|null} Writeup object or null
-     */
-    getWriteup(slug) {
-        return this.writeups.find(w => w.slug === slug) || null;
-    }
-
-    /**
-     * Add new writeup (for dynamic content)
-     * @param {Object} writeup - Writeup data
-     */
-    addWriteup(writeup) {
-        if (!writeup.id) {
-            writeup.id = Math.max(...this.writeups.map(w => w.id)) + 1;
-        }
-        
-        this.writeups.push(writeup);
-        this.filterWriteups();
-    }
-
-    /**
-     * Remove writeup by ID
-     * @param {number} id - Writeup ID
-     */
-    removeWriteup(id) {
-        this.writeups = this.writeups.filter(w => w.id !== id);
-        this.filterWriteups();
-    }
-
-    /**
-     * Update writeup
-     * @param {number} id - Writeup ID
-     * @param {Object} updates - Updates to apply
-     */
-    updateWriteup(id, updates) {
-        const index = this.writeups.findIndex(w => w.id === id);
-        if (index !== -1) {
-            this.writeups[index] = { ...this.writeups[index], ...updates };
-            this.filterWriteups();
-        }
-    }
+    // Create and download file
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 }
 
-// Initialize writeups manager when DOM is loaded
-let writeupsManager = null;
+// Global functions for onclick handlers
+window.openWriteup = function(id) {
+  if (window.writeupsManager) {
+    window.writeupsManager.openWriteup(id);
+  }
+};
 
+window.closeWriteupModal = function() {
+  if (window.writeupsManager) {
+    window.writeupsManager.closeModal();
+  }
+};
+
+window.clearFilters = function() {
+  if (window.writeupsManager) {
+    window.writeupsManager.clearFilters();
+  }
+};
+
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    writeupsManager = new WriteupsManager();
-    
-    // Make available globally for onclick handlers
-    window.writeupsManager = writeupsManager;
+  window.writeupsManager = new WriteupsManager();
 });
 
-// Export for module systems (if needed)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = WriteupsManager;
-}
+// Add keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  // Ctrl/Cmd + K to focus search
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.focus();
+    }
+  }
+  
+  // Escape to clear search
+  if (e.key === 'Escape') {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput && document.activeElement === searchInput) {
+      searchInput.blur();
+      searchInput.value = '';
+      if (window.writeupsManager) {
+        window.writeupsManager.handleSearch({ target: { value: '' } });
+      }
+    }
+  }
+});
+
+// Add search placeholder animation
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    const placeholders = [
+      'Search writeups...',
+      'Try "ARM64", "hardware", "reverse engineering"...',
+      'Filter by tags, titles, or descriptions...',
+      'Search by difficulty or platform...'
+    ];
+    
+    let currentIndex = 0;
+    
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % placeholders.length;
+      searchInput.setAttribute('placeholder', placeholders[currentIndex]);
+    }, 3000);
+  }
+});

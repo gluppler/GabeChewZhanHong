@@ -4,581 +4,320 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Writeups | Gabe Chew Zhan Hong</title>
-    <meta name="description" content="Technical writeups, CTF solutions, and security research by Gabe Chew Zhan Hong - Hardware Security Specialist & Cybersecurity Expert.">
+    <meta name="description" content="Technical writeups and security research by Gabe Chew Zhan Hong">
     <link rel="icon" type="image/x-icon" href="public/favicon.ico">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/animations.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        /* Writeups specific styles */
-        .writeups-hero {
-            background: linear-gradient(135deg, var(--bg-color) 0%, var(--bg-secondary) 100%);
-            padding: var(--spacing-5xl) 0 var(--spacing-4xl);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .writeups-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 30% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 70% 80%, rgba(255, 107, 53, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .writeups-header {
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .writeups-title {
-            font-size: var(--font-size-4xl);
-            font-weight: var(--font-weight-bold);
-            color: var(--text-primary);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .writeups-subtitle {
-            font-size: var(--font-size-xl);
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto var(--spacing-xl);
-            line-height: var(--line-height-relaxed);
-        }
-
-        .writeups-filters {
-            display: flex;
-            justify-content: center;
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-2xl);
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: var(--spacing-sm) var(--spacing-lg);
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-xl);
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: var(--font-weight-medium);
-            transition: all var(--transition-fast);
-            cursor: pointer;
-            font-size: var(--font-size-sm);
-        }
-
-        .filter-btn:hover,
-        .filter-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .writeups-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: var(--spacing-xl);
-            margin-top: var(--spacing-2xl);
-        }
-
-        .writeup-card {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-xl);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: all var(--transition-normal);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .writeup-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .writeup-header {
-            padding: var(--spacing-xl);
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .writeup-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(45deg);
-            transition: transform var(--transition-slow);
-        }
-
-        .writeup-card:hover .writeup-header::before {
-            transform: rotate(45deg) translate(50%, 50%);
-        }
-
-        .writeup-title {
-            font-size: var(--font-size-xl);
-            font-weight: var(--font-weight-bold);
-            margin-bottom: var(--spacing-sm);
-            position: relative;
-            z-index: 1;
-        }
-
-        .writeup-meta {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-lg);
-            font-size: var(--font-size-sm);
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-
-        .writeup-date {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-        }
-
-        .writeup-difficulty {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            padding: var(--spacing-xs) var(--spacing-sm);
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: var(--border-radius-sm);
-        }
-
-        .writeup-content {
-            padding: var(--spacing-xl);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-lg);
-        }
-
-        .writeup-description {
-            color: var(--text-secondary);
-            line-height: var(--line-height-relaxed);
-            flex: 1;
-        }
-
-        .writeup-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--spacing-sm);
-        }
-
-        .writeup-tag {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            padding: var(--spacing-xs) var(--spacing-sm);
-            border-radius: var(--border-radius-sm);
-            font-size: var(--font-size-xs);
-            font-weight: var(--font-weight-medium);
-            font-family: var(--font-family-mono);
-        }
-
-        .writeup-actions {
-            display: flex;
-            gap: var(--spacing-md);
-            padding-top: var(--spacing-lg);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .writeup-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-md);
-            border-radius: var(--border-radius-md);
-            text-decoration: none;
-            font-weight: var(--font-weight-medium);
-            transition: all var(--transition-fast);
-            font-size: var(--font-size-sm);
-            border: none;
-            cursor: pointer;
-        }
-
-        .writeup-btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .writeup-btn-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        .writeup-btn-secondary {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        .writeup-btn-secondary:hover {
-            background: var(--surface-hover);
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: var(--spacing-4xl);
-            color: var(--text-muted);
-        }
-
-        .empty-state i {
-            font-size: var(--font-size-4xl);
-            color: var(--primary-color);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .empty-state h3 {
-            font-size: var(--font-size-xl);
-            font-weight: var(--font-weight-semibold);
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .search-box {
-            max-width: 400px;
-            margin: 0 auto var(--spacing-xl);
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: var(--spacing-md) var(--spacing-xl);
-            padding-left: var(--spacing-3xl);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-xl);
-            background: var(--surface-color);
-            color: var(--text-primary);
-            font-size: var(--font-size-base);
-            transition: all var(--transition-fast);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: var(--spacing-md);
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            pointer-events: none;
-        }
-
-        .featured-badge {
-            position: absolute;
-            top: var(--spacing-md);
-            right: var(--spacing-md);
-            background: var(--secondary-color);
-            color: white;
-            padding: var(--spacing-xs) var(--spacing-sm);
-            border-radius: var(--border-radius-sm);
-            font-size: var(--font-size-xs);
-            font-weight: var(--font-weight-medium);
-            z-index: 2;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.fade-in {
-            opacity: 1;
-        }
-
-        .modal-content {
-            background: var(--surface-color);
-            border-radius: var(--border-radius-xl);
-            padding: var(--spacing-2xl);
-            max-height: 80vh;
-            max-width: 800px;
-            width: 90%;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border-color);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.fade-in .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-xl);
-            padding-bottom: var(--spacing-lg);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            color: var(--text-primary);
-            font-size: var(--font-size-2xl);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: var(--font-size-xl);
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: var(--spacing-sm);
-            border-radius: var(--border-radius-sm);
-            transition: all var(--transition-fast);
-        }
-
-        .modal-close:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        .modal-body {
-            color: var(--text-secondary);
-            line-height: var(--line-height-relaxed);
-        }
-
-        .writeup-meta-full {
-            display: flex;
-            gap: var(--spacing-lg);
-            margin-bottom: var(--spacing-lg);
-            padding: var(--spacing-md);
-            background: var(--bg-tertiary);
-            border-radius: var(--border-radius-md);
-            flex-wrap: wrap;
-        }
-
-        .writeup-meta-full span {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            color: var(--text-secondary);
-        }
-
-        .placeholder-content {
-            margin-top: var(--spacing-xl);
-            padding: var(--spacing-xl);
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius-lg);
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .placeholder-content h3 {
-            color: var(--text-primary);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .placeholder-content code {
-            background: var(--bg-tertiary);
-            padding: var(--spacing-sm);
-            border-radius: var(--border-radius-sm);
-            display: block;
-            margin: var(--spacing-md) 0;
-            font-family: var(--font-family-mono);
-            color: var(--primary-color);
-        }
-
-        /* Toast Notification */
-        .toast-notification {
-            position: fixed;
-            bottom: var(--spacing-xl);
-            right: var(--spacing-xl);
-            background: var(--primary-color);
-            color: white;
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-radius: var(--border-radius-lg);
-            z-index: 1000;
-            box-shadow: var(--shadow-lg);
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            max-width: 300px;
-            word-wrap: break-word;
-        }
-
-        @media (max-width: 768px) {
-            .writeups-hero {
-                padding: var(--spacing-3xl) 0 var(--spacing-2xl);
-            }
-            
-            .writeups-title {
-                font-size: var(--font-size-3xl);
-            }
-            
-            .writeups-filters {
-                justify-content: flex-start;
-                overflow-x: auto;
-                padding-bottom: var(--spacing-sm);
-            }
-            
-            .filter-btn {
-                white-space: nowrap;
-                flex-shrink: 0;
-            }
-            
-            .writeups-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .writeup-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: var(--spacing-sm);
-            }
-            
-            .writeup-actions {
-                flex-direction: column;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin: var(--spacing-md);
-                padding: var(--spacing-lg);
-            }
-
-            .writeup-meta-full {
-                flex-direction: column;
-                gap: var(--spacing-sm);
-            }
-
-            .toast-notification {
-                right: var(--spacing-md);
-                left: var(--spacing-md);
-                max-width: none;
-            }
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Theme Toggle -->
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-        <i class="fas fa-moon"></i>
-        <i class="fas fa-sun"></i>
-    </button>
-
     <!-- Navigation -->
     <nav class="nav" id="nav">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <span class="nav-logo">GC</span>
-                <span class="nav-name">Gabe Chew</span>
+        <div class="nav__container">
+            <div class="nav__brand">
+                <a href="index.html" class="nav__logo">GCZ</a>
             </div>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="index.html#about" class="nav-link">About</a></li>
-                <li><a href="index.html#experience" class="nav-link">Experience</a></li>
-                <li><a href="index.html#projects" class="nav-link">Projects</a></li>
-                <li><a href="index.html#ventures" class="nav-link">Ventures</a></li>
-                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-                <li><a href="writeups.html" class="nav-link active">Writeups</a></li>
-            </ul>
-            <button class="nav-toggle" id="nav-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="index.html" class="nav__link">Home</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="index.html#about" class="nav__link">About</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="index.html#experience" class="nav__link">Experience</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="index.html#projects" class="nav__link">Projects</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="index.html#contact" class="nav__link">Contact</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="writeups.html" class="nav__link active">Writeups</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="nav__controls">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <button class="nav__toggle" id="nav-toggle" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <!-- Writeups Hero Section -->
-    <section class="writeups-hero">
-        <div class="container">
-            <div class="writeups-header">
-                <h1 class="writeups-title animate-fade-up">Technical Writeups</h1>
-                <p class="writeups-subtitle animate-fade-up" style="animation-delay: 0.1s;">
-                    In-depth analysis of cybersecurity challenges, CTF solutions, and hardware security research. 
-                    Documenting the journey from curiosity to exploitation.
-                </p>
-                
-                <!-- Search Box -->
-                <div class="search-box animate-fade-up" style="animation-delay: 0.2s;">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-input" class="search-input" placeholder="Search writeups..." autocomplete="off">
+    <main>
+        <!-- Header Section -->
+        <section class="writeups-header">
+            <div class="section__container">
+                <div class="writeups-header__content animate-on-scroll fade-up">
+                    <h1 class="writeups-header__title">Technical Writeups</h1>
+                    <p class="writeups-header__description">
+                        In-depth analysis of security challenges, vulnerability research, and technical explorations from HackTheBox, TryHackMe, and independent research projects.
+                    </p>
+                    <div class="writeups-header__stats">
+                        <div class="writeups-stat">
+                            <span class="writeups-stat__number" id="total-writeups">12</span>
+                            <span class="writeups-stat__label">Total Writeups</span>
+                        </div>
+                        <div class="writeups-stat">
+                            <span class="writeups-stat__number">5</span>
+                            <span class="writeups-stat__label">Categories</span>
+                        </div>
+                        <div class="writeups-stat">
+                            <span class="writeups-stat__number">#1</span>
+                            <span class="writeups-stat__label">TryHackMe Malaysia</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters Section -->
+        <section class="writeups-filters">
+            <div class="section__container">
+                <div class="filters animate-on-scroll fade-up">
+                    <h3 class="filters__title">Filter by Category</h3>
+                    <div class="filters__buttons" id="category-filters">
+                        <button class="filter-btn active" data-category="all">All</button>
+                        <button class="filter-btn" data-category="reverse-engineering">Reverse Engineering</button>
+                        <button class="filter-btn" data-category="pwn">PWN</button>
+                        <button class="filter-btn" data-category="hardware">Hardware</button>
+                        <button class="filter-btn" data-category="mobile">Mobile</button>
+                        <button class="filter-btn" data-category="ai-ml">AI/ML Security</button>
+                        <button class="filter-btn" data-category="osint">OSINT</button>
+                    </div>
+                </div>
+                <div class="search animate-on-scroll fade-up">
+                    <div class="search__container">
+                        <input type="text" class="search__input" id="search-input" placeholder="Search writeups...">
+                        <div class="search__icon">🔍</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Writeups Grid -->
+        <section class="writeups-content">
+            <div class="section__container">
+                <div class="writeups-grid" id="writeups-grid">
+                    <!-- Writeup cards will be dynamically loaded here -->
+                    
+                    <!-- Example Writeup 1 -->
+                    <article class="writeup-card animate-on-scroll scale-up" data-category="reverse-engineering">
+                        <div class="writeup-card__image">
+                            <div class="writeup-card__placeholder">REV</div>
+                            <div class="writeup-card__difficulty">Hard</div>
+                        </div>
+                        <div class="writeup-card__content">
+                            <div class="writeup-card__meta">
+                                <span class="writeup-card__platform">HackTheBox</span>
+                                <span class="writeup-card__date">March 2025</span>
+                            </div>
+                            <h3 class="writeup-card__title">Advanced ARM64 Binary Analysis</h3>
+                            <p class="writeup-card__description">
+                                Deep dive into ARM64 assembly reverse engineering, exploring advanced anti-debugging techniques and custom exploit development for embedded systems.
+                            </p>
+                            <div class="writeup-card__tags">
+                                <span class="tag">ARM64</span>
+                                <span class="tag">Assembly</span>
+                                <span class="tag">Anti-Debug</span>
+                                <span class="tag">Embedded</span>
+                            </div>
+                            <div class="writeup-card__actions">
+                                <button class="btn btn--outline" onclick="openWriteup('example-1')">Read Writeup</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Example Writeup 2 -->
+                    <article class="writeup-card animate-on-scroll scale-up" data-category="hardware">
+                        <div class="writeup-card__image">
+                            <div class="writeup-card__placeholder">HW</div>
+                            <div class="writeup-card__difficulty">Medium</div>
+                        </div>
+                        <div class="writeup-card__content">
+                            <div class="writeup-card__meta">
+                                <span class="writeup-card__platform">Independent</span>
+                                <span class="writeup-card__date">February 2025</span>
+                            </div>
+                            <h3 class="writeup-card__title">IoT Device UART Exploitation</h3>
+                            <p class="writeup-card__description">
+                                Complete hardware teardown and UART interface exploitation of a popular IoT device, including firmware extraction and privilege escalation.
+                            </p>
+                            <div class="writeup-card__tags">
+                                <span class="tag">IoT</span>
+                                <span class="tag">UART</span>
+                                <span class="tag">Firmware</span>
+                                <span class="tag">Hardware</span>
+                            </div>
+                            <div class="writeup-card__actions">
+                                <button class="btn btn--outline" onclick="openWriteup('example-2')">Read Writeup</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Example Writeup 3 -->
+                    <article class="writeup-card animate-on-scroll scale-up" data-category="pwn">
+                        <div class="writeup-card__image">
+                            <div class="writeup-card__placeholder">PWN</div>
+                            <div class="writeup-card__difficulty">Insane</div>
+                        </div>
+                        <div class="writeup-card__content">
+                            <div class="writeup-card__meta">
+                                <span class="writeup-card__platform">HackTheBox</span>
+                                <span class="writeup-card__date">January 2025</span>
+                            </div>
+                            <h3 class="writeup-card__title">Custom ROP Chain Exploitation</h3>
+                            <p class="writeup-card__description">
+                                Advanced exploitation techniques using custom ROP chains to bypass modern protection mechanisms including ASLR, DEP, and stack canaries.
+                            </p>
+                            <div class="writeup-card__tags">
+                                <span class="tag">ROP</span>
+                                <span class="tag">Binary Exploitation</span>
+                                <span class="tag">ASLR Bypass</span>
+                                <span class="tag">Stack</span>
+                            </div>
+                            <div class="writeup-card__actions">
+                                <button class="btn btn--outline" onclick="openWriteup('example-3')">Read Writeup</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Example Writeup 4 -->
+                    <article class="writeup-card animate-on-scroll scale-up" data-category="ai-ml">
+                        <div class="writeup-card__image">
+                            <div class="writeup-card__placeholder">AI</div>
+                            <div class="writeup-card__difficulty">Hard</div>
+                        </div>
+                        <div class="writeup-card__content">
+                            <div class="writeup-card__meta">
+                                <span class="writeup-card__platform">Research</span>
+                                <span class="writeup-card__date">December 2024</span>
+                            </div>
+                            <h3 class="writeup-card__title">Adversarial ML Attack Vectors</h3>
+                            <p class="writeup-card__description">
+                                Research into adversarial machine learning attacks, exploring poisoning techniques and model evasion strategies in production ML systems.
+                            </p>
+                            <div class="writeup-card__tags">
+                                <span class="tag">Machine Learning</span>
+                                <span class="tag">Adversarial</span>
+                                <span class="tag">Model Poisoning</span>
+                                <span class="tag">Research</span>
+                            </div>
+                            <div class="writeup-card__actions">
+                                <button class="btn btn--outline" onclick="openWriteup('example-4')">Read Writeup</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Example Writeup 5 -->
+                    <article class="writeup-card animate-on-scroll scale-up" data-category="mobile">
+                        <div class="writeup-card__image">
+                            <div class="writeup-card__placeholder">MOB</div>
+                            <div class="writeup-card__difficulty">Medium</div>
+                        </div>
+                        <div class="writeup-card__content">
+                            <div class="writeup-card__meta">
+                                <span class="writeup-card__platform">TryHackMe</span>
+                                <span class="writeup-card__date">November 2024</span>
+                            </div>
+                            <h3 class="writeup-card__title">Android Application Security Analysis</h3>
+                            <p class="writeup-card__description">
+                                Complete mobile application penetration testing workflow, from APK analysis to runtime manipulation and certificate pinning bypass.
+                            </p>
+                            <div class="writeup-card__tags">
+                                <span class="tag">Android</span>
+                                <span class="tag">APK Analysis</span>
+                                <span class="tag">Frida</span>
+                                <span class="tag">SSL Pinning</span>
+                            </div>
+                            <div class="writeup-card__actions">
+                                <button class="btn btn--outline" onclick="openWriteup('example-5')">Read Writeup</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Example Writeup 6 -->
+                    <article class="writeup-card animate-on-scroll scale-up" data-category="osint">
+                        <div class="writeup-card__image">
+                            <div class="writeup-card__placeholder">OSINT</div>
+                            <div class="writeup-card__difficulty">Easy</div>
+                        </div>
+                        <div class="writeup-card__content">
+                            <div class="writeup-card__meta">
+                                <span class="writeup-card__platform">TryHackMe</span>
+                                <span class="writeup-card__date">October 2024</span>
+                            </div>
+                            <h3 class="writeup-card__title">Advanced OSINT Reconnaissance Techniques</h3>
+                            <p class="writeup-card__description">
+                                Comprehensive guide to open source intelligence gathering using modern tools and techniques for digital footprinting and reconnaissance.
+                            </p>
+                            <div class="writeup-card__tags">
+                                <span class="tag">OSINT</span>
+                                <span class="tag">Reconnaissance</span>
+                                <span class="tag">Digital Footprint</span>
+                                <span class="tag">Intelligence</span>
+                            </div>
+                            <div class="writeup-card__actions">
+                                <button class="btn btn--outline" onclick="openWriteup('example-6')">Read Writeup</button>
+                            </div>
+                        </div>
+                    </article>
                 </div>
 
-                <!-- Filters -->
-                <div class="writeups-filters animate-fade-up" style="animation-delay: 0.3s;">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="hardware">Hardware</button>
-                    <button class="filter-btn" data-filter="ctf">CTF</button>
-                    <button class="filter-btn" data-filter="web">Web Security</button>
-                    <button class="filter-btn" data-filter="mobile">Mobile</button>
-                    <button class="filter-btn" data-filter="reversing">Reverse Engineering</button>
-                    <button class="filter-btn" data-filter="osint">OSINT</button>
-                    <button class="filter-btn" data-filter="ai-ml">AI/ML Security</button>
+                <div class="load-more animate-on-scroll fade-up">
+                    <button class="btn btn--primary" id="load-more-btn">Load More Writeups</button>
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <div class="empty-state__content">
+                        <div class="empty-state__icon">📝</div>
+                        <h3 class="empty-state__title">No writeups found</h3>
+                        <p class="empty-state__description">Try adjusting your filters or search terms</p>
+                        <button class="btn btn--outline" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Writeup Modal -->
+    <div class="modal" id="writeup-modal">
+        <div class="modal__backdrop" onclick="closeWriteupModal()"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title" id="modal-title">Writeup Title</h2>
+                <button class="modal__close" onclick="closeWriteupModal()" aria-label="Close modal">×</button>
+            </div>
+            <div class="modal__body" id="modal-body">
+                <div class="writeup-content">
+                    <p>Loading writeup content...</p>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Writeups Content -->
-    <section class="section">
-        <div class="container">
-            <div class="writeups-grid" id="writeups-grid">
-                <!-- Writeups will be dynamically loaded here -->
-            </div>
-            
-            <!-- Empty State -->
-            <div class="empty-state" id="empty-state" style="display: none;">
-                <i class="fas fa-search"></i>
-                <h3>No writeups found</h3>
-                <p>Try adjusting your search terms or filters.</p>
-            </div>
-        </div>
-    </section>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-left">
-                    <p>&copy; 2025 Gabe Chew Zhan Hong. All rights reserved.</p>
-                </div>
-                <div class="footer-right">
-                    <p>Built with passion for security and innovation</p>
-                </div>
+        <div class="footer__container">
+            <div class="footer__content">
+                <p class="footer__text">
+                    © 2025 Gabe Chew Zhan Hong. Technical writeups and security research.
+                </p>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="js/script.js"></script>
     <script src="js/writeups.js"></script>
 </body>
