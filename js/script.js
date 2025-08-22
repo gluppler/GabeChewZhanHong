@@ -65,7 +65,7 @@ class NavigationManager {
     this.setupActiveSection();
   }
 
-setupScrollEffect() {
+  setupScrollEffect() {
     let lastScrollY = window.scrollY;
     
     window.addEventListener('scroll', () => {
@@ -85,7 +85,7 @@ setupScrollEffect() {
       }
       
       lastScrollY = currentScrollY;
-    }, { passive: true }); // This is the added part
+    }, { passive: true });
   }
 
   setupSmoothScrolling() {
@@ -303,7 +303,7 @@ class ProjectsManager {
               <i class="fab fa-github"></i>
               View Repository
             </a>
-            <a href="#" class="project-btn project-btn-secondary" onclick="projectsManager.showProjectDetails('${project.title}')">
+            <a href="#" class="project-btn project-btn-secondary project-details-btn" data-project-title="${project.title}">
               <i class="fas fa-info-circle"></i>
               Learn More
             </a>
@@ -313,6 +313,15 @@ class ProjectsManager {
     `).join('');
 
     this.projectsContainer.innerHTML = projectsHTML;
+
+    // Add event listeners after rendering the HTML
+    this.projectsContainer.querySelectorAll('.project-details-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const projectTitle = e.currentTarget.dataset.projectTitle;
+            this.showProjectDetails(projectTitle);
+        });
+    });
   }
 
   setupProjectAnimations() {
@@ -1221,7 +1230,7 @@ let projectsManager;
 
 // Initialize the application
 portfolioApp = new PortfolioApp();
-projectsManager = portfolioApp;
+projectsManager = portfolioApp.getComponent('projectsManager');
 
 // Export for global access
 window.portfolioApp = portfolioApp;
