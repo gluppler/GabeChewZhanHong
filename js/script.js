@@ -285,7 +285,10 @@ class ProjectsManager {
   }
 
   renderProjects() {
-    if (!this.projectsContainer) return;
+    if (!this.projectsContainer) {
+        console.error('Projects container not found!');
+        return;
+    }
 
     const projectsHTML = this.projects.map((project, index) => `
       <div class="project-card reveal" style="animation-delay: ${index * 0.1}s">
@@ -1230,6 +1233,8 @@ let projectsManager;
 
 // Initialize the application
 portfolioApp = new PortfolioApp();
+
+// This makes the 'Learn More' buttons work correctly.
 projectsManager = portfolioApp.getComponent('projectsManager');
 
 // Export for global access
