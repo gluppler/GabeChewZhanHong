@@ -491,7 +491,9 @@ class WriteupsManager {
 
     try {
       // Load markdown content
-      const content = await this.loadMarkdownContent(writeup.markdownFile);
+      // js/writeups.js (After)
+      const markdownPath = `writeups/${writeup.markdownFile}`;
+      const content = await this.loadMarkdownContent(markdownPath);
       const htmlContent = this.markdownToHtml(content);
       
       modalBody.innerHTML = `

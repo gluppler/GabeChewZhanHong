@@ -13,7 +13,7 @@
         "Hardware"
       ],
       "featured": false,
-      "markdownFile": "writeups/htb-824.md",
+      "markdownFile": "htb-824.md",
       "htbUrl": "https://labs.hackthebox.com/achievement/challenge/2141842/824"
     }
   ]
