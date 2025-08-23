@@ -1,30 +1,13 @@
 {
-  "writeups": [
-    {
-      "id": "htb-001",
-      "title": "Advanced ARM64 Binary Analysis - HTB 001",
-      "description": "Detailed reverse engineering analysis including disassembly, debugging techniques, and exploit development strategies.",
-      "category": "reversing",
-      "platform": "HackTheBox",
-      "difficulty": "hard",
-      "date": "2025-01-15",
-      "tags": ["ARM64", "Assembly", "Anti-Debug", "Embedded"],
-      "featured": true,
-      "markdownFile": "writeups/htb-001.md",
-      "htbUrl": "https://labs.hackthebox.com/achievement/challenge/2141842/824"
-    },
-    {
-      "id": "htb-002",
-      "title": "Buffer Overflow Exploitation - HTB 002",
-      "description": "Binary exploitation walkthrough covering vulnerability discovery, payload crafting, and successful exploitation.",
-      "category": "pwn",
-      "platform": "HackTheBox",
-      "difficulty": "medium",
-      "date": "2024-12-20",
-      "tags": ["Buffer Overflow", "Stack", "Exploitation", "GDB"],
-      "featured": false,
-      "markdownFile": "writeups/htb-002.md",
-      "htbUrl": "https://labs.hackthebox.com/achievement/challenge/2141842/220"
-    }
-  ]
+  "id": "htb-824",
+  "title": "Low Logic - Digital Logic Reversing",
+  "description": "A walkthrough of the Low Logic challenge, focusing on identifying and applying boolean logic to decode a flag from binary input data.",
+  "category": "hardware",
+  "platform": "HackTheBox",
+  "difficulty": "very easy",
+  "date": "2025-08-23",
+  "tags": ["Digital Logic", "Boolean Algebra", "Scripting", "Hardware"],
+  "featured": false,
+  "markdownFile": "writeups/htb-824.md",
+  "htbUrl": "https://app.hackthebox.com/challenges/Low%20Logic"
 }
