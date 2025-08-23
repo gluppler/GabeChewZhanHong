@@ -491,8 +491,12 @@ class WriteupsManager {
 
     try {
       // *** THIS IS THE FIX ***
-      // Construct the full path to the markdown file
-      const markdownPath = `writeups/${writeup.markdownFile}`;
+      const filename = writeup.markdownFile;
+      // Remove the '.md' extension from the filename to match clean URLs
+      const filenameWithoutExt = filename.endsWith('.md') ? filename.slice(0, -3) : filename;
+      // Construct the full, correct path
+      const markdownPath = `writeups/${filenameWithoutExt}`;
+      
       const content = await this.loadMarkdownContent(markdownPath);
       
       const htmlContent = this.markdownToHtml(content);
@@ -539,6 +543,8 @@ class WriteupsManager {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      // Since the server might not send the right content-type for a URL without an extension,
+      // we assume it's markdown text.
       const content = await response.text();
       this.markdownCache.set(filepath, content);
       return content;
