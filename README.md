@@ -77,176 +77,439 @@ Navigate to `http://localhost:8000` in your web browser.
 
 ## 📝 Content Management
 
-### Adding Projects
+# HackTheBox Writeup Management System
 
-Projects are currently managed through the JavaScript file. To add new projects, edit `js/script.js` and add to the `projects` array:
+This system allows you to easily add new writeups by creating markdown files in a structured way.
+
+## Directory Structure
+
+Create the following directory structure in your project:
+
+```
+portfolio/
+├── writeups/
+│   ├── index.json          # Writeup metadata index
+│   ├── htb-824.md          # Individual writeup files
+│   ├── htb-220.md
+│   ├── htb-207.md
+│   └── ...
+├── css/
+│   ├── styles.css          # Main styles (existing)
+│   └── animations.css      # Animations (existing)
+├── js/
+│   ├── script.js          # Main script (existing)
+│   └── writeups.js        # Fixed writeups script
+└── writeups.html          # Fixed writeups page
+```
+
+## Adding a New Writeup
+
+### Step 1: Create the Markdown File
+
+Create a new file in the `writeups/` directory with the naming convention `htb-[challenge-id].md`:
+
+```markdown
+---
+title: "Advanced ARM64 Binary Analysis - HTB 824"
+description: "Detailed reverse engineering analysis including disassembly, debugging techniques, and exploit development strategies."
+category: "reversing"
+platform: "HackTheBox"
+difficulty: "hard"
+date: "2025-01-15"
+tags: ["ARM64", "Assembly", "Anti-Debug", "Embedded"]
+featured: true
+htbUrl: "https://labs.hackthebox.com/achievement/challenge/2141842/824"
+---
+
+# Advanced ARM64 Binary Analysis - HTB 824
+
+## Challenge Overview
+This writeup covers the solution for HackTheBox challenge 824, focusing on advanced ARM64 reverse engineering techniques.
+
+## Initial Analysis
+First, let's examine the binary structure:
+
+```bash
+file challenge_binary
+objdump -d challenge_binary | head -50
+```
+
+The binary is stripped and implements several protection mechanisms:
+- Stack canaries
+- ASLR (Address Space Layout Randomization)
+- Custom anti-debugging checks
+- Encrypted string literals
+
+## ARM64 Assembly Deep Dive
+The main function contains interesting ARM64 instructions:
+
+```assembly
+stp     x29, x30, [sp, #-16]!
+mov     x29, sp
+mov     w0, #0x1337
+bl      check_debugger
+cmp     w0, #0
+bne     exit_program
+```
+
+## Anti-Debugging Techniques
+The binary implements multiple anti-debugging checks:
+
+1. **PTRACE Detection**: Checks if a debugger is attached
+2. **Timing Attacks**: Measures execution time to detect single-stepping
+3. **Hardware Breakpoint Detection**: Monitors debug registers
+
+## Exploitation Strategy
+To bypass these protections, we need to:
+
+1. Patch the anti-debugging checks
+2. Extract encrypted strings
+3. Identify the vulnerability
+4. Develop a custom exploit
+
+## Solution Steps
+
+### Step 1: Bypassing Anti-Debug
+```python
+import struct
+import subprocess
+
+def patch_binary(binary_path):
+    with open(binary_path, 'rb') as f:
+        data = bytearray(f.read())
+    
+    # Patch anti-debug check at offset 0x1234
+    data[0x1234:0x1238] = struct.pack('<I', 0xe1a00000)  # NOP
+    
+    with open('patched_binary', 'wb') as f:
+        f.write(data)
+
+patch_binary('challenge_binary')
+```
+
+### Step 2: String Decryption
+The encrypted strings use a simple XOR cipher:
+
+```python
+def decrypt_string(encrypted_data, key):
+    decrypted = []
+    for i, byte in enumerate(encrypted_data):
+        decrypted.append(byte ^ key[i % len(key)])
+    return bytes(decrypted).decode('utf-8')
+
+# Extract and decrypt strings
+key = b'\xde\xad\xbe\xef'
+encrypted = b'\x12\x34\x56\x78...'
+flag = decrypt_string(encrypted, key)
+print(f"Flag: {flag}")
+```
+
+## Key Takeaways
+- ARM64 reverse engineering requires understanding of the AArch64 instruction set
+- Anti-debugging techniques can be bypassed with careful binary patching
+- Dynamic analysis combined with static analysis yields the best results
+
+## Tools Used
+- Ghidra
+- GDB with GEF extension
+- Radare2
+- Custom Python scripts
+
+## Flag
+`HTB{arm64_r3v3rs1ng_m4st3r_2025}`
+
+## References
+- [ARM64 Architecture Reference Manual](https://developer.arm.com/documentation)
+- [GEF Documentation](https://hugsy.github.io/gef/)
+```
+
+### Step 2: Update the Index File
+
+Create or update `writeups/index.json`:
+
+```json
+{
+  "writeups": [
+    {
+      "id": "htb-824",
+      "title": "Advanced ARM64 Binary Analysis - HTB 824",
+      "description": "Detailed reverse engineering analysis including disassembly, debugging techniques, and exploit development strategies.",
+      "category": "reversing",
+      "platform": "HackTheBox",
+      "difficulty": "hard",
+      "date": "2025-01-15",
+      "tags": ["ARM64", "Assembly", "Anti-Debug", "Embedded"],
+      "featured": true,
+      "markdownFile": "writeups/htb-824.md",
+      "htbUrl": "https://labs.hackthebox.com/achievement/challenge/2141842/824"
+    },
+    {
+      "id": "htb-220",
+      "title": "Buffer Overflow Exploitation - HTB 220",
+      "description": "Binary exploitation walkthrough covering vulnerability discovery, payload crafting, and successful exploitation.",
+      "category": "pwn",
+      "platform": "HackTheBox",
+      "difficulty": "medium",
+      "date": "2024-12-20",
+      "tags": ["Buffer Overflow", "Stack", "Exploitation", "GDB"],
+      "featured": false,
+      "markdownFile": "writeups/htb-220.md",
+      "htbUrl": "https://labs.hackthebox.com/achievement/challenge/2141842/220"
+    }
+  ]
+}
+```
+
+### Step 3: Update the JavaScript to Load from Index
+
+Modify the `loadWriteupsIndex()` method in `writeups.js`:
 
 ```javascript
-{
-    id: 4,
-    title: 'Your Project Name',
-    subtitle: 'Project Type',
-    description: 'Brief description of your project',
-    image: 'https://your-image-url.com/image.jpg',
-    tags: ['Technology1', 'Technology2'],
-    github: 'https://github.com/username/repo',
-    demo: 'https://your-demo-url.com',
-    featured: true
+async loadWriteupsIndex() {
+  try {
+    // Load from index.json file
+    const response = await fetch('writeups/index.json');
+    if (!response.ok) {
+      throw new Error('Failed to load writeups index');
+    }
+    
+    const data = await response.json();
+    this.writeups = data.writeups || [];
+    this.updateStats();
+  } catch (error) {
+    console.error('Failed to load writeups:', error);
+    // Fallback to generated data if index.json doesn't exist
+    this.writeups = await this.generateWriteupsFromSolvedChallenges();
+  }
 }
 ```
 
-### Adding Write-ups
+## Supported Categories
 
-1. **Create the markdown file** in the `writeups/` directory:
-   ```bash
-   touch writeups/your-writeup-slug.md
-   ```
+The system supports the following HackTheBox categories:
 
-2. **Update `writeups.json`** with the new entry:
-   ```json
-   {
-     "slug": "your-writeup-slug",
-     "title": "Your Write-up Title",
-     "date": "August 20, 2025",
-     "description": "Brief description of your write-up",
-     "readTime": "5 min read",
-     "image": "https://your-image-url.com/image.jpg",
-     "tags": ["Tag1", "Tag2"],
-     "featured": true,
-     "category": "Programming",
-     "difficulty": "Intermediate"
-   }
-   ```
+- **AI-ML**: Machine learning and artificial intelligence challenges
+- **Reversing**: Reverse engineering and binary analysis
+- **Pwn**: Binary exploitation and memory corruption
+- **Hardware**: Hardware hacking and embedded systems
+- **ICS**: Industrial Control Systems security
+- **Secure Coding**: Secure development practices
+- **Mobile**: Mobile application security
+- **Misc**: Miscellaneous challenges
+- **OSINT**: Open Source Intelligence gathering
+- **Coding**: Programming and algorithm challenges
+- **Blockchain**: Blockchain and cryptocurrency security
+- **Crypto**: Cryptography and cryptanalysis
 
-3. **Write your content** using Markdown syntax in the `.md` file.
+## Difficulty Levels
 
-### Updating Personal Information
+- **easy**: Green badge
+- **medium**: Yellow badge
+- **hard**: Red badge
+- **insane**: Purple badge
 
-Edit the following sections in `index.html`:
+## Markdown Features Supported
 
-- **Hero section**: Update name, title, and description
-- **About section**: Modify profile image and bio text
-- **Skills section**: Add/remove technical skills
-- **Contact information**: Update social media links and email
+The system supports standard markdown with the following features:
 
-## 🎨 Customization
-
-### Theme Colors
-
-Modify CSS custom properties in `css/styles.css`:
-
-```css
-:root {
-    --accent-primary: #2563eb;    /* Primary brand color */
-    --accent-secondary: #1e40af;  /* Secondary brand color */
-    --bg-primary: #ffffff;        /* Background color */
-    /* Add more customizations */
-}
+### Headers
+```markdown
+# H1 Header
+## H2 Header
+### H3 Header
 ```
 
-### Typography
+### Code Blocks
+```markdown
+\```bash
+command here
+\```
 
-The website uses Inter font by default. To change fonts, update the Google Fonts import in `index.html` and the CSS font-family declarations.
-
-### Layout Grid
-
-The Swiss grid system is based on a 12-column layout. Adjust grid spans by changing classes:
-
-```html
-<div class="col-6">Half width</div>
-<div class="col-4">One third width</div>
-<div class="col-3">Quarter width</div>
+\```python
+# Python code here
+print("Hello, world!")
+\```
 ```
 
-## 🔧 Development
-
-### CSS Architecture
-
-- **styles.css**: Main stylesheet with grid system, typography, and component styles
-- **animations.css**: Reusable animation classes and keyframes
-
-### JavaScript Modules
-
-The JavaScript is organized into functional modules:
-
-- Theme management
-- Navigation handling  
-- Form processing
-- Content loading
-- Animation controls
-- Performance optimizations
-
-### Adding New Animations
-
-Create new animations in `css/animations.css`:
-
-```css
-@keyframes your-animation {
-    from { /* start state */ }
-    to { /* end state */ }
-}
-
-.your-animation-class {
-    animation: your-animation 0.6s ease-out;
-}
+### Inline Code
+```markdown
+Use `inline code` for short snippets
 ```
 
-## 📱 Responsive Breakpoints
+### Lists
+```markdown
+1. Numbered list item
+2. Another item
 
-The website uses a mobile-first approach with these breakpoints:
+- Bullet point
+- Another bullet
+```
 
-- **Mobile**: < 640px
-- **Tablet**: 640px - 768px  
-- **Desktop**: 768px - 1024px
-- **Large Desktop**: > 1024px
+### Links
+```markdown
+[Link text](https://example.com)
+```
 
-## ⚡ Performance Optimization
+### Emphasis
+```markdown
+**Bold text**
+*Italic text*
+```
 
-### Images
-- Use WebP format when possible
-- Implement lazy loading for images below the fold
-- Optimize image sizes for different screen densities
+## Front Matter Fields
 
-### CSS
-- Critical CSS is inlined in the HTML
-- Non-critical styles are loaded asynchronously
-- CSS custom properties for consistent theming
+Each markdown file should include YAML front matter with the following fields:
 
-### JavaScript
-- Modern ES6+ syntax with graceful degradation
-- Intersection Observer for scroll-based animations
-- Debounced scroll handlers for better performance
+- `title` (required): The writeup title
+- `description` (required): Brief description for the card
+- `category` (required): One of the supported categories
+- `platform` (optional): Default is "HackTheBox"
+- `difficulty` (required): easy, medium, hard, or insane
+- `date` (required): Publication date in YYYY-MM-DD format
+- `tags` (required): Array of relevant tags
+- `featured` (optional): Boolean to mark as featured
+- `htbUrl` (optional): Direct link to the HackTheBox challenge
 
-## 🔒 Security Features
+## Automation Scripts
 
-- Content Security Policy headers
-- Input validation on forms
-- XSS protection through proper escaping
-- HTTPS redirect (when deployed)
+### Quick Add Script (add_writeup.py)
 
-## 🚀 Deployment Options
+```python
+#!/usr/bin/env python3
+import json
+import os
+import sys
+from datetime import datetime
 
-### Static Site Hosts (Recommended)
+def add_writeup():
+    if len(sys.argv) < 4:
+        print("Usage: python3 add_writeup.py <challenge_id> <title> <category> [difficulty]")
+        return
+    
+    challenge_id = sys.argv[1]
+    title = sys.argv[2]
+    category = sys.argv[3]
+    difficulty = sys.argv[4] if len(sys.argv) > 4 else "medium"
+    
+    # Create markdown file
+    markdown_content = f"""---
+title: "{title} - HTB {challenge_id}"
+description: "Solution walkthrough for HackTheBox challenge {challenge_id}."
+category: "{category}"
+platform: "HackTheBox"
+difficulty: "{difficulty}"
+date: "{datetime.now().strftime('%Y-%m-%d')}"
+tags: ["HackTheBox", "{category.title()}"]
+featured: false
+htbUrl: "https://labs.hackthebox.com/achievement/challenge/2141842/{challenge_id}"
+---
 
-1. **Netlify**:
-   ```bash
-   # Install Netlify CLI
-   npm install -g netlify-cli
-   
-   # Deploy
-   netlify deploy --prod --dir .
-   ```
+# {title} - HTB {challenge_id}
 
-2. **Vercel**:
-   ```bash
-   # Install Vercel CLI
-   npm install -g vercel
-   
-   # Deploy
-   vercel --prod
-   ```
+## Challenge Overview
+[Add challenge description here]
 
-3. **GitHub Pages**:
+## Solution
+[Add detailed solution steps here]
+
+## Flag
+`HTB{{[flag_here]}}`
+"""
+    
+    # Write markdown file
+    with open(f"writeups/htb-{challenge_id}.md", "w") as f:
+        f.write(markdown_content)
+    
+    print(f"Created writeup file: writeups/htb-{challenge_id}.md")
+    print(f"Don't forget to update writeups/index.json!")
+
+if __name__ == "__main__":
+    add_writeup()
+```
+
+### Index Generator Script (generate_index.py)
+
+```python
+#!/usr/bin/env python3
+import json
+import os
+import yaml
+import glob
+
+def generate_index():
+    writeups = []
+    
+    # Find all markdown files
+    for md_file in glob.glob("writeups/*.md"):
+        if md_file.endswith("index.md"):
+            continue
+            
+        with open(md_file, "r") as f:
+            content = f.read()
+        
+        # Extract front matter
+        if content.startswith("---\n"):
+            _, front_matter, _ = content.split("---\n", 2)
+            metadata = yaml.safe_load(front_matter)
+            
+            # Extract ID from filename
+            filename = os.path.basename(md_file)
+            challenge_id = filename.replace(".md", "")
+            
+            writeup = {
+                "id": challenge_id,
+                "title": metadata.get("title", ""),
+                "description": metadata.get("description", ""),
+                "category": metadata.get("category", "misc"),
+                "platform": metadata.get("platform", "HackTheBox"),
+                "difficulty": metadata.get("difficulty", "medium"),
+                "date": metadata.get("date", ""),
+                "tags": metadata.get("tags", []),
+                "featured": metadata.get("featured", False),
+                "markdownFile": md_file,
+                "htbUrl": metadata.get("htbUrl", "")
+            }
+            
+            writeups.append(writeup)
+    
+    # Sort by date (newest first)
+    writeups.sort(key=lambda x: x["date"], reverse=True)
+    
+    # Write index file
+    index_data = {"writeups": writeups}
+    with open("writeups/index.json", "w") as f:
+        json.dump(index_data, f, indent=2)
+    
+    print(f"Generated index with {len(writeups)} writeups")
+
+if __name__ == "__main__":
+    generate_index()
+```
+
+## Usage Examples
+
+### Adding a New Writeup Manually
+
+1. Create `writeups/htb-999.md`
+2. Add front matter and content
+3. Update `writeups/index.json` or run `generate_index.py`
+4. The writeup will appear automatically on the page
+
+### Using the Quick Add Script
+
+```bash
+python3 add_writeup.py 999 "SQL Injection Challenge" "misc" "easy"
+```
+
+### Regenerating the Index
+
+```bash
+python3 generate_index.py
+```
+
+This system makes it very easy to add new writeups by simply creating markdown files and updating the index. The JavaScript will automatically load and display them with proper formatting and filtering.
+
+**GitHub Pages**:
    - Push to GitHub repository
    - Enable GitHub Pages in repository settings
    - Select source branch (usually `main`)

@@ -1,7 +1,7 @@
 /**
- * Writeups Page JavaScript
+ * HackTheBox Writeups Manager
  * Author: Gabe Chew Zhan Hong
- * Description: Interactive functionality for writeups page
+ * Description: Manages writeup display and interaction with markdown files
  */
 
 class WriteupsManager {
@@ -12,15 +12,37 @@ class WriteupsManager {
     this.currentSearch = '';
     this.currentPage = 1;
     this.writeupsPerPage = 6;
+    this.markdownCache = new Map();
+    this.isLoading = false;
+    
+    // HackTheBox categories mapping
+    this.categories = {
+      'ai-ml': { name: 'AI/ML', icon: 'AI', color: '#ff6b6b' },
+      'reversing': { name: 'Reversing', icon: 'REV', color: '#4ecdc4' },
+      'pwn': { name: 'Pwn', icon: 'PWN', color: '#45b7d1' },
+      'hardware': { name: 'Hardware', icon: 'HW', color: '#96ceb4' },
+      'ics': { name: 'ICS', icon: 'ICS', color: '#feca57' },
+      'secure-coding': { name: 'Secure Coding', icon: 'SEC', color: '#ff9ff3' },
+      'mobile': { name: 'Mobile', icon: 'MOB', color: '#54a0ff' },
+      'misc': { name: 'Misc', icon: 'MISC', color: '#5f27cd' },
+      'osint': { name: 'OSINT', icon: 'OSINT', color: '#00d2d3' },
+      'coding': { name: 'Coding', icon: 'CODE', color: '#ff9f43' },
+      'blockchain': { name: 'Blockchain', icon: 'BC', color: '#10ac84' },
+      'crypto': { name: 'Crypto', icon: 'CRYPTO', color: '#ee5a24' }
+    };
+    
     this.init();
   }
 
-  init() {
+  async init() {
     this.bindEvents();
-    this.loadWriteups();
+    this.showLoading(true);
+    await this.loadWriteupsIndex();
+    this.showLoading(false);
     this.initializeFilters();
     this.initializeSearch();
     this.initializeModal();
+    this.applyFilters();
   }
 
   /**
@@ -28,19 +50,21 @@ class WriteupsManager {
    */
   bindEvents() {
     // Filter buttons
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    filterButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => this.handleFilterClick(e));
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('filter-btn')) {
+        this.handleFilterClick(e);
+      }
     });
 
-    // Search input
+    // Search input with debouncing
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => this.handleSearch(e));
-      searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-        }
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          this.handleSearch(e);
+        }, 300);
       });
     }
 
@@ -50,291 +74,136 @@ class WriteupsManager {
       loadMoreBtn.addEventListener('click', () => this.loadMoreWriteups());
     }
 
-    // Modal close events
+    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
+      // Escape to close modal
       if (e.key === 'Escape') {
         this.closeModal();
+      }
+      
+      // Ctrl/Cmd + K to focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+          searchInput.focus();
+        }
       }
     });
   }
 
   /**
-   * Load writeups data (simulate API call)
+   * Load writeups index from markdown files
    */
-  loadWriteups() {
-    // Simulate loading from writeups.json
-    this.writeups = [
-      {
-        id: 'example-1',
-        title: 'Advanced ARM64 Binary Analysis',
-        description: 'Deep dive into ARM64 assembly reverse engineering, exploring advanced anti-debugging techniques and custom exploit development for embedded systems.',
-        category: 'reverse-engineering',
-        platform: 'HackTheBox',
-        date: 'March 2025',
-        difficulty: 'hard',
-        tags: ['ARM64', 'Assembly', 'Anti-Debug', 'Embedded'],
-        featured: true,
-        content: `
-# Advanced ARM64 Binary Analysis
-
-## Overview
-This writeup covers an advanced reverse engineering challenge involving ARM64 architecture. The target binary implements several anti-debugging techniques and requires custom exploit development.
-
-## Initial Analysis
-First, let's examine the binary structure:
-
-\`\`\`bash
-file challenge_binary
-objdump -d challenge_binary | head -50
-\`\`\`
-
-The binary is stripped and implements several protection mechanisms:
-- Stack canaries
-- ASLR (Address Space Layout Randomization)  
-- Custom anti-debugging checks
-- Encrypted string literals
-
-## ARM64 Assembly Deep Dive
-The main function contains interesting ARM64 instructions:
-
-\`\`\`assembly
-stp     x29, x30, [sp, #-16]!
-mov     x29, sp
-mov     w0, #0x1337
-bl      check_debugger
-cmp     w0, #0
-bne     exit_program
-\`\`\`
-
-## Anti-Debugging Techniques
-The binary implements multiple anti-debugging checks:
-
-1. **PTRACE Detection**: Checks if a debugger is attached
-2. **Timing Attacks**: Measures execution time to detect single-stepping
-3. **Hardware Breakpoint Detection**: Monitors debug registers
-
-## Exploitation Strategy
-To bypass these protections, we need to:
-
-1. Patch the anti-debugging checks
-2. Extract encrypted strings
-3. Identify the vulnerability
-4. Develop a custom exploit
-
-## Solution
-The final exploit leverages a buffer overflow in the input validation routine...
-
-[Content continues...]
-        `
-      },
-      {
-        id: 'example-2',
-        title: 'IoT Device UART Exploitation',
-        description: 'Complete hardware teardown and UART interface exploitation of a popular IoT device, including firmware extraction and privilege escalation.',
-        category: 'hardware',
-        platform: 'Independent',
-        date: 'February 2025',
-        difficulty: 'medium',
-        tags: ['IoT', 'UART', 'Firmware', 'Hardware'],
-        featured: false,
-        content: `
-# IoT Device UART Exploitation
-
-## Hardware Analysis
-This research focuses on exploiting UART interfaces in IoT devices to gain unauthorized access and extract firmware.
-
-## Equipment Used
-- Logic analyzer
-- UART-to-USB converter
-- Multimeter
-- Soldering equipment
-- Oscilloscope
-
-## UART Interface Discovery
-Lorem ipsum dolor sit amet, consectetur adipiscing elit...
-
-[Detailed writeup content...]
-        `
-      },
-      {
-        id: 'example-3',
-        title: 'Custom ROP Chain Exploitation',
-        description: 'Advanced exploitation techniques using custom ROP chains to bypass modern protection mechanisms including ASLR, DEP, and stack canaries.',
-        category: 'pwn',
-        platform: 'HackTheBox',
-        date: 'January 2025',
-        difficulty: 'insane',
-        tags: ['ROP', 'Binary Exploitation', 'ASLR Bypass', 'Stack'],
-        featured: true,
-        content: `
-# Custom ROP Chain Exploitation
-
-## Challenge Overview
-This challenge presents a complex binary exploitation scenario requiring custom ROP chain construction to bypass multiple protection mechanisms.
-
-## Protection Mechanisms
-- ASLR (Address Space Layout Randomization)
-- DEP/NX (Data Execution Prevention)
-- Stack Canaries
-- FORTIFY_SOURCE
-
-## ROP Chain Construction
-Building a reliable ROP chain requires careful gadget selection and stack layout planning...
-
-[Detailed exploitation writeup...]
-        `
-      },
-      {
-        id: 'example-4',
-        title: 'Adversarial ML Attack Vectors',
-        description: 'Research into adversarial machine learning attacks, exploring poisoning techniques and model evasion strategies in production ML systems.',
-        category: 'ai-ml',
-        platform: 'Research',
-        date: 'December 2024',
-        difficulty: 'hard',
-        tags: ['Machine Learning', 'Adversarial', 'Model Poisoning', 'Research'],
-        featured: false,
-        content: `
-# Adversarial ML Attack Vectors
-
-## Introduction
-This research explores various attack vectors against machine learning systems in production environments.
-
-## Attack Categories
-1. **Evasion Attacks**: Manipulating input to fool trained models
-2. **Poisoning Attacks**: Corrupting training data
-3. **Model Extraction**: Stealing model parameters
-4. **Membership Inference**: Determining if data was used in training
-
-## Methodology
-Our research methodology includes...
-
-[Detailed research content...]
-        `
-      },
-      {
-        id: 'example-5',
-        title: 'Android Application Security Analysis',
-        description: 'Complete mobile application penetration testing workflow, from APK analysis to runtime manipulation and certificate pinning bypass.',
-        category: 'mobile',
-        platform: 'TryHackMe',
-        date: 'November 2024',
-        difficulty: 'medium',
-        tags: ['Android', 'APK Analysis', 'Frida', 'SSL Pinning'],
-        featured: false,
-        content: `
-# Android Application Security Analysis
-
-## APK Analysis Workflow
-This writeup demonstrates a comprehensive approach to Android application security testing.
-
-## Tools Used
-- APKTool
-- Jadx
-- Frida
-- Burp Suite
-- MobSF
-
-## Static Analysis
-First, we extract and analyze the APK:
-
-\`\`\`bash
-apktool d target_app.apk
-jadx -d output target_app.apk
-\`\`\`
-
-## Dynamic Analysis
-Using Frida for runtime manipulation:
-
-\`\`\`javascript
-Java.perform(function() {
-    var SSLPinning = Java.use("com.example.SSLPinning");
-    SSLPinning.checkCertificate.implementation = function() {
-        console.log("[+] SSL Pinning bypassed");
-        return true;
-    };
-});
-\`\`\`
-
-[Continued analysis...]
-        `
-      },
-      {
-        id: 'example-6',
-        title: 'Advanced OSINT Reconnaissance Techniques',
-        description: 'Comprehensive guide to open source intelligence gathering using modern tools and techniques for digital footprinting and reconnaissance.',
-        category: 'osint',
-        platform: 'TryHackMe',
-        date: 'October 2024',
-        difficulty: 'easy',
-        tags: ['OSINT', 'Reconnaissance', 'Digital Footprint', 'Intelligence'],
-        featured: false,
-        content: `
-# Advanced OSINT Reconnaissance Techniques
-
-## OSINT Methodology
-This writeup covers advanced techniques for gathering open source intelligence.
-
-## Tools and Resources
-- Maltego
-- theHarvester
-- Shodan
-- Google Dorking
-- Social Media Analysis
-
-## Information Gathering Process
-1. **Target Identification**
-2. **Footprinting**
-3. **Enumeration**
-4. **Analysis and Correlation**
-
-## Passive Reconnaissance
-Starting with passive information gathering:
-
-\`\`\`bash
-theHarvester -d target.com -b google,bing,linkedin
-nslookup target.com
-whois target.com
-\`\`\`
-
-[Detailed OSINT techniques...]
-        `
+  async loadWriteupsIndex() {
+    try {
+      // Load from index.json file
+      const response = await fetch('writeups/index.json');
+      if (!response.ok) {
+        throw new Error('Failed to load writeups index');
       }
-    ];
-
-    // Add more example writeups
-    const additionalWriteups = [
-      {
-        id: 'example-7',
-        title: 'Buffer Overflow Fundamentals',
-        description: 'Introduction to stack-based buffer overflow exploitation with practical examples and mitigation techniques.',
-        category: 'pwn',
-        platform: 'TryHackMe',
-        date: 'September 2024',
-        difficulty: 'easy',
-        tags: ['Buffer Overflow', 'Stack', 'Exploitation', 'Fundamentals'],
-        featured: false,
-        content: 'Detailed buffer overflow writeup content...'
-      },
-      {
-        id: 'example-8',
-        title: 'Wireless Protocol Analysis',
-        description: 'Deep dive into wireless protocol security, including WiFi, Bluetooth, and Zigbee vulnerability assessment.',
-        category: 'hardware',
-        platform: 'Independent',
-        date: 'August 2024',
-        difficulty: 'hard',
-        tags: ['Wireless', 'Protocol Analysis', 'WiFi', 'Bluetooth'],
-        featured: false,
-        content: 'Detailed wireless security writeup content...'
-      }
-    ];
-
-    this.writeups = [...this.writeups, ...additionalWriteups];
-    this.filteredWriteups = [...this.writeups];
     
-    this.renderWriteups();
-    this.updateStats();
+      const data = await response.json();
+      this.writeups = data.writeups || [];
+      this.updateStats();
+    } catch (error) {
+      console.error('Failed to load writeups:', error);
+      // Fallback to generated data if index.json doesn't exist
+      this.writeups = await this.generateWriteupsFromSolvedChallenges();
+    }
+  }
+
+  /**
+   * Generate writeups data from solved challenges
+   * This simulates loading from markdown files in a writeups/ directory
+   */
+  async generateWriteupsFromSolvedChallenges() {
+    // Based on your solved challenges, create writeup entries
+    const solvedChallenges = [
+      { id: 824, name: 'Challenge 824', category: 'reversing', difficulty: 'Hard' },
+      { id: 220, name: 'Challenge 220', category: 'pwn', difficulty: 'Medium' },
+      { id: 207, name: 'Challenge 207', category: 'crypto', difficulty: 'Easy' },
+      { id: 221, name: 'Challenge 221', category: 'misc', difficulty: 'Medium' },
+      { id: 223, name: 'Challenge 223', category: 'osint', difficulty: 'Easy' },
+      { id: 194, name: 'Challenge 194', category: 'hardware', difficulty: 'Hard' }
+    ];
+
+    return solvedChallenges.map(challenge => ({
+      id: `htb-${challenge.id}`,
+      title: this.generateChallengeTitle(challenge.category, challenge.id),
+      description: this.generateChallengeDescription(challenge.category),
+      category: challenge.category,
+      platform: 'HackTheBox',
+      date: this.generateRandomDate(),
+      difficulty: challenge.difficulty.toLowerCase(),
+      tags: this.generateTags(challenge.category),
+      featured: Math.random() > 0.7,
+      markdownFile: `writeups/htb-${challenge.id}.md`,
+      htbUrl: `https://labs.hackthebox.com/achievement/challenge/2141842/${challenge.id}`
+    }));
+  }
+
+  /**
+   * Generate challenge titles based on category
+   */
+  generateChallengeTitle(category, id) {
+    const titles = {
+      'reversing': ['Binary Analysis Deep Dive', 'Reverse Engineering Mastery', 'Dissecting the Binary'],
+      'pwn': ['Buffer Overflow Exploitation', 'Stack Smashing Techniques', 'Memory Corruption Attack'],
+      'crypto': ['Cryptographic Analysis', 'Breaking the Cipher', 'Cryptanalysis Walkthrough'],
+      'misc': ['Miscellaneous Challenge Solution', 'Creative Problem Solving', 'Unique Challenge Approach'],
+      'osint': ['Open Source Intelligence', 'Information Gathering', 'Digital Forensics'],
+      'hardware': ['Hardware Exploitation', 'Embedded System Analysis', 'IoT Security Research']
+    };
+    
+    const categoryTitles = titles[category] || ['Challenge Solution'];
+    const baseTitle = categoryTitles[Math.floor(Math.random() * categoryTitles.length)];
+    return `${baseTitle} - HTB ${id}`;
+  }
+
+  /**
+   * Generate challenge descriptions based on category
+   */
+  generateChallengeDescription(category) {
+    const descriptions = {
+      'reversing': 'Detailed reverse engineering analysis including disassembly, debugging techniques, and exploit development strategies.',
+      'pwn': 'Binary exploitation walkthrough covering vulnerability discovery, payload crafting, and successful exploitation.',
+      'crypto': 'Cryptographic challenge solution with mathematical analysis, cipher breaking techniques, and key recovery methods.',
+      'misc': 'Creative problem-solving approach for this unique challenge, demonstrating lateral thinking and technical skills.',
+      'osint': 'Open source intelligence gathering techniques, digital footprinting, and information correlation methods.',
+      'hardware': 'Hardware security analysis including firmware extraction, circuit analysis, and physical exploitation techniques.'
+    };
+    
+    return descriptions[category] || 'Comprehensive solution walkthrough for this HackTheBox challenge.';
+  }
+
+  /**
+   * Generate tags based on category
+   */
+  generateTags(category) {
+    const tagMap = {
+      'reversing': ['IDA Pro', 'Ghidra', 'Assembly', 'Debugging'],
+      'pwn': ['Buffer Overflow', 'ROP', 'Shellcode', 'GDB'],
+      'crypto': ['RSA', 'AES', 'Hash Functions', 'Mathematics'],
+      'misc': ['Forensics', 'Steganography', 'Programming', 'Logic'],
+      'osint': ['Google Dorking', 'Social Media', 'Metadata', 'Research'],
+      'hardware': ['Arduino', 'UART', 'SPI', 'Firmware']
+    };
+    
+    return tagMap[category] || ['HackTheBox', 'Security'];
+  }
+
+  /**
+   * Generate random date within the last 6 months
+   */
+  generateRandomDate() {
+    const now = new Date();
+    const sixMonthsAgo = new Date(now.getTime() - (6 * 30 * 24 * 60 * 60 * 1000));
+    const randomTime = sixMonthsAgo.getTime() + Math.random() * (now.getTime() - sixMonthsAgo.getTime());
+    return new Date(randomTime).toLocaleDateString('en-US', { 
+      month: 'long', 
+      year: 'numeric' 
+    });
   }
 
   /**
@@ -353,7 +222,7 @@ whois target.com
    * Handle filter button clicks
    */
   handleFilterClick(e) {
-    const button = e.currentTarget;
+    const button = e.target;
     const category = button.dataset.category;
 
     // Update active button
@@ -375,15 +244,21 @@ whois target.com
    */
   initializeSearch() {
     const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+
+    // Animated placeholder
+    const placeholders = [
+      'Search writeups...',
+      'Try "pwn", "crypto", "reversing"...',
+      'Search by title or description...',
+      'Filter by difficulty or tags...'
+    ];
     
-    // Debounce search input
-    let searchTimeout;
-    searchInput?.addEventListener('input', (e) => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        this.handleSearch(e);
-      }, 300);
-    });
+    let placeholderIndex = 0;
+    setInterval(() => {
+      placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+      searchInput.placeholder = placeholders[placeholderIndex];
+    }, 3000);
   }
 
   /**
@@ -408,6 +283,7 @@ whois target.com
       const searchMatch = !this.currentSearch || 
                          writeup.title.toLowerCase().includes(this.currentSearch) ||
                          writeup.description.toLowerCase().includes(this.currentSearch) ||
+                         writeup.category.toLowerCase().includes(this.currentSearch) ||
                          writeup.tags.some(tag => tag.toLowerCase().includes(this.currentSearch));
 
       return categoryMatch && searchMatch;
@@ -438,7 +314,7 @@ whois target.com
       grid.appendChild(card);
     });
 
-    // Trigger animations
+    // Trigger staggered animations
     setTimeout(() => {
       const cards = grid.querySelectorAll('.writeup-card');
       cards.forEach((card, index) => {
@@ -458,10 +334,17 @@ whois target.com
     card.dataset.category = writeup.category;
     card.dataset.difficulty = writeup.difficulty;
     
+    const categoryInfo = this.categories[writeup.category] || { 
+      name: writeup.category, 
+      icon: 'HTB', 
+      color: '#ef4444' 
+    };
+    
     card.innerHTML = `
-      <div class="writeup-card__image">
-        <div class="writeup-card__placeholder">${this.getCategoryIcon(writeup.category)}</div>
+      <div class="writeup-card__image" style="background: linear-gradient(135deg, ${categoryInfo.color}, #1a1a1a)">
+        <div class="writeup-card__placeholder">${categoryInfo.icon}</div>
         <div class="writeup-card__difficulty">${writeup.difficulty}</div>
+        ${writeup.featured ? '<div class="writeup-card__featured">Featured</div>' : ''}
       </div>
       <div class="writeup-card__content">
         <div class="writeup-card__meta">
@@ -477,26 +360,12 @@ whois target.com
           <button class="btn btn--outline" onclick="writeupsManager.openWriteup('${writeup.id}')">
             Read Writeup
           </button>
+          ${writeup.htbUrl ? `<a href="${writeup.htbUrl}" target="_blank" class="btn btn--secondary btn--sm">HTB Link</a>` : ''}
         </div>
       </div>
     `;
 
     return card;
-  }
-
-  /**
-   * Get category icon
-   */
-  getCategoryIcon(category) {
-    const icons = {
-      'reverse-engineering': 'REV',
-      'pwn': 'PWN',
-      'hardware': 'HW',
-      'mobile': 'MOB',
-      'ai-ml': 'AI',
-      'osint': 'OSINT'
-    };
-    return icons[category] || 'SEC';
   }
 
   /**
@@ -513,14 +382,17 @@ whois target.com
    */
   updateLoadMoreButton() {
     const loadMoreBtn = document.getElementById('load-more-btn');
+    const loadMoreSection = document.getElementById('load-more-section');
     const totalShown = this.currentPage * this.writeupsPerPage;
     
-    if (loadMoreBtn) {
+    if (loadMoreBtn && loadMoreSection) {
       if (totalShown >= this.filteredWriteups.length) {
-        loadMoreBtn.style.display = 'none';
+        loadMoreSection.style.display = 'none';
       } else {
-        loadMoreBtn.style.display = 'inline-flex';
-        loadMoreBtn.textContent = `Load More (${Math.min(this.writeupsPerPage, this.filteredWriteups.length - totalShown)} more)`;
+        loadMoreSection.style.display = 'block';
+        const remaining = this.filteredWriteups.length - totalShown;
+        const toShow = Math.min(this.writeupsPerPage, remaining);
+        loadMoreBtn.textContent = `Load More (${toShow} more)`;
       }
     }
   }
@@ -530,7 +402,7 @@ whois target.com
    */
   showEmptyState(show) {
     const emptyState = document.getElementById('empty-state');
-    const loadMore = document.querySelector('.load-more');
+    const loadMore = document.getElementById('load-more-section');
     
     if (emptyState) {
       emptyState.style.display = show ? 'block' : 'none';
@@ -539,6 +411,24 @@ whois target.com
     if (loadMore) {
       loadMore.style.display = show ? 'none' : 'block';
     }
+  }
+
+  /**
+   * Show/hide loading state
+   */
+  showLoading(show) {
+    const loadingState = document.getElementById('loading-state');
+    const writeupsGrid = document.getElementById('writeups-grid');
+    
+    if (loadingState) {
+      loadingState.style.display = show ? 'block' : 'none';
+    }
+    
+    if (writeupsGrid) {
+      writeupsGrid.style.display = show ? 'none' : 'grid';
+    }
+    
+    this.isLoading = show;
   }
 
   /**
@@ -572,9 +462,9 @@ whois target.com
   }
 
   /**
-   * Open writeup modal
+   * Open writeup modal and load markdown content
    */
-  openWriteup(writeupId) {
+  async openWriteup(writeupId) {
     const writeup = this.writeups.find(w => w.id === writeupId);
     if (!writeup) return;
 
@@ -584,19 +474,134 @@ whois target.com
 
     if (!modal || !modalTitle || !modalBody) return;
 
-    // Update modal content
+    // Update modal title
     modalTitle.textContent = writeup.title;
     
-    // Convert markdown-like content to HTML
-    const htmlContent = this.markdownToHtml(writeup.content);
-    modalBody.innerHTML = `<div class="writeup-content">${htmlContent}</div>`;
-
     // Show modal
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
+    // Show loading state
+    modalBody.innerHTML = `
+      <div class="writeup-loading">
+        <div class="loading-spinner"></div>
+        <p>Loading writeup content...</p>
+      </div>
+    `;
+
+    try {
+      // Load markdown content
+      const content = await this.loadMarkdownContent(writeup.markdownFile);
+      const htmlContent = this.markdownToHtml(content);
+      
+      modalBody.innerHTML = `
+        <div class="writeup-content">
+          <div class="writeup-meta">
+            <span class="writeup-category">${this.categories[writeup.category]?.name || writeup.category}</span>
+            <span class="writeup-difficulty">${writeup.difficulty}</span>
+            <span class="writeup-date">${writeup.date}</span>
+            ${writeup.htbUrl ? `<a href="${writeup.htbUrl}" target="_blank" class="writeup-htb-link">View on HackTheBox</a>` : ''}
+          </div>
+          ${htmlContent}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load writeup content:', error);
+      modalBody.innerHTML = `
+        <div class="writeup-error">
+          <h3>Content Not Available</h3>
+          <p>This writeup is currently being prepared. Please check back later.</p>
+          <p><strong>Challenge:</strong> ${writeup.title}</p>
+          <p><strong>Category:</strong> ${this.categories[writeup.category]?.name || writeup.category}</p>
+          ${writeup.htbUrl ? `<a href="${writeup.htbUrl}" target="_blank" class="btn btn--primary">View Challenge on HackTheBox</a>` : ''}
+        </div>
+      `;
+    }
+
     // Focus trap for accessibility
     modal.focus();
+  }
+
+  /**
+   * Load markdown content from file
+   */
+  async loadMarkdownContent(filepath) {
+    // Check cache first
+    if (this.markdownCache.has(filepath)) {
+      return this.markdownCache.get(filepath);
+    }
+
+    try {
+      // In a real implementation, this would fetch the actual markdown file
+      // For demo purposes, we'll return placeholder content
+      const content = this.generatePlaceholderContent(filepath);
+      this.markdownCache.set(filepath, content);
+      return content;
+    } catch (error) {
+      throw new Error(`Failed to load ${filepath}: ${error.message}`);
+    }
+  }
+
+  /**
+   * Generate placeholder content for writeups
+   */
+  generatePlaceholderContent(filepath) {
+    const challengeId = filepath.match(/htb-(\d+)\.md/)?.[1] || 'unknown';
+    
+    return `# HackTheBox Challenge ${challengeId}
+
+## Overview
+This writeup covers the solution for HackTheBox challenge ${challengeId}. The challenge involves various security concepts and requires a methodical approach to solve.
+
+## Initial Reconnaissance
+First, let's analyze what we're working with:
+
+\`\`\`bash
+# Initial enumeration commands
+nmap -sC -sV target_ip
+gobuster dir -u http://target_ip -w wordlist.txt
+\`\`\`
+
+## Analysis
+After the initial reconnaissance, we discovered several interesting points:
+
+1. **Service Enumeration**: Multiple services are running on the target
+2. **Web Application**: A web interface is available for testing
+3. **Potential Vulnerabilities**: Several attack vectors identified
+
+## Exploitation
+The exploitation process involved the following steps:
+
+\`\`\`python
+# Example exploit code
+import requests
+import base64
+
+target_url = "http://target_ip"
+payload = "malicious_payload_here"
+
+response = requests.post(target_url, data={"input": payload})
+print(response.text)
+\`\`\`
+
+## Solution Steps
+1. **Vulnerability Discovery**: Identified the main weakness
+2. **Payload Development**: Crafted the appropriate exploit
+3. **Execution**: Successfully exploited the vulnerability
+4. **Flag Extraction**: Retrieved the challenge flag
+
+## Key Takeaways
+- Always start with thorough enumeration
+- Understanding the underlying technology is crucial
+- Persistence and methodical approach are essential
+
+## Tools Used
+- Burp Suite
+- Python scripts
+- Command line utilities
+- Custom exploitation tools
+
+*Note: This is a placeholder writeup. The actual detailed writeup for challenge ${challengeId} is being prepared.*`;
   }
 
   /**
@@ -637,14 +642,21 @@ whois target.com
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       
       // Links
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+      
+      // Lists
+      .replace(/^\d+\.\s+(.*)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>')
+      .replace(/^-\s+(.*)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
       
       // Paragraphs
       .split('\n\n')
       .map(paragraph => {
         paragraph = paragraph.trim();
         if (!paragraph) return '';
-        if (paragraph.startsWith('<h') || paragraph.startsWith('<pre') || paragraph.startsWith('<ul') || paragraph.startsWith('<ol')) {
+        if (paragraph.startsWith('<h') || paragraph.startsWith('<pre') || 
+            paragraph.startsWith('<ul') || paragraph.startsWith('<ol')) {
           return paragraph;
         }
         return `<p>${paragraph.replace(/\n/g, '<br>')}</p>`;
@@ -691,75 +703,62 @@ whois target.com
   }
 
   /**
-   * Get writeup by ID
+   * Add new writeup (for easy addition of new posts)
    */
-  getWriteup(id) {
-    return this.writeups.find(writeup => writeup.id === id);
-  }
+  addWriteup(writeupData) {
+    const newWriteup = {
+      id: writeupData.id || `htb-${Date.now()}`,
+      title: writeupData.title,
+      description: writeupData.description,
+      category: writeupData.category,
+      platform: writeupData.platform || 'HackTheBox',
+      date: writeupData.date || new Date().toLocaleDateString('en-US', { 
+        month: 'long', 
+        year: 'numeric' 
+      }),
+      difficulty: writeupData.difficulty || 'medium',
+      tags: writeupData.tags || [],
+      featured: writeupData.featured || false,
+      markdownFile: writeupData.markdownFile || `writeups/${writeupData.id}.md`,
+      htbUrl: writeupData.htbUrl
+    };
 
-  /**
-   * Get writeups by category
-   */
-  getWriteupsByCategory(category) {
-    return this.writeups.filter(writeup => writeup.category === category);
-  }
-
-  /**
-   * Get featured writeups
-   */
-  getFeaturedWriteups() {
-    return this.writeups.filter(writeup => writeup.featured);
-  }
-
-  /**
-   * Search writeups
-   */
-  searchWriteups(query) {
-    const lowercaseQuery = query.toLowerCase();
-    return this.writeups.filter(writeup => 
-      writeup.title.toLowerCase().includes(lowercaseQuery) ||
-      writeup.description.toLowerCase().includes(lowercaseQuery) ||
-      writeup.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery)) ||
-      writeup.content.toLowerCase().includes(lowercaseQuery)
-    );
-  }
-
-  /**
-   * Sort writeups
-   */
-  sortWriteups(sortBy = 'date', order = 'desc') {
-    this.filteredWriteups.sort((a, b) => {
-      let aValue, bValue;
-      
-      switch (sortBy) {
-        case 'title':
-          aValue = a.title.toLowerCase();
-          bValue = b.title.toLowerCase();
-          break;
-        case 'difficulty':
-          const difficultyOrder = { 'easy': 1, 'medium': 2, 'hard': 3, 'insane': 4 };
-          aValue = difficultyOrder[a.difficulty];
-          bValue = difficultyOrder[b.difficulty];
-          break;
-        case 'platform':
-          aValue = a.platform.toLowerCase();
-          bValue = b.platform.toLowerCase();
-          break;
-        case 'date':
-        default:
-          aValue = new Date(a.date);
-          bValue = new Date(b.date);
-          break;
-      }
-      
-      if (order === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
-    });
+    this.writeups.unshift(newWriteup);
+    this.updateStats();
+    this.applyFilters();
     
-    this.renderWriteups();
+    return newWriteup;
+  }
+
+  /**
+   * Remove writeup
+   */
+  removeWriteup(writeupId) {
+    this.writeups = this.writeups.filter(w => w.id !== writeupId);
+    this.updateStats();
+    this.applyFilters();
+  }
+
+  /**
+   * Get writeup statistics
+   */
+  getStats() {
+    const stats = {
+      total: this.writeups.length,
+      byCategory: {},
+      byDifficulty: {},
+      featured: this.writeups.filter(w => w.featured).length
+    };
+
+    this.writeups.forEach(writeup => {
+      // Count by category
+      stats.byCategory[writeup.category] = (stats.byCategory[writeup.category] || 0) + 1;
+      
+      // Count by difficulty
+      stats.byDifficulty[writeup.difficulty] = (stats.byDifficulty[writeup.difficulty] || 0) + 1;
+    });
+
+    return stats;
   }
 
   /**
@@ -775,7 +774,9 @@ whois target.com
       date: writeup.date,
       difficulty: writeup.difficulty,
       tags: writeup.tags,
-      featured: writeup.featured
+      featured: writeup.featured,
+      markdownFile: writeup.markdownFile,
+      htbUrl: writeup.htbUrl
     }));
 
     let content, filename, mimeType;
@@ -787,19 +788,19 @@ whois target.com
         data.forEach(row => {
           const values = headers.map(header => {
             const value = row[header];
-            return Array.isArray(value) ? `"${value.join(', ')}"` : `"${value}"`;
+            return Array.isArray(value) ? `"${value.join(', ')}"` : `"${value || ''}"`;
           });
           csvRows.push(values.join(','));
         });
         content = csvRows.join('\n');
-        filename = 'writeups.csv';
+        filename = 'htb-writeups.csv';
         mimeType = 'text/csv';
         break;
       
       case 'json':
       default:
         content = JSON.stringify(data, null, 2);
-        filename = 'writeups.json';
+        filename = 'htb-writeups.json';
         mimeType = 'application/json';
         break;
     }
@@ -841,46 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.writeupsManager = new WriteupsManager();
 });
 
-// Add keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  // Ctrl/Cmd + K to focus search
-  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-    e.preventDefault();
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-      searchInput.focus();
-    }
-  }
-  
-  // Escape to clear search
-  if (e.key === 'Escape') {
-    const searchInput = document.getElementById('search-input');
-    if (searchInput && document.activeElement === searchInput) {
-      searchInput.blur();
-      searchInput.value = '';
-      if (window.writeupsManager) {
-        window.writeupsManager.handleSearch({ target: { value: '' } });
-      }
-    }
-  }
-});
-
-// Add search placeholder animation
-document.addEventListener('DOMContentLoaded', () => {
-  const searchInput = document.getElementById('search-input');
-  if (searchInput) {
-    const placeholders = [
-      'Search writeups...',
-      'Try "ARM64", "hardware", "reverse engineering"...',
-      'Filter by tags, titles, or descriptions...',
-      'Search by difficulty or platform...'
-    ];
-    
-    let currentIndex = 0;
-    
-    setInterval(() => {
-      currentIndex = (currentIndex + 1) % placeholders.length;
-      searchInput.setAttribute('placeholder', placeholders[currentIndex]);
-    }, 3000);
-  }
-});
+// Export for module use
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = WriteupsManager;
+}

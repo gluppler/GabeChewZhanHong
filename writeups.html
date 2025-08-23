@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Writeups | Gabe Chew Zhan Hong</title>
-    <meta name="description" content="Technical writeups and security research by Gabe Chew Zhan Hong">
+    <meta name="description" content="HackTheBox writeups and security research by Gabe Chew Zhan Hong">
     <link rel="icon" type="image/x-icon" href="public/favicon.ico">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/animations.css">
@@ -17,7 +17,7 @@
     <nav class="nav" id="nav">
         <div class="nav__container">
             <div class="nav__brand">
-                <a href="index.html" class="nav__logo">GCZ</a>
+                <a href="index.html" class="nav__logo">CZH</a>
             </div>
             <div class="nav__menu" id="nav-menu">
                 <ul class="nav__list">
@@ -32,6 +32,9 @@
                     </li>
                     <li class="nav__item">
                         <a href="index.html#projects" class="nav__link">Projects</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="index.html#certifications" class="nav__link">Certifications</a>
                     </li>
                     <li class="nav__item">
                         <a href="index.html#contact" class="nav__link">Contact</a>
@@ -59,22 +62,22 @@
         <section class="writeups-header">
             <div class="section__container">
                 <div class="writeups-header__content animate-on-scroll fade-up">
-                    <h1 class="writeups-header__title">Technical Writeups</h1>
+                    <h1 class="writeups-header__title">HackTheBox Writeups</h1>
                     <p class="writeups-header__description">
-                        In-depth analysis of security challenges, vulnerability research, and technical explorations from HackTheBox, TryHackMe, and independent research projects.
+                        Detailed walkthroughs and analysis of HackTheBox challenges across multiple categories including AI/ML, Pwn, Reversing, Hardware, and more.
                     </p>
                     <div class="writeups-header__stats">
                         <div class="writeups-stat">
-                            <span class="writeups-stat__number" id="total-writeups">12</span>
+                            <span class="writeups-stat__number" id="total-writeups">0</span>
                             <span class="writeups-stat__label">Total Writeups</span>
                         </div>
                         <div class="writeups-stat">
-                            <span class="writeups-stat__number">5</span>
+                            <span class="writeups-stat__number" id="categories-count">12</span>
                             <span class="writeups-stat__label">Categories</span>
                         </div>
                         <div class="writeups-stat">
-                            <span class="writeups-stat__number">#1</span>
-                            <span class="writeups-stat__label">TryHackMe Malaysia</span>
+                            <span class="writeups-stat__number">HTB</span>
+                            <span class="writeups-stat__label">Platform</span>
                         </div>
                     </div>
                 </div>
@@ -88,12 +91,18 @@
                     <h3 class="filters__title">Filter by Category</h3>
                     <div class="filters__buttons" id="category-filters">
                         <button class="filter-btn active" data-category="all">All</button>
-                        <button class="filter-btn" data-category="reverse-engineering">Reverse Engineering</button>
-                        <button class="filter-btn" data-category="pwn">PWN</button>
+                        <button class="filter-btn" data-category="ai-ml">AI/ML</button>
+                        <button class="filter-btn" data-category="reversing">Reversing</button>
+                        <button class="filter-btn" data-category="pwn">Pwn</button>
                         <button class="filter-btn" data-category="hardware">Hardware</button>
+                        <button class="filter-btn" data-category="ics">ICS</button>
+                        <button class="filter-btn" data-category="secure-coding">Secure Coding</button>
                         <button class="filter-btn" data-category="mobile">Mobile</button>
-                        <button class="filter-btn" data-category="ai-ml">AI/ML Security</button>
+                        <button class="filter-btn" data-category="misc">Misc</button>
                         <button class="filter-btn" data-category="osint">OSINT</button>
+                        <button class="filter-btn" data-category="coding">Coding</button>
+                        <button class="filter-btn" data-category="blockchain">Blockchain</button>
+                        <button class="filter-btn" data-category="crypto">Crypto</button>
                     </div>
                 </div>
                 <div class="search animate-on-scroll fade-up">
@@ -110,181 +119,27 @@
             <div class="section__container">
                 <div class="writeups-grid" id="writeups-grid">
                     <!-- Writeup cards will be dynamically loaded here -->
-                    
-                    <!-- Example Writeup 1 -->
-                    <article class="writeup-card animate-on-scroll scale-up" data-category="reverse-engineering">
-                        <div class="writeup-card__image">
-                            <div class="writeup-card__placeholder">REV</div>
-                            <div class="writeup-card__difficulty">Hard</div>
-                        </div>
-                        <div class="writeup-card__content">
-                            <div class="writeup-card__meta">
-                                <span class="writeup-card__platform">HackTheBox</span>
-                                <span class="writeup-card__date">March 2025</span>
-                            </div>
-                            <h3 class="writeup-card__title">Advanced ARM64 Binary Analysis</h3>
-                            <p class="writeup-card__description">
-                                Deep dive into ARM64 assembly reverse engineering, exploring advanced anti-debugging techniques and custom exploit development for embedded systems.
-                            </p>
-                            <div class="writeup-card__tags">
-                                <span class="tag">ARM64</span>
-                                <span class="tag">Assembly</span>
-                                <span class="tag">Anti-Debug</span>
-                                <span class="tag">Embedded</span>
-                            </div>
-                            <div class="writeup-card__actions">
-                                <button class="btn btn--outline" onclick="openWriteup('example-1')">Read Writeup</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Example Writeup 2 -->
-                    <article class="writeup-card animate-on-scroll scale-up" data-category="hardware">
-                        <div class="writeup-card__image">
-                            <div class="writeup-card__placeholder">HW</div>
-                            <div class="writeup-card__difficulty">Medium</div>
-                        </div>
-                        <div class="writeup-card__content">
-                            <div class="writeup-card__meta">
-                                <span class="writeup-card__platform">Independent</span>
-                                <span class="writeup-card__date">February 2025</span>
-                            </div>
-                            <h3 class="writeup-card__title">IoT Device UART Exploitation</h3>
-                            <p class="writeup-card__description">
-                                Complete hardware teardown and UART interface exploitation of a popular IoT device, including firmware extraction and privilege escalation.
-                            </p>
-                            <div class="writeup-card__tags">
-                                <span class="tag">IoT</span>
-                                <span class="tag">UART</span>
-                                <span class="tag">Firmware</span>
-                                <span class="tag">Hardware</span>
-                            </div>
-                            <div class="writeup-card__actions">
-                                <button class="btn btn--outline" onclick="openWriteup('example-2')">Read Writeup</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Example Writeup 3 -->
-                    <article class="writeup-card animate-on-scroll scale-up" data-category="pwn">
-                        <div class="writeup-card__image">
-                            <div class="writeup-card__placeholder">PWN</div>
-                            <div class="writeup-card__difficulty">Insane</div>
-                        </div>
-                        <div class="writeup-card__content">
-                            <div class="writeup-card__meta">
-                                <span class="writeup-card__platform">HackTheBox</span>
-                                <span class="writeup-card__date">January 2025</span>
-                            </div>
-                            <h3 class="writeup-card__title">Custom ROP Chain Exploitation</h3>
-                            <p class="writeup-card__description">
-                                Advanced exploitation techniques using custom ROP chains to bypass modern protection mechanisms including ASLR, DEP, and stack canaries.
-                            </p>
-                            <div class="writeup-card__tags">
-                                <span class="tag">ROP</span>
-                                <span class="tag">Binary Exploitation</span>
-                                <span class="tag">ASLR Bypass</span>
-                                <span class="tag">Stack</span>
-                            </div>
-                            <div class="writeup-card__actions">
-                                <button class="btn btn--outline" onclick="openWriteup('example-3')">Read Writeup</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Example Writeup 4 -->
-                    <article class="writeup-card animate-on-scroll scale-up" data-category="ai-ml">
-                        <div class="writeup-card__image">
-                            <div class="writeup-card__placeholder">AI</div>
-                            <div class="writeup-card__difficulty">Hard</div>
-                        </div>
-                        <div class="writeup-card__content">
-                            <div class="writeup-card__meta">
-                                <span class="writeup-card__platform">Research</span>
-                                <span class="writeup-card__date">December 2024</span>
-                            </div>
-                            <h3 class="writeup-card__title">Adversarial ML Attack Vectors</h3>
-                            <p class="writeup-card__description">
-                                Research into adversarial machine learning attacks, exploring poisoning techniques and model evasion strategies in production ML systems.
-                            </p>
-                            <div class="writeup-card__tags">
-                                <span class="tag">Machine Learning</span>
-                                <span class="tag">Adversarial</span>
-                                <span class="tag">Model Poisoning</span>
-                                <span class="tag">Research</span>
-                            </div>
-                            <div class="writeup-card__actions">
-                                <button class="btn btn--outline" onclick="openWriteup('example-4')">Read Writeup</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Example Writeup 5 -->
-                    <article class="writeup-card animate-on-scroll scale-up" data-category="mobile">
-                        <div class="writeup-card__image">
-                            <div class="writeup-card__placeholder">MOB</div>
-                            <div class="writeup-card__difficulty">Medium</div>
-                        </div>
-                        <div class="writeup-card__content">
-                            <div class="writeup-card__meta">
-                                <span class="writeup-card__platform">TryHackMe</span>
-                                <span class="writeup-card__date">November 2024</span>
-                            </div>
-                            <h3 class="writeup-card__title">Android Application Security Analysis</h3>
-                            <p class="writeup-card__description">
-                                Complete mobile application penetration testing workflow, from APK analysis to runtime manipulation and certificate pinning bypass.
-                            </p>
-                            <div class="writeup-card__tags">
-                                <span class="tag">Android</span>
-                                <span class="tag">APK Analysis</span>
-                                <span class="tag">Frida</span>
-                                <span class="tag">SSL Pinning</span>
-                            </div>
-                            <div class="writeup-card__actions">
-                                <button class="btn btn--outline" onclick="openWriteup('example-5')">Read Writeup</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Example Writeup 6 -->
-                    <article class="writeup-card animate-on-scroll scale-up" data-category="osint">
-                        <div class="writeup-card__image">
-                            <div class="writeup-card__placeholder">OSINT</div>
-                            <div class="writeup-card__difficulty">Easy</div>
-                        </div>
-                        <div class="writeup-card__content">
-                            <div class="writeup-card__meta">
-                                <span class="writeup-card__platform">TryHackMe</span>
-                                <span class="writeup-card__date">October 2024</span>
-                            </div>
-                            <h3 class="writeup-card__title">Advanced OSINT Reconnaissance Techniques</h3>
-                            <p class="writeup-card__description">
-                                Comprehensive guide to open source intelligence gathering using modern tools and techniques for digital footprinting and reconnaissance.
-                            </p>
-                            <div class="writeup-card__tags">
-                                <span class="tag">OSINT</span>
-                                <span class="tag">Reconnaissance</span>
-                                <span class="tag">Digital Footprint</span>
-                                <span class="tag">Intelligence</span>
-                            </div>
-                            <div class="writeup-card__actions">
-                                <button class="btn btn--outline" onclick="openWriteup('example-6')">Read Writeup</button>
-                            </div>
-                        </div>
-                    </article>
                 </div>
 
-                <div class="load-more animate-on-scroll fade-up">
+                <div class="load-more animate-on-scroll fade-up" id="load-more-section">
                     <button class="btn btn--primary" id="load-more-btn">Load More Writeups</button>
                 </div>
 
                 <!-- Empty state -->
                 <div class="empty-state" id="empty-state" style="display: none;">
                     <div class="empty-state__content">
-                        <div class="empty-state__icon">📝</div>
+                        <div class="empty-state__icon">🔍</div>
                         <h3 class="empty-state__title">No writeups found</h3>
                         <p class="empty-state__description">Try adjusting your filters or search terms</p>
                         <button class="btn btn--outline" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                </div>
+
+                <!-- Loading state -->
+                <div class="loading-state" id="loading-state">
+                    <div class="loading-state__content">
+                        <div class="loading-spinner"></div>
+                        <p>Loading writeups...</p>
                     </div>
                 </div>
             </div>
@@ -300,8 +155,9 @@
                 <button class="modal__close" onclick="closeWriteupModal()" aria-label="Close modal">×</button>
             </div>
             <div class="modal__body" id="modal-body">
-                <div class="writeup-content">
-                    <p>Loading writeup content...</p>
+                <div class="writeup-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading writeup...</p>
                 </div>
             </div>
         </div>
@@ -312,7 +168,7 @@
         <div class="footer__container">
             <div class="footer__content">
                 <p class="footer__text">
-                    © 2025 Gabe Chew Zhan Hong. Technical writeups and security research.
+                    © 2025 Gabe Chew Zhan Hong.
                 </p>
             </div>
         </div>
