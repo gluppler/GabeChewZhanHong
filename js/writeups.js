@@ -17,10 +17,10 @@ class WriteupsManager {
     
     // HackTheBox categories mapping
     this.categories = {
+      'hardware': { name: 'Hardware', icon: 'HW', color: '#96ceb4' },
       'ai-ml': { name: 'AI/ML', icon: 'AI', color: '#ff6b6b' },
       'reversing': { name: 'Reversing', icon: 'REV', color: '#4ecdc4' },
       'pwn': { name: 'Pwn', icon: 'PWN', color: '#45b7d1' },
-      'hardware': { name: 'Hardware', icon: 'HW', color: '#96ceb4' },
       'ics': { name: 'ICS', icon: 'ICS', color: '#feca57' },
       'secure-coding': { name: 'Secure Coding', icon: 'SEC', color: '#ff9ff3' },
       'mobile': { name: 'Mobile', icon: 'MOB', color: '#54a0ff' },
@@ -98,9 +98,9 @@ class WriteupsManager {
   async loadWriteupsIndex() {
     try {
       // Load from index.json file
-      const response = await fetch('writeups/index.json');
+      const response = await fetch('./writeups/index.json');
       if (!response.ok) {
-        throw new Error('Failed to load writeups index');
+        throw new Error(`Failed to load writeups index: ${response.status}`);
       }
     
       const data = await response.json();
@@ -108,102 +108,24 @@ class WriteupsManager {
       this.updateStats();
     } catch (error) {
       console.error('Failed to load writeups:', error);
-      // Fallback to generated data if index.json doesn't exist
-      this.writeups = await this.generateWriteupsFromSolvedChallenges();
+      // Show error message to user
+      this.showError('Failed to load writeups. Please try again later.');
     }
   }
 
   /**
-   * Generate writeups data from solved challenges
-   * This simulates loading from markdown files in a writeups/ directory
+   * Show error message
    */
-  async generateWriteupsFromSolvedChallenges() {
-    // Based on your solved challenges, create writeup entries
-    const solvedChallenges = [
-      { id: 824, name: 'Challenge 824', category: 'reversing', difficulty: 'Hard' },
-      { id: 220, name: 'Challenge 220', category: 'pwn', difficulty: 'Medium' },
-      { id: 207, name: 'Challenge 207', category: 'crypto', difficulty: 'Easy' },
-      { id: 221, name: 'Challenge 221', category: 'misc', difficulty: 'Medium' },
-      { id: 223, name: 'Challenge 223', category: 'osint', difficulty: 'Easy' },
-      { id: 194, name: 'Challenge 194', category: 'hardware', difficulty: 'Hard' }
-    ];
-
-    return solvedChallenges.map(challenge => ({
-      id: `htb-${challenge.id}`,
-      title: this.generateChallengeTitle(challenge.category, challenge.id),
-      description: this.generateChallengeDescription(challenge.category),
-      category: challenge.category,
-      platform: 'HackTheBox',
-      date: this.generateRandomDate(),
-      difficulty: challenge.difficulty.toLowerCase(),
-      tags: this.generateTags(challenge.category),
-      featured: Math.random() > 0.7,
-      markdownFile: `htb-${challenge.id}.md`, // Store only the filename
-      htbUrl: `https://labs.hackthebox.com/achievement/challenge/2141842/${challenge.id}`
-    }));
-  }
-
-  /**
-   * Generate challenge titles based on category
-   */
-  generateChallengeTitle(category, id) {
-    const titles = {
-      'reversing': ['Binary Analysis Deep Dive', 'Reverse Engineering Mastery', 'Dissecting the Binary'],
-      'pwn': ['Buffer Overflow Exploitation', 'Stack Smashing Techniques', 'Memory Corruption Attack'],
-      'crypto': ['Cryptographic Analysis', 'Breaking the Cipher', 'Cryptanalysis Walkthrough'],
-      'misc': ['Miscellaneous Challenge Solution', 'Creative Problem Solving', 'Unique Challenge Approach'],
-      'osint': ['Open Source Intelligence', 'Information Gathering', 'Digital Forensics'],
-      'hardware': ['Hardware Exploitation', 'Embedded System Analysis', 'IoT Security Research']
-    };
-    
-    const categoryTitles = titles[category] || ['Challenge Solution'];
-    const baseTitle = categoryTitles[Math.floor(Math.random() * categoryTitles.length)];
-    return `${baseTitle} - HTB ${id}`;
-  }
-
-  /**
-   * Generate challenge descriptions based on category
-   */
-  generateChallengeDescription(category) {
-    const descriptions = {
-      'reversing': 'Detailed reverse engineering analysis including disassembly, debugging techniques, and exploit development strategies.',
-      'pwn': 'Binary exploitation walkthrough covering vulnerability discovery, payload crafting, and successful exploitation.',
-      'crypto': 'Cryptographic challenge solution with mathematical analysis, cipher breaking techniques, and key recovery methods.',
-      'misc': 'Creative problem-solving approach for this unique challenge, demonstrating lateral thinking and technical skills.',
-      'osint': 'Open source intelligence gathering techniques, digital footprinting, and information correlation methods.',
-      'hardware': 'Hardware security analysis including firmware extraction, circuit analysis, and physical exploitation techniques.'
-    };
-    
-    return descriptions[category] || 'Comprehensive solution walkthrough for this HackTheBox challenge.';
-  }
-
-  /**
-   * Generate tags based on category
-   */
-  generateTags(category) {
-    const tagMap = {
-      'reversing': ['IDA Pro', 'Ghidra', 'Assembly', 'Debugging'],
-      'pwn': ['Buffer Overflow', 'ROP', 'Shellcode', 'GDB'],
-      'crypto': ['RSA', 'AES', 'Hash Functions', 'Mathematics'],
-      'misc': ['Forensics', 'Steganography', 'Programming', 'Logic'],
-      'osint': ['Google Dorking', 'Social Media', 'Metadata', 'Research'],
-      'hardware': ['Arduino', 'UART', 'SPI', 'Firmware']
-    };
-    
-    return tagMap[category] || ['HackTheBox', 'Security'];
-  }
-
-  /**
-   * Generate random date within the last 6 months
-   */
-  generateRandomDate() {
-    const now = new Date();
-    const sixMonthsAgo = new Date(now.getTime() - (6 * 30 * 24 * 60 * 60 * 1000));
-    const randomTime = sixMonthsAgo.getTime() + Math.random() * (now.getTime() - sixMonthsAgo.getTime());
-    return new Date(randomTime).toLocaleDateString('en-US', { 
-      month: 'long', 
-      year: 'numeric' 
-    });
+  showError(message) {
+    const grid = document.getElementById('writeups-grid');
+    if (grid) {
+      grid.innerHTML = `
+        <div class="error-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+          <h3 style="color: var(--color-accent); margin-bottom: 1rem;">Error Loading Writeups</h3>
+          <p style="color: var(--color-text-secondary);">${message}</p>
+        </div>
+      `;
+    }
   }
 
   /**
@@ -340,10 +262,13 @@ class WriteupsManager {
       color: '#ef4444' 
     };
     
+    // Format difficulty for display
+    const displayDifficulty = writeup.difficulty.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    
     card.innerHTML = `
       <div class="writeup-card__image" style="background: linear-gradient(135deg, ${categoryInfo.color}, #1a1a1a)">
         <div class="writeup-card__placeholder">${categoryInfo.icon}</div>
-        <div class="writeup-card__difficulty">${writeup.difficulty}</div>
+        <div class="writeup-card__difficulty">${displayDifficulty}</div>
         ${writeup.featured ? '<div class="writeup-card__featured">Featured</div>' : ''}
       </div>
       <div class="writeup-card__content">
@@ -357,7 +282,7 @@ class WriteupsManager {
           ${(writeup.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
         </div>
         <div class="writeup-card__actions">
-          <button class="btn btn--outline" onclick="writeupsManager.openWriteup('${writeup.id}')">
+          <button class="btn btn--outline" onclick="window.writeupsManager.openWriteup('${writeup.id}')">
             Read Writeup
           </button>
           ${writeup.htbUrl ? `<a href="${writeup.htbUrl}" target="_blank" class="btn btn--secondary btn--sm">HTB Link</a>` : ''}
@@ -490,26 +415,25 @@ class WriteupsManager {
     `;
 
     try {
-      // *** THIS IS THE FIX ***
-      const filename = writeup.markdownFile;
-      // Remove the '.md' extension from the filename to match clean URLs
-      const filenameWithoutExt = filename.endsWith('.md') ? filename.slice(0, -3) : filename;
-      // Construct the full, correct path
-      const markdownPath = `writeups/${filenameWithoutExt}`;
+      // Construct the correct path to the markdown file
+      const markdownPath = `./writeups/${writeup.markdownFile}`;
+      
+      console.log(`Loading writeup from: ${markdownPath}`);
       
       const content = await this.loadMarkdownContent(markdownPath);
-      
       const htmlContent = this.markdownToHtml(content);
       
       modalBody.innerHTML = `
         <div class="writeup-content">
           <div class="writeup-meta">
             <span class="writeup-category">${this.categories[writeup.category]?.name || writeup.category}</span>
-            <span class="writeup-difficulty">${writeup.difficulty}</span>
+            <span class="writeup-difficulty">${writeup.difficulty.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
             <span class="writeup-date">${writeup.date}</span>
             ${writeup.htbUrl ? `<a href="${writeup.htbUrl}" target="_blank" class="writeup-htb-link">View on HackTheBox</a>` : ''}
           </div>
-          ${htmlContent}
+          <div class="writeup-markdown-content">
+            ${htmlContent}
+          </div>
         </div>
       `;
     } catch (error) {
@@ -517,9 +441,10 @@ class WriteupsManager {
       modalBody.innerHTML = `
         <div class="writeup-error">
           <h3>Content Not Available</h3>
-          <p>This writeup is currently being prepared. Please check back later.</p>
+          <p>This writeup is currently being prepared or there was an error loading the content.</p>
           <p><strong>Challenge:</strong> ${writeup.title}</p>
           <p><strong>Category:</strong> ${this.categories[writeup.category]?.name || writeup.category}</p>
+          <p><strong>Error:</strong> ${error.message}</p>
           ${writeup.htbUrl ? `<a href="${writeup.htbUrl}" target="_blank" class="btn btn--primary">View Challenge on HackTheBox</a>` : ''}
         </div>
       `;
@@ -539,16 +464,24 @@ class WriteupsManager {
     }
 
     try {
+      console.log(`Fetching content from: ${filepath}`);
       const response = await fetch(filepath);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
       }
+      
       const content = await response.text();
+      
+      if (!content.trim()) {
+        throw new Error('Empty file content');
+      }
+      
       this.markdownCache.set(filepath, content);
       return content;
     } catch (error) {
       console.error(`Failed to load ${filepath}:`, error);
-      throw new Error(`Failed to load ${filepath}: ${error.message}`);
+      throw new Error(`Failed to load writeup: ${error.message}`);
     }
   }
 
@@ -568,15 +501,60 @@ class WriteupsManager {
    */
   markdownToHtml(markdown) {
     if (typeof marked === 'undefined') {
-        console.error('Marked.js library is not loaded.');
-        return '<p>Error: Markdown parser not available.</p>';
+      console.error('Marked.js library is not loaded.');
+      return '<p>Error: Markdown parser not available.</p>';
     }
-    if (!markdown) return '<p>Content not available.</p>';
-
-    // Remove frontmatter before parsing
-    const contentWithoutFrontmatter = markdown.replace(/---[\s\S]*?---/, '').trim();
     
-    return marked.parse(contentWithoutFrontmatter);
+    if (!markdown || !markdown.trim()) {
+      return '<p>No content available.</p>';
+    }
+
+    try {
+      // Configure marked with options
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        headerIds: true,
+        mangle: false
+      });
+
+      // Remove frontmatter if present
+      const contentWithoutFrontmatter = markdown.replace(/^---[\s\S]*?---\n?/, '').trim();
+      
+      // Parse markdown to HTML
+      const html = marked.parse(contentWithoutFrontmatter);
+      
+      return html;
+    } catch (error) {
+      console.error('Error parsing markdown:', error);
+      return `<p>Error parsing content: ${error.message}</p>`;
+    }
+  }
+
+  /**
+   * Clear all filters and search
+   */
+  clearFilters() {
+    // Reset filters
+    this.currentCategory = 'all';
+    this.currentSearch = '';
+    this.currentPage = 1;
+
+    // Reset UI
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.category === 'all') {
+        btn.classList.add('active');
+      }
+    });
+
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    // Apply filters
+    this.applyFilters();
   }
 }
 
