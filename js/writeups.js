@@ -1,3 +1,4 @@
+// Location: /js/writeups.js
 /**
  * HackTheBox Writeups Manager
  * Author: Gabe Chew Zhan Hong
@@ -543,8 +544,6 @@ class WriteupsManager {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      // Since the server might not send the right content-type for a URL without an extension,
-      // we assume it's markdown text.
       const content = await response.text();
       this.markdownCache.set(filepath, content);
       return content;
