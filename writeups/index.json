@@ -1,13 +1,20 @@
 {
-  "id": "htb-824",
-  "title": "Low Logic - Digital Logic Reversing",
-  "description": "A walkthrough of the Low Logic challenge, focusing on identifying and applying boolean logic to decode a flag from binary input data.",
-  "category": "hardware",
-  "platform": "HackTheBox",
-  "difficulty": "very easy",
-  "date": "2025-08-23",
-  "tags": ["Digital Logic", "Boolean Algebra", "Scripting", "Hardware"],
-  "featured": false,
-  "markdownFile": "writeups/htb-824.md",
-  "htbUrl": "https://app.hackthebox.com/challenges/Low%20Logic"
+  "writeups": [
+    {
+      "id": "htb-824",
+      "title": "Low Logic Challenge - HTB 824",
+      "description": "Solution walkthrough for HackTheBox challenge 824.",
+      "category": "hardware",
+      "platform": "HackTheBox",
+      "difficulty": "very-easy",
+      "date": "2025-08-23",
+      "tags": [
+        "HackTheBox",
+        "Hardware"
+      ],
+      "featured": false,
+      "markdownFile": "writeups/htb-824.md",
+      "htbUrl": "https://labs.hackthebox.com/achievement/challenge/2141842/824"
+    }
+  ]
 }
