@@ -1,4 +1,3 @@
-// Location: /js/writeups.js
 /**
  * HackTheBox Writeups Manager
  * Author: Gabe Chew Zhan Hong
