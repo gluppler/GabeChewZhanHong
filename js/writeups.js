@@ -138,7 +138,7 @@ class WriteupsManager {
       difficulty: challenge.difficulty.toLowerCase(),
       tags: this.generateTags(challenge.category),
       featured: Math.random() > 0.7,
-      markdownFile: `writeups/htb-${challenge.id}.md`,
+      markdownFile: `htb-${challenge.id}.md`, // Store only the filename
       htbUrl: `https://labs.hackthebox.com/achievement/challenge/2141842/${challenge.id}`
     }));
   }
@@ -284,7 +284,7 @@ class WriteupsManager {
                          writeup.title.toLowerCase().includes(this.currentSearch) ||
                          writeup.description.toLowerCase().includes(this.currentSearch) ||
                          writeup.category.toLowerCase().includes(this.currentSearch) ||
-                         writeup.tags.some(tag => tag.toLowerCase().includes(this.currentSearch));
+                         (writeup.tags && writeup.tags.some(tag => tag.toLowerCase().includes(this.currentSearch)));
 
       return categoryMatch && searchMatch;
     });
@@ -354,7 +354,7 @@ class WriteupsManager {
         <h3 class="writeup-card__title">${writeup.title}</h3>
         <p class="writeup-card__description">${writeup.description}</p>
         <div class="writeup-card__tags">
-          ${writeup.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+          ${(writeup.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
         </div>
         <div class="writeup-card__actions">
           <button class="btn btn--outline" onclick="writeupsManager.openWriteup('${writeup.id}')">
@@ -490,10 +490,11 @@ class WriteupsManager {
     `;
 
     try {
-      // Load markdown content
-      // js/writeups.js (After)
+      // *** THIS IS THE FIX ***
+      // Construct the full path to the markdown file
       const markdownPath = `writeups/${writeup.markdownFile}`;
       const content = await this.loadMarkdownContent(markdownPath);
+      
       const htmlContent = this.markdownToHtml(content);
       
       modalBody.innerHTML = `
@@ -548,68 +549,6 @@ class WriteupsManager {
   }
 
   /**
-   * Generate placeholder content for writeups
-   */
-  generatePlaceholderContent(filepath) {
-    const challengeId = filepath.match(/htb-(\d+)\.md/)?.[1] || 'unknown';
-    
-    return `# HackTheBox Challenge ${challengeId}
-
-## Overview
-This writeup covers the solution for HackTheBox challenge ${challengeId}. The challenge involves various security concepts and requires a methodical approach to solve.
-
-## Initial Reconnaissance
-First, let's analyze what we're working with:
-
-\`\`\`bash
-# Initial enumeration commands
-nmap -sC -sV target_ip
-gobuster dir -u http://target_ip -w wordlist.txt
-\`\`\`
-
-## Analysis
-After the initial reconnaissance, we discovered several interesting points:
-
-1. **Service Enumeration**: Multiple services are running on the target
-2. **Web Application**: A web interface is available for testing
-3. **Potential Vulnerabilities**: Several attack vectors identified
-
-## Exploitation
-The exploitation process involved the following steps:
-
-\`\`\`python
-# Example exploit code
-import requests
-import base64
-
-target_url = "http://target_ip"
-payload = "malicious_payload_here"
-
-response = requests.post(target_url, data={"input": payload})
-print(response.text)
-\`\`\`
-
-## Solution Steps
-1. **Vulnerability Discovery**: Identified the main weakness
-2. **Payload Development**: Crafted the appropriate exploit
-3. **Execution**: Successfully exploited the vulnerability
-4. **Flag Extraction**: Retrieved the challenge flag
-
-## Key Takeaways
-- Always start with thorough enumeration
-- Understanding the underlying technology is crucial
-- Persistence and methodical approach are essential
-
-## Tools Used
-- Burp Suite
-- Python scripts
-- Command line utilities
-- Custom exploitation tools
-
-*Note: This is a placeholder writeup. The actual detailed writeup for challenge ${challengeId} is being prepared.*`;
-  }
-
-  /**
    * Close writeup modal
    */
   closeModal() {
@@ -634,157 +573,6 @@ print(response.text)
     const contentWithoutFrontmatter = markdown.replace(/---[\s\S]*?---/, '').trim();
     
     return marked.parse(contentWithoutFrontmatter);
-  }
-
-  /**
-   * Escape HTML characters
-   */
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  /**
-   * Clear all filters
-   */
-  clearFilters() {
-    // Reset category filter
-    this.currentCategory = 'all';
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.dataset.category === 'all') {
-        btn.classList.add('active');
-      }
-    });
-
-    // Reset search
-    this.currentSearch = '';
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-      searchInput.value = '';
-    }
-
-    // Reset page
-    this.currentPage = 1;
-
-    // Apply filters
-    this.applyFilters();
-  }
-
-  /**
-   * Add new writeup (for easy addition of new posts)
-   */
-  addWriteup(writeupData) {
-    const newWriteup = {
-      id: writeupData.id || `htb-${Date.now()}`,
-      title: writeupData.title,
-      description: writeupData.description,
-      category: writeupData.category,
-      platform: writeupData.platform || 'HackTheBox',
-      date: writeupData.date || new Date().toLocaleDateString('en-US', { 
-        month: 'long', 
-        year: 'numeric' 
-      }),
-      difficulty: writeupData.difficulty || 'medium',
-      tags: writeupData.tags || [],
-      featured: writeupData.featured || false,
-      markdownFile: writeupData.markdownFile || `writeups/${writeupData.id}.md`,
-      htbUrl: writeupData.htbUrl
-    };
-
-    this.writeups.unshift(newWriteup);
-    this.updateStats();
-    this.applyFilters();
-    
-    return newWriteup;
-  }
-
-  /**
-   * Remove writeup
-   */
-  removeWriteup(writeupId) {
-    this.writeups = this.writeups.filter(w => w.id !== writeupId);
-    this.updateStats();
-    this.applyFilters();
-  }
-
-  /**
-   * Get writeup statistics
-   */
-  getStats() {
-    const stats = {
-      total: this.writeups.length,
-      byCategory: {},
-      byDifficulty: {},
-      featured: this.writeups.filter(w => w.featured).length
-    };
-
-    this.writeups.forEach(writeup => {
-      // Count by category
-      stats.byCategory[writeup.category] = (stats.byCategory[writeup.category] || 0) + 1;
-      
-      // Count by difficulty
-      stats.byDifficulty[writeup.difficulty] = (stats.byDifficulty[writeup.difficulty] || 0) + 1;
-    });
-
-    return stats;
-  }
-
-  /**
-   * Export writeups data
-   */
-  exportWriteups(format = 'json') {
-    const data = this.writeups.map(writeup => ({
-      id: writeup.id,
-      title: writeup.title,
-      description: writeup.description,
-      category: writeup.category,
-      platform: writeup.platform,
-      date: writeup.date,
-      difficulty: writeup.difficulty,
-      tags: writeup.tags,
-      featured: writeup.featured,
-      markdownFile: writeup.markdownFile,
-      htbUrl: writeup.htbUrl
-    }));
-
-    let content, filename, mimeType;
-
-    switch (format) {
-      case 'csv':
-        const headers = Object.keys(data[0]);
-        const csvRows = [headers.join(',')];
-        data.forEach(row => {
-          const values = headers.map(header => {
-            const value = row[header];
-            return Array.isArray(value) ? `"${value.join(', ')}"` : `"${value || ''}"`;
-          });
-          csvRows.push(values.join(','));
-        });
-        content = csvRows.join('\n');
-        filename = 'htb-writeups.csv';
-        mimeType = 'text/csv';
-        break;
-      
-      case 'json':
-      default:
-        content = JSON.stringify(data, null, 2);
-        filename = 'htb-writeups.json';
-        mimeType = 'application/json';
-        break;
-    }
-
-    // Create and download file
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   }
 }
 
