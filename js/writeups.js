@@ -532,12 +532,15 @@ class WriteupsManager {
     }
 
     try {
-      // In a real implementation, this would fetch the actual markdown file
-      // For demo purposes, we'll return placeholder content
-      const content = this.generatePlaceholderContent(filepath);
+      const response = await fetch(filepath);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const content = await response.text();
       this.markdownCache.set(filepath, content);
       return content;
     } catch (error) {
+      console.error(`Failed to load ${filepath}:`, error);
       throw new Error(`Failed to load ${filepath}: ${error.message}`);
     }
   }
@@ -616,54 +619,19 @@ print(response.text)
   }
 
   /**
-   * Convert basic markdown to HTML
+   * Convert markdown to HTML using the Marked.js library
    */
   markdownToHtml(markdown) {
+    if (typeof marked === 'undefined') {
+        console.error('Marked.js library is not loaded.');
+        return '<p>Error: Markdown parser not available.</p>';
+    }
     if (!markdown) return '<p>Content not available.</p>';
 
-    let html = markdown
-      // Headers
-      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-      
-      // Code blocks
-      .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-        return `<pre><code class="language-${lang || 'text'}">${this.escapeHtml(code.trim())}</code></pre>`;
-      })
-      
-      // Inline code
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      
-      // Bold
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      
-      // Italic
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      
-      // Links
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-      
-      // Lists
-      .replace(/^\d+\.\s+(.*)$/gm, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>')
-      .replace(/^-\s+(.*)$/gm, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-      
-      // Paragraphs
-      .split('\n\n')
-      .map(paragraph => {
-        paragraph = paragraph.trim();
-        if (!paragraph) return '';
-        if (paragraph.startsWith('<h') || paragraph.startsWith('<pre') || 
-            paragraph.startsWith('<ul') || paragraph.startsWith('<ol')) {
-          return paragraph;
-        }
-        return `<p>${paragraph.replace(/\n/g, '<br>')}</p>`;
-      })
-      .join('\n');
-
-    return html;
+    // Remove frontmatter before parsing
+    const contentWithoutFrontmatter = markdown.replace(/---[\s\S]*?---/, '').trim();
+    
+    return marked.parse(contentWithoutFrontmatter);
   }
 
   /**
