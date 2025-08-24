@@ -249,6 +249,8 @@
 .animate-on-scroll {
   opacity: 0;
   transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Add will-change for better performance */
+  will-change: opacity, transform;
 }
 
 .animate-on-scroll.animate {
@@ -311,6 +313,9 @@
 
 .nav {
   animation: slideInFromTop 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Add performance optimizations */
+  will-change: transform;
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 .nav__link {
@@ -332,6 +337,8 @@
     transparent
   );
   transition: left 0.8s;
+  /* Optimize for performance */
+  will-change: left;
 }
 
 .nav__link:hover::before {
@@ -344,6 +351,8 @@
 
 .hero__content > * {
   animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  /* Performance optimization */
+  will-change: opacity, transform;
 }
 
 .hero__badge {
@@ -376,6 +385,9 @@
 
 .hero__image-container {
   animation: float 6s ease-in-out infinite;
+  /* Performance optimization */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .hero__image-container:hover {
@@ -407,6 +419,9 @@
   overflow: hidden;
   transform: translateY(0);
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Performance optimization */
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
 }
 
 .btn::before {
@@ -423,6 +438,7 @@
     transparent
   );
   transition: left 0.8s;
+  will-change: left;
 }
 
 .btn:hover::before {
@@ -435,20 +451,20 @@
 
 .btn--primary:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  transform: translateY(-3px);
+  transform: translateY(-3px) translateZ(0);
 }
 
 .btn--primary:active {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(-1px) scale(0.98) translateZ(0);
 }
 
 .btn--outline:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .btn--secondary:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
@@ -458,11 +474,12 @@
 
 .project-card {
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
 }
 
 .project-card:hover {
-  transform: translateY(-12px);
+  transform: translateY(-12px) translateZ(0);
 }
 
 .project-card:hover .project-card__image {
@@ -478,26 +495,28 @@
 
 .project-card:hover .project-card__placeholder {
   animation: pulse 2s ease-in-out infinite;
-  transform: scale(1.1);
+  transform: scale(1.1) translateZ(0);
 }
 
 .experience__item {
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
 }
 
 .experience__item:hover {
-  transform: translateY(-6px);
+  transform: translateY(-6px) translateZ(0);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
 }
 
 .company-card {
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
 }
 
 .company-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-6px) translateZ(0);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
@@ -507,20 +526,22 @@
 
 .cert-category {
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
+  will-change: transform;
 }
 
 .cert-category:hover {
-  transform: translateY(-6px);
+  transform: translateY(-6px) translateZ(0);
 }
 
 .cert-item {
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
 }
 
 .cert-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
@@ -529,7 +550,7 @@
 }
 
 .cert-item:hover .cert-item__status {
-  transform: scale(1.05);
+  transform: scale(1.05) translateZ(0);
 }
 
 /* ========================================
@@ -540,7 +561,8 @@
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
 }
 
 .skill-tag::before {
@@ -557,6 +579,7 @@
     transparent
   );
   transition: left 0.6s;
+  will-change: left;
 }
 
 .skill-tag:hover::before {
@@ -564,7 +587,7 @@
 }
 
 .skill-tag:hover {
-  transform: translateY(-3px);
+  transform: translateY(-3px) translateZ(0);
   box-shadow: 0 8px 25px rgba(239, 68, 68, 0.2);
 }
 
@@ -573,7 +596,7 @@
 }
 
 .skills__category:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) translateZ(0);
 }
 
 /* ========================================
@@ -582,10 +605,11 @@
 
 .form__input {
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, box-shadow;
 }
 
 .form__input:focus {
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
@@ -605,6 +629,7 @@
   opacity: 0;
   transform: translateX(-30px);
   animation: slideInFromLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  will-change: opacity, transform;
 }
 
 .timeline__item:nth-child(1) { animation-delay: 0.1s; }
@@ -622,16 +647,18 @@
 
 .theme-toggle {
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, box-shadow;
 }
 
 .theme-toggle:hover {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px) scale(1.05);
+  transform: translateY(-2px) scale(1.05) translateZ(0);
 }
 
 .theme-icon {
   display: block;
   transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
 }
 
 .theme-toggle:hover .theme-icon {
@@ -672,6 +699,7 @@
   background: var(--color-accent);
   border-radius: 50%;
   animation: bounce 1.4s infinite;
+  will-change: transform;
 }
 
 .loading-dots span:nth-child(2) {
@@ -688,10 +716,11 @@
 
 .section__number {
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, box-shadow;
 }
 
 .section__number:hover {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.1) rotate(5deg) translateZ(0);
   box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
 }
 
@@ -709,6 +738,7 @@
   height: 3px;
   background: linear-gradient(90deg, var(--color-accent), transparent);
   transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: width;
 }
 
 .section__title.animate::after {
@@ -722,11 +752,12 @@
 .social-link {
   position: relative;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
+  will-change: transform;
 }
 
 .social-link:hover {
-  transform: translateY(-3px);
+  transform: translateY(-3px) translateZ(0);
 }
 
 .contact__social .social-link {
@@ -743,42 +774,32 @@
 
 .nav__logo:hover {
   color: var(--color-accent);
-  transform: scale(1.05);
+  transform: scale(1.05) translateZ(0);
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* ========================================
-   Staggered Animations
+   Staggered Animations - Optimized
    ======================================== */
 
 .skills__list .skill-tag {
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  will-change: opacity, transform;
 }
 
-.skills__list .skill-tag:nth-child(1) { animation-delay: 0.1s; }
-.skills__list .skill-tag:nth-child(2) { animation-delay: 0.15s; }
-.skills__list .skill-tag:nth-child(3) { animation-delay: 0.2s; }
-.skills__list .skill-tag:nth-child(4) { animation-delay: 0.25s; }
-.skills__list .skill-tag:nth-child(5) { animation-delay: 0.3s; }
-.skills__list .skill-tag:nth-child(6) { animation-delay: 0.35s; }
-.skills__list .skill-tag:nth-child(7) { animation-delay: 0.4s; }
-.skills__list .skill-tag:nth-child(8) { animation-delay: 0.45s; }
-.skills__list .skill-tag:nth-child(9) { animation-delay: 0.5s; }
-.skills__list .skill-tag:nth-child(10) { animation-delay: 0.55s; }
+/* Reduce the number of nth-child selectors for better performance */
+.skills__list .skill-tag:nth-child(n) { animation-delay: calc(0.1s + (0.05s * (var(--index, 0)))); }
 
 .cert-list .cert-item {
   opacity: 0;
   transform: translateX(-20px);
   animation: slideInFromLeft 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  will-change: opacity, transform;
 }
 
-.cert-list .cert-item:nth-child(1) { animation-delay: 0.1s; }
-.cert-list .cert-item:nth-child(2) { animation-delay: 0.2s; }
-.cert-list .cert-item:nth-child(3) { animation-delay: 0.3s; }
-.cert-list .cert-item:nth-child(4) { animation-delay: 0.4s; }
-.cert-list .cert-item:nth-child(5) { animation-delay: 0.5s; }
+.cert-list .cert-item:nth-child(n) { animation-delay: calc(0.1s + (0.1s * (var(--index, 0)))); }
 
 /* ========================================
    Responsive Animation Controls
@@ -810,18 +831,24 @@
     transform: none;
     animation: none;
   }
+  
+  /* Remove will-change for users who prefer reduced motion */
+  * {
+    will-change: auto !important;
+  }
 }
 
+/* Mobile Performance Optimizations */
 @media (max-width: 768px) {
   /* Reduce animation complexity on mobile */
   .hero__content > * {
     animation-delay: 0s;
-    animation-duration: 0.6s;
+    animation-duration: 0.4s; /* Faster animations on mobile */
   }
   
   .timeline__item {
     animation-delay: 0s;
-    animation-duration: 0.6s;
+    animation-duration: 0.4s;
   }
   
   .hero__image-container {
@@ -831,22 +858,71 @@
   .skill-tag,
   .cert-item {
     animation-delay: 0s;
-    animation-duration: 0.4s;
+    animation-duration: 0.3s;
   }
   
-  /* Reduce transform intensity on mobile */
+  /* Reduce transform intensity on mobile to improve performance */
   .btn:hover,
   .project-card:hover,
   .company-card:hover,
   .experience__item:hover,
   .cert-category:hover,
   .skills__category:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px) translateZ(0); /* Reduced from -3px+ */
   }
   
   .skill-tag:hover,
   .cert-item:hover {
-    transform: translateY(-1px);
+    transform: translateY(-1px) translateZ(0);
+  }
+  
+  /* Disable complex hover effects on touch devices */
+  .nav__link::before,
+  .btn::before,
+  .skill-tag::before {
+    display: none;
+  }
+  
+  /* Simplify floating animation on mobile */
+  .hero__image-container {
+    animation: none;
+  }
+  
+  /* Remove will-change on mobile to save memory */
+  * {
+    will-change: auto;
+  }
+  
+  /* Add will-change only during active animations */
+  .animating {
+    will-change: transform, opacity;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Further optimizations for small screens */
+  .hero__stats .hero__stat {
+    animation: fadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  
+  .hero__stats .hero__stat:nth-child(1) { animation-delay: 0.1s; }
+  .hero__stats .hero__stat:nth-child(2) { animation-delay: 0.15s; }
+  .hero__stats .hero__stat:nth-child(3) { animation-delay: 0.2s; }
+  
+  /* Disable complex transforms on very small screens */
+  .project-card:hover,
+  .company-card:hover,
+  .experience__item:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* High-performance device detection */
+@media (min-resolution: 2dppx) and (min-width: 1024px) {
+  /* Enhanced animations for high-performance devices */
+  .hero__image-container {
+    animation: float 6s ease-in-out infinite;
   }
 }
 
@@ -864,6 +940,7 @@
   z-index: 9999;
   transform: translateY(-100%);
   transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
 }
 
 .page-transition.active {
@@ -912,17 +989,12 @@
   animation: shimmer 2s infinite;
 }
 
-/* Animation Delay Classes */
+/* Animation Delay Classes - Optimized */
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
 .delay-400 { animation-delay: 0.4s; }
 .delay-500 { animation-delay: 0.5s; }
-.delay-600 { animation-delay: 0.6s; }
-.delay-700 { animation-delay: 0.7s; }
-.delay-800 { animation-delay: 0.8s; }
-.delay-900 { animation-delay: 0.9s; }
-.delay-1000 { animation-delay: 1s; }
 
 /* Duration Classes */
 .duration-fast { animation-duration: 0.3s; }
@@ -957,10 +1029,20 @@
 
 .notification {
   animation: slideInFromRightNotification 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, opacity;
 }
 
 .notification.removing {
   animation: slideOutToRightNotification 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Remove will-change after animation completes */
+.notification:not(.removing) {
+  animation-fill-mode: forwards;
+}
+
+.notification.animation-complete {
+  will-change: auto;
 }
 
 /* ========================================
@@ -970,18 +1052,138 @@
 .scroll-progress {
   transition: width 0.1s ease-out;
   background: linear-gradient(90deg, var(--color-accent), var(--color-text));
+  will-change: width;
 }
 
 /* ========================================
-   Mobile Specific Animations
+   Performance Optimizations
    ======================================== */
 
-@media (max-width: 480px) {
-  .hero__stats .hero__stat {
-    animation: fadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+/* Use transform3d for hardware acceleration */
+.hw-accel {
+  transform: translateZ(0);
+}
+
+/* Container queries support for modern browsers */
+@supports (container-type: inline-size) {
+  .animation-container {
+    container-type: inline-size;
   }
   
-  .hero__stats .hero__stat:nth-child(1) { animation-delay: 0.7s; }
-  .hero__stats .hero__stat:nth-child(2) { animation-delay: 0.8s; }
-  .hero__stats .hero__stat:nth-child(3) { animation-delay: 0.9s; }
+  @container (max-width: 480px) {
+    .project-card:hover {
+      transform: none;
+    }
+  }
+}
+
+/* Intersection Observer optimizations */
+.animate-on-scroll:not(.in-viewport) {
+  /* Only apply transforms when not in viewport to save resources */
+  content-visibility: auto;
+  contain-intrinsic-size: 100px;
+}
+
+/* Critical rendering optimizations */
+@supports (content-visibility: auto) {
+  .off-screen {
+    content-visibility: auto;
+    contain-intrinsic-size: 200px 100px;
+  }
+}
+
+/* Loading state optimizations */
+.loading-state {
+  contain: layout style paint;
+}
+
+/* Reduced motion alternatives */
+@media (prefers-reduced-motion: reduce) {
+  .loading-shimmer {
+    animation: none;
+    background: var(--color-surface);
+  }
+  
+  .loading-dots span {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* Battery and performance considerations */
+@media (prefers-reduced-data: reduce) {
+  /* Disable non-essential animations on limited data connections */
+  .hero__image-container,
+  .animate-float,
+  .animate-bounce,
+  .animate-pulse {
+    animation: none;
+  }
+}
+
+/* GPU memory optimization */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Critical path optimization - inline critical animations */
+@keyframes criticalFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.critical-content {
+  animation: criticalFadeIn 0.3s ease-out;
+}
+
+/* Prevent layout shifts during animations */
+.animation-container {
+  min-height: 1px; /* Prevent collapse */
+}
+
+/* Memory leak prevention */
+.animation-complete {
+  will-change: auto !important;
+  transform: none !important;
+}
+
+/* ========================================
+   Accessibility Enhancements
+   ======================================== */
+
+/* Focus indicators with animations */
+.focusable:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  transition: outline-offset 0.2s ease;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .btn:hover {
+    box-shadow: 0 0 0 2px var(--color-accent);
+    transform: none;
+  }
+  
+  .skill-tag:hover {
+    border: 2px solid var(--color-accent);
+    transform: none;
+  }
+}
+
+/* Screen reader friendly animations */
+@media (prefers-reduced-motion: no-preference) {
+  .sr-only-animate {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }

@@ -2,73 +2,125 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Writeups | Gabe Chew Zhan Hong</title>
     <meta name="description" content="HackTheBox writeups and security research by Gabe Chew Zhan Hong">
+    <meta name="keywords" content="cybersecurity, ethical hacking, HackTheBox, writeups, penetration testing">
+    <meta name="author" content="Gabe Chew Zhan Hong">
+    
+    <!-- Favicon and App Icons -->
     <link rel="icon" type="image/x-icon" href="public/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="public/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="public/favicon-16x16.png">
+    <link rel="manifest" href="public/site.webmanifest">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="css/styles.css" as="style">
+    <link rel="preload" href="css/animations.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- DNS prefetch for external resources -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- Preconnect to Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Theme and color scheme -->
+    <meta name="theme-color" content="#ef4444">
+    <meta name="color-scheme" content="light dark">
+    
+    <!-- Performance hints -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    <!-- Security headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <!-- Structured data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Writeups | Gabe Chew Zhan Hong",
+        "description": "HackTheBox writeups and security research",
+        "author": {
+            "@type": "Person",
+            "name": "Gabe Chew Zhan Hong"
+        },
+        "url": "https://gabechew.dev/writeups.html"
+    }
+    </script>
 </head>
 <body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only sr-only-focusable">Skip to main content</a>
+    
     <!-- Navigation -->
-    <nav class="nav" id="nav">
+    <nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
         <div class="nav__container">
             <div class="nav__brand">
-                <a href="index.html" class="nav__logo">CZH</a>
+                <a href="index.html" class="nav__logo" aria-label="Go to home page">CZH</a>
             </div>
-            <div class="nav__menu" id="nav-menu">
-                <ul class="nav__list">
-                    <li class="nav__item">
-                        <a href="index.html" class="nav__link">Home</a>
+            <div class="nav__menu" id="nav-menu" role="menubar">
+                <ul class="nav__list" role="none">
+                    <li class="nav__item" role="none">
+                        <a href="index.html" class="nav__link" role="menuitem">Home</a>
                     </li>
-                    <li class="nav__item">
-                        <a href="index.html#about" class="nav__link">About</a>
+                    <li class="nav__item" role="none">
+                        <a href="index.html#about" class="nav__link" role="menuitem">About</a>
                     </li>
-                    <li class="nav__item">
-                        <a href="index.html#experience" class="nav__link">Experience</a>
+                    <li class="nav__item" role="none">
+                        <a href="index.html#experience" class="nav__link" role="menuitem">Experience</a>
                     </li>
-                    <li class="nav__item">
-                        <a href="index.html#projects" class="nav__link">Projects</a>
+                    <li class="nav__item" role="none">
+                        <a href="index.html#projects" class="nav__link" role="menuitem">Projects</a>
                     </li>
-                    <li class="nav__item">
-                        <a href="index.html#certifications" class="nav__link">Certifications</a>
+                    <li class="nav__item" role="none">
+                        <a href="index.html#certifications" class="nav__link" role="menuitem">Certifications</a>
                     </li>
-                    <li class="nav__item">
-                        <a href="index.html#contact" class="nav__link">Contact</a>
+                    <li class="nav__item" role="none">
+                        <a href="index.html#contact" class="nav__link" role="menuitem">Contact</a>
                     </li>
-                    <li class="nav__item">
-                        <a href="writeups.html" class="nav__link active">Writeups</a>
+                    <li class="nav__item" role="none">
+                        <a href="writeups.html" class="nav__link active" role="menuitem" aria-current="page">Writeups</a>
                     </li>
                 </ul>
             </div>
             <div class="nav__controls">
-                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-                    <span class="theme-icon">🌙</span>
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light theme" type="button">
+                    <span class="theme-icon" aria-hidden="true">🌙</span>
                 </button>
-                <button class="nav__toggle" id="nav-toggle" aria-label="Toggle navigation">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <button class="nav__toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" type="button">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <main>
+    <main id="main-content" tabindex="-1">
         <!-- Header Section -->
-        <section class="writeups-header">
+        <section class="writeups-header" aria-labelledby="writeups-title">
             <div class="section__container">
                 <div class="writeups-header__content animate-on-scroll fade-up">
-                    <h1 class="writeups-header__title">HackTheBox Writeups</h1>
+                    <h1 class="writeups-header__title" id="writeups-title">HackTheBox Writeups</h1>
                     <p class="writeups-header__description">
                         Detailed walkthroughs and analysis of HackTheBox challenges across multiple categories including AI/ML, Pwn, Reversing, Hardware, and more.
                     </p>
-                    <div class="writeups-header__stats">
+                    <div class="writeups-header__stats" role="region" aria-label="Writeups statistics">
                         <div class="writeups-stat">
-                            <span class="writeups-stat__number" id="total-writeups">0</span>
+                            <span class="writeups-stat__number" id="total-writeups" aria-live="polite">0</span>
                             <span class="writeups-stat__label">Total Writeups</span>
                         </div>
                         <div class="writeups-stat">
@@ -85,61 +137,110 @@
         </section>
 
         <!-- Filters Section -->
-        <section class="writeups-filters">
+        <section class="writeups-filters" aria-label="Filter and search writeups">
             <div class="section__container">
                 <div class="filters animate-on-scroll fade-up">
-                    <h3 class="filters__title">Filter by Category</h3>
-                    <div class="filters__buttons" id="category-filters">
-                        <button class="filter-btn active" data-category="all">All</button>
-                        <button class="filter-btn" data-category="ai-ml">AI/ML</button>
-                        <button class="filter-btn" data-category="reversing">Reversing</button>
-                        <button class="filter-btn" data-category="pwn">Pwn</button>
-                        <button class="filter-btn" data-category="hardware">Hardware</button>
-                        <button class="filter-btn" data-category="ics">ICS</button>
-                        <button class="filter-btn" data-category="secure-coding">Secure Coding</button>
-                        <button class="filter-btn" data-category="mobile">Mobile</button>
-                        <button class="filter-btn" data-category="misc">Misc</button>
-                        <button class="filter-btn" data-category="osint">OSINT</button>
-                        <button class="filter-btn" data-category="coding">Coding</button>
-                        <button class="filter-btn" data-category="blockchain">Blockchain</button>
-                        <button class="filter-btn" data-category="crypto">Crypto</button>
+                    <h2 class="filters__title">Filter by Category</h2>
+                    <div class="filters__buttons" id="category-filters" role="group" aria-label="Category filter buttons">
+                        <button class="filter-btn active" data-category="all" type="button" aria-pressed="true">
+                            All
+                            <span class="sr-only">category filter</span>
+                        </button>
+                        <button class="filter-btn" data-category="ai-ml" type="button" aria-pressed="false">AI/ML</button>
+                        <button class="filter-btn" data-category="reversing" type="button" aria-pressed="false">Reversing</button>
+                        <button class="filter-btn" data-category="pwn" type="button" aria-pressed="false">Pwn</button>
+                        <button class="filter-btn" data-category="hardware" type="button" aria-pressed="false">Hardware</button>
+                        <button class="filter-btn" data-category="ics" type="button" aria-pressed="false">ICS</button>
+                        <button class="filter-btn" data-category="secure-coding" type="button" aria-pressed="false">Secure Coding</button>
+                        <button class="filter-btn" data-category="mobile" type="button" aria-pressed="false">Mobile</button>
+                        <button class="filter-btn" data-category="misc" type="button" aria-pressed="false">Misc</button>
+                        <button class="filter-btn" data-category="osint" type="button" aria-pressed="false">OSINT</button>
+                        <button class="filter-btn" data-category="coding" type="button" aria-pressed="false">Coding</button>
+                        <button class="filter-btn" data-category="blockchain" type="button" aria-pressed="false">Blockchain</button>
+                        <button class="filter-btn" data-category="crypto" type="button" aria-pressed="false">Crypto</button>
                     </div>
                 </div>
-                <div class="search animate-on-scroll fade-up">
+                <div class="search animate-on-scroll fade-up" role="search">
                     <div class="search__container">
-                        <input type="text" class="search__input" id="search-input" placeholder="Search writeups...">
-                        <div class="search__icon">🔍</div>
+                        <label for="search-input" class="sr-only">Search writeups</label>
+                        <input 
+                            type="text" 
+                            class="search__input" 
+                            id="search-input" 
+                            placeholder="Search writeups..."
+                            aria-describedby="search-help"
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <div class="search__icon" aria-hidden="true">🔍</div>
+                        <div id="search-help" class="sr-only">
+                            Type to search through writeup titles, descriptions, and tags
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Writeups Grid -->
-        <section class="writeups-content">
+        <section class="writeups-content" aria-label="Writeups listing">
             <div class="section__container">
-                <div class="writeups-grid" id="writeups-grid">
+                <div 
+                    class="writeups-grid" 
+                    id="writeups-grid"
+                    role="region"
+                    aria-live="polite"
+                    aria-label="Filtered writeups"
+                >
                     <!-- Writeup cards will be dynamically loaded here -->
+                    <div class="writeups-grid__placeholder" aria-hidden="true">
+                        <div class="skeleton-card" role="presentation"></div>
+                        <div class="skeleton-card" role="presentation"></div>
+                        <div class="skeleton-card" role="presentation"></div>
+                    </div>
                 </div>
 
-                <div class="load-more animate-on-scroll fade-up" id="load-more-section">
-                    <button class="btn btn--primary" id="load-more-btn">Load More Writeups</button>
+                <div class="load-more animate-on-scroll fade-up" id="load-more-section" role="region" aria-label="Load more writeups">
+                    <button class="btn btn--primary" id="load-more-btn" type="button" aria-describedby="load-more-help">
+                        Load More Writeups
+                    </button>
+                    <div id="load-more-help" class="sr-only">
+                        Load additional writeups to view more content
+                    </div>
                 </div>
 
                 <!-- Empty state -->
-                <div class="empty-state" id="empty-state" style="display: none;">
+                <div class="empty-state" id="empty-state" style="display: none;" role="status" aria-live="polite">
                     <div class="empty-state__content">
-                        <div class="empty-state__icon">🔍</div>
+                        <div class="empty-state__icon" aria-hidden="true">🔍</div>
                         <h3 class="empty-state__title">No writeups found</h3>
                         <p class="empty-state__description">Try adjusting your filters or search terms</p>
-                        <button class="btn btn--outline" onclick="clearFilters()">Clear Filters</button>
+                        <button class="btn btn--outline" onclick="clearFilters()" type="button" aria-describedby="clear-filters-help">
+                            Clear Filters
+                        </button>
+                        <div id="clear-filters-help" class="sr-only">
+                            Remove all active filters and show all writeups
+                        </div>
                     </div>
                 </div>
 
                 <!-- Loading state -->
-                <div class="loading-state" id="loading-state">
+                <div class="loading-state" id="loading-state" role="status" aria-live="polite">
                     <div class="loading-state__content">
-                        <div class="loading-spinner"></div>
+                        <div class="loading-spinner" aria-hidden="true"></div>
                         <p>Loading writeups...</p>
+                        <div class="sr-only">Please wait while writeups are being loaded</div>
+                    </div>
+                </div>
+
+                <!-- Error state -->
+                <div class="error-state" id="error-state" style="display: none;" role="alert">
+                    <div class="error-state__content">
+                        <div class="error-state__icon" aria-hidden="true">⚠️</div>
+                        <h3 class="error-state__title">Unable to load writeups</h3>
+                        <p class="error-state__description">Please check your connection and try again</p>
+                        <button class="btn btn--primary" onclick="retryLoadWriteups()" type="button">
+                            Retry Loading
+                        </button>
                     </div>
                 </div>
             </div>
@@ -147,35 +248,120 @@
     </main>
 
     <!-- Writeup Modal -->
-    <div class="modal" id="writeup-modal">
-        <div class="modal__backdrop" onclick="closeWriteupModal()"></div>
-        <div class="modal__content">
+    <div 
+        class="modal" 
+        id="writeup-modal" 
+        role="dialog" 
+        aria-modal="true" 
+        aria-labelledby="modal-title"
+        aria-describedby="modal-body"
+        style="display: none;"
+    >
+        <div class="modal__backdrop" onclick="closeWriteupModal()" aria-hidden="true"></div>
+        <div class="modal__content" role="document">
             <div class="modal__header">
                 <h2 class="modal__title" id="modal-title">Writeup Title</h2>
-                <button class="modal__close" onclick="closeWriteupModal()" aria-label="Close modal">×</button>
+                <button 
+                    class="modal__close" 
+                    onclick="closeWriteupModal()" 
+                    aria-label="Close writeup modal"
+                    type="button"
+                >×</button>
             </div>
-            <div class="modal__body" id="modal-body">
-                <div class="writeup-loading">
-                    <div class="loading-spinner"></div>
+            <div class="modal__body" id="modal-body" tabindex="0">
+                <div class="writeup-loading" role="status" aria-live="polite">
+                    <div class="loading-spinner" aria-hidden="true"></div>
                     <p>Loading writeup...</p>
+                    <div class="sr-only">Please wait while the writeup content is being loaded</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" role="contentinfo">
         <div class="footer__container">
             <div class="footer__content">
                 <p class="footer__text">
-                    © 2025 Gabe Chew Zhan Hong.
+                    © <span id="current-year">2025</span> Gabe Chew Zhan Hong. All rights reserved.
                 </p>
+                <div class="footer__links" role="navigation" aria-label="Footer links">
+                    <a href="index.html#contact" class="footer__link">Contact</a>
+                    <a href="/privacy.html" class="footer__link">Privacy Policy</a>
+                    <a href="/sitemap.xml" class="footer__link">Sitemap</a>
+                </div>
             </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/script.js"></script>
-    <script src="js/writeups.js"></script>
+    <!-- Toast notification container -->
+    <div id="toast-container" class="toast-container" role="region" aria-live="polite" aria-label="Notifications"></div>
+
+    <!-- Scripts -->
+    <script>
+        // Critical inline script for theme
+        (function() {
+            const theme = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+        
+        // Set current year
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Basic error handling
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('Global error:', {msg, url, lineNo, columnNo, error});
+            return false;
+        };
+        
+        // Performance monitoring
+        if ('performance' in window && 'measure' in window.performance) {
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const perfData = performance.timing;
+                    const loadTime = perfData.loadEventEnd - perfData.navigationStart;
+                    console.log('Page load time:', loadTime + 'ms');
+                }, 0);
+            });
+        }
+    </script>
+    
+    <!-- External scripts with error handling -->
+    <script 
+        src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+        async
+        defer
+        onerror="console.error('Failed to load marked.js')"
+    ></script>
+    
+    <!-- Main scripts -->
+    <script src="js/script.js" defer onerror="console.error('Failed to load script.js')"></script>
+    <script src="js/writeups.js" defer onerror="console.error('Failed to load writeups.js')"></script>
+
+    <!-- Service Worker registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+
+    <!-- Intersection Observer polyfill for older browsers -->
+    <script>
+        if (!('IntersectionObserver' in window)) {
+            const script = document.createElement('script');
+            script.src = 'https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver';
+            script.async = true;
+            document.head.appendChild(script);
+        }
+    </script>
 </body>
 </html>
