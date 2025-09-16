@@ -1,0 +1,415 @@
+/* ========================================
+   Enhanced Writeup Card Styles
+   ======================================== */
+
+/* Read time badge on writeup cards */
+.writeup-card__readtime {
+  position: absolute;
+  bottom: var(--space-md);
+  left: var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+[data-theme="dark"] .writeup-card__readtime {
+  background: rgba(15, 23, 42, 0.95);
+  color: #f8fafc;
+}
+
+/* Enhanced loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Writeup meta badges in modal */
+.writeup-readtime {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Enhanced error state */
+.writeup-error {
+  text-align: center;
+  padding: var(--space-3xl);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.writeup-error h3 {
+  color: var(--color-accent);
+  margin-bottom: var(--space-lg);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.writeup-error ul {
+  margin: var(--space-lg) 0;
+  padding-left: var(--space-xl);
+  list-style: disc;
+}
+
+.writeup-error li {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-sm);
+  text-align: left;
+}
+
+/* Enhanced empty state */
+.empty-state {
+  padding: var(--space-3xl) var(--space-lg);
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.empty-state__content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-state__icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-lg);
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: 1.5rem;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+
+.empty-state__description {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xl);
+}
+
+/* Enhanced loading state */
+.loading-state {
+  padding: var(--space-3xl);
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.loading-state__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.loading-state p {
+  color: var(--color-text-secondary);
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* Skeleton loading cards */
+.writeups-grid__placeholder {
+  display: contents;
+}
+
+.skeleton-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Better modal backdrop blur */
+.modal.active .modal__backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Smooth modal transition */
+.modal {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal__content {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.3s ease;
+}
+
+.modal:not(.active) .modal__content {
+  transform: scale(0.95) translateY(20px);
+  opacity: 0;
+}
+
+.modal.active .modal__content {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Code block enhancements */
+.writeup-markdown-content pre {
+  position: relative;
+  background: #1e293b;
+  color: #f8fafc;
+  tab-size: 2;
+}
+
+[data-theme="light"] .writeup-markdown-content pre {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.writeup-markdown-content pre::after {
+  content: 'CODE';
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Python code blocks */
+.writeup-markdown-content pre:has(code.language-python)::after {
+  content: 'PYTHON';
+}
+
+/* JavaScript code blocks */
+.writeup-markdown-content pre:has(code.language-javascript)::after,
+.writeup-markdown-content pre:has(code.language-js)::after {
+  content: 'JAVASCRIPT';
+}
+
+/* Bash code blocks */
+.writeup-markdown-content pre:has(code.language-bash)::after,
+.writeup-markdown-content pre:has(code.language-sh)::after {
+  content: 'BASH';
+}
+
+/* Improved button hover states */
+.writeup-card__actions .btn {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.writeup-card__actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.writeup-card__actions .btn--secondary {
+  background: rgba(159, 239, 0, 0.1);
+  color: #9FEF00;
+  border-color: #9FEF00;
+}
+
+[data-theme="light"] .writeup-card__actions .btn--secondary {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border-color: #16a34a;
+}
+
+.writeup-card__actions .btn--secondary:hover {
+  background: #9FEF00;
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .writeup-card__actions .btn--secondary:hover {
+  background: #16a34a;
+  color: white;
+}
+
+/* Animated number counter */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.writeups-stat__number {
+  animation: countUp 0.6s ease-out;
+}
+
+/* Filter button improvements */
+.filter-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: var(--color-accent);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+  opacity: 0.2;
+}
+
+.filter-btn:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Search input enhancements */
+.search__input {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.search__input:focus {
+  transform: translateY(-2px);
+}
+
+.search__input::placeholder {
+  transition: opacity 0.3s ease;
+}
+
+.search__input:focus::placeholder {
+  opacity: 0.5;
+}
+
+/* Load more button pulse animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.load-more .btn:hover {
+  animation: pulse 1.5s infinite;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .writeup-card__readtime {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+  }
+  
+  .writeups-header__stats {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  
+  .writeup-meta {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+  
+  .modal__content {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}
+
+/* Print styles for writeups */
+@media print {
+  .writeup-card__actions,
+  .modal__header,
+  .writeup-meta,
+  .writeups-filters,
+  .load-more {
+    display: none !important;
+  }
+  
+  .writeup-markdown-content {
+    padding: 0;
+    max-width: 100%;
+  }
+  
+  .writeup-markdown-content pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .writeup-card,
+  .filter-btn::before,
+  .loading-spinner,
+  .skeleton-card::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .writeup-card {
+    border-width: 2px;
+  }
+  
+  .filter-btn.active {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  
+  .writeup-card__difficulty,
+  .writeup-card__featured {
+    font-weight: var(--font-weight-bold);
+    border: 1px solid currentColor;
+  }
+}

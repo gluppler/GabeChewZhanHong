@@ -1,7 +1,7 @@
 /**
- * HackTheBox Writeups Manager - Optimized Version
+ * HackTheBox Writeups Manager - Enhanced Version
  * Author: Gabe Chew Zhan Hong
- * Description: Enhanced writeup display with better performance and error handling
+ * Description: Manages writeup display with improved error handling and functionality
  */
 
 class WriteupsManager {
@@ -14,9 +14,8 @@ class WriteupsManager {
     this.writeupsPerPage = 6;
     this.markdownCache = new Map();
     this.isLoading = false;
-    this.abortController = null;
     
-    // HackTheBox categories mapping
+    // HackTheBox categories mapping with updated colors
     this.categories = {
       'hardware': { name: 'Hardware', icon: 'HW', color: '#96ceb4' },
       'ai-ml': { name: 'AI/ML', icon: 'AI', color: '#ff6b6b' },
@@ -39,45 +38,71 @@ class WriteupsManager {
     try {
       this.bindEvents();
       this.showLoading(true);
+      
+      // Load marked.js library if not already loaded
+      await this.loadMarkedLibrary();
+      
+      // Load writeups data
       await this.loadWriteupsIndex();
+      
+      this.showLoading(false);
       this.initializeFilters();
       this.initializeSearch();
       this.initializeModal();
       this.applyFilters();
     } catch (error) {
       console.error('Failed to initialize writeups:', error);
-      this.showError('Failed to initialize. Please refresh the page.');
-    } finally {
+      this.showError('Failed to initialize writeups. Please refresh the page.');
       this.showLoading(false);
     }
   }
 
   /**
-   * Bind event listeners using event delegation
+   * Load marked.js library dynamically
+   */
+  async loadMarkedLibrary() {
+    if (typeof marked !== 'undefined') {
+      console.log('Marked.js already loaded');
+      return;
+    }
+
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+      script.async = true;
+      script.onload = () => {
+        console.log('Marked.js loaded successfully');
+        // Configure marked
+        if (typeof marked !== 'undefined') {
+          marked.setOptions({
+            breaks: true,
+            gfm: true,
+            headerIds: true,
+            mangle: false,
+            highlight: function(code, lang) {
+              // Basic syntax highlighting
+              return code;
+            }
+          });
+        }
+        resolve();
+      };
+      script.onerror = () => {
+        console.error('Failed to load marked.js');
+        reject(new Error('Failed to load markdown parser'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  /**
+   * Bind event listeners
    */
   bindEvents() {
-    // Use event delegation for better performance
+    // Filter buttons
     document.addEventListener('click', (e) => {
-      // Filter buttons
       if (e.target.classList.contains('filter-btn')) {
         this.handleFilterClick(e);
-      }
-      
-      // Writeup card clicks
-      const card = e.target.closest('.writeup-card');
-      if (card && card.dataset.writeupId) {
-        this.openWriteup(card.dataset.writeupId);
-      }
-      
-      // Load more button
-      if (e.target.id === 'load-more-btn') {
-        this.loadMoreWriteups();
-      }
-      
-      // Modal close
-      if (e.target.classList.contains('modal__backdrop') || 
-          e.target.classList.contains('modal__close')) {
-        this.closeModal();
       }
     });
 
@@ -91,41 +116,26 @@ class WriteupsManager {
           this.handleSearch(e);
         }, 300);
       });
-      
-      // Clear search on ESC
-      searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          searchInput.value = '';
-          this.handleSearch({ target: { value: '' } });
-          searchInput.blur();
-        }
-      });
+    }
+
+    // Load more button
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => this.loadMoreWriteups());
     }
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-      // ESC to close modal
-      if (e.key === 'Escape' && this.isModalOpen()) {
+      if (e.key === 'Escape') {
         this.closeModal();
       }
       
-      // Ctrl/Cmd + K to focus search
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         const searchInput = document.getElementById('search-input');
         if (searchInput) {
           searchInput.focus();
-          searchInput.select();
         }
-      }
-    });
-
-    // Handle browser back button for modal
-    window.addEventListener('popstate', (e) => {
-      if (e.state && e.state.modalOpen) {
-        this.openWriteup(e.state.writeupId, false);
-      } else if (this.isModalOpen()) {
-        this.closeModal(false);
       }
     });
   }
@@ -135,86 +145,70 @@ class WriteupsManager {
    */
   async loadWriteupsIndex() {
     try {
-      // Cancel any pending requests
-      if (this.abortController) {
-        this.abortController.abort();
+      // Try multiple paths to ensure we find the file
+      const possiblePaths = [
+        './writeups/index.json',
+        '/writeups/index.json',
+        'writeups/index.json'
+      ];
+      
+      let data = null;
+      let successPath = null;
+      
+      for (const path of possiblePaths) {
+        try {
+          const response = await fetch(path);
+          if (response.ok) {
+            data = await response.json();
+            successPath = path;
+            break;
+          }
+        } catch (e) {
+          console.log(`Failed to load from ${path}, trying next...`);
+        }
       }
       
-      this.abortController = new AbortController();
-      
-      const response = await fetch('./writeups/index.json', {
-        signal: this.abortController.signal,
-        cache: 'no-cache' // Force fresh data
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!data) {
+        throw new Error('Could not load writeups index from any path');
       }
-    
-      const data = await response.json();
+      
+      console.log(`Successfully loaded writeups from ${successPath}`);
       this.writeups = data.writeups || [];
       
       // Sort by date (newest first)
       this.writeups.sort((a, b) => new Date(b.date) - new Date(a.date));
       
       this.updateStats();
-      
-      // Preload featured writeups
-      this.preloadFeaturedWriteups();
-      
+      console.log(`Loaded ${this.writeups.length} writeups`);
     } catch (error) {
-      if (error.name === 'AbortError') {
-        console.log('Request was cancelled');
-        return;
-      }
-      
       console.error('Failed to load writeups:', error);
-      
-      // Try to load from cache or show sample data
+      // Use fallback data if loading fails
       this.loadFallbackData();
     }
   }
 
   /**
-   * Load fallback data if main request fails
+   * Load fallback data when JSON fails to load
    */
   loadFallbackData() {
-    // Sample data for demonstration
+    console.log('Loading fallback writeup data');
     this.writeups = [
       {
-        id: "htb-824",
-        title: "Low Logic Challenge - HTB 824",
-        description: "Solution walkthrough for HackTheBox challenge 824.",
-        category: "hardware",
-        platform: "HackTheBox",
-        difficulty: "very-easy",
-        date: "2025-08-23",
-        tags: ["HackTheBox", "Hardware"],
+        id: 'htb-824',
+        title: 'Low Logic Challenge - HTB 824',
+        description: 'Solution walkthrough for HackTheBox challenge 824 involving digital logic and boolean operations.',
+        category: 'hardware',
+        platform: 'HackTheBox',
+        difficulty: 'very-easy',
+        date: '2025-08-23',
+        tags: ['HackTheBox', 'Hardware', 'Logic Gates'],
         featured: false,
-        markdownFile: "htb-824.md",
-        htbUrl: "https://labs.hackthebox.com/achievement/challenge/2141842/824"
+        markdownFile: 'htb-824.md',
+        htbUrl: 'https://labs.hackthebox.com/achievement/challenge/2141842/824',
+        readTime: '5 min'
       }
     ];
-    
     this.updateStats();
-    this.showError('Using cached data. Some features may be limited.');
-  }
-
-  /**
-   * Preload featured writeups for faster access
-   */
-  async preloadFeaturedWriteups() {
-    const featured = this.writeups.filter(w => w.featured);
-    
-    for (const writeup of featured) {
-      if (writeup.markdownFile) {
-        // Preload in background
-        requestIdleCallback(() => {
-          this.loadMarkdownContent(`./writeups/${writeup.markdownFile}`)
-            .catch(() => {}); // Silently fail
-        });
-      }
-    }
   }
 
   /**
@@ -225,10 +219,10 @@ class WriteupsManager {
     if (grid) {
       grid.innerHTML = `
         <div class="error-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-          <h3 style="color: var(--color-accent); margin-bottom: 1rem;">⚠️ Notice</h3>
+          <h3 style="color: var(--color-accent); margin-bottom: 1rem;">⚠️ Error</h3>
           <p style="color: var(--color-text-secondary);">${message}</p>
           <button class="btn btn--primary" style="margin-top: 1rem;" onclick="location.reload()">
-            Retry
+            Reload Page
           </button>
         </div>
       `;
@@ -244,6 +238,8 @@ class WriteupsManager {
       if (btn.dataset.category === 'all') {
         btn.classList.add('active');
         btn.setAttribute('aria-pressed', 'true');
+      } else {
+        btn.setAttribute('aria-pressed', 'false');
       }
     });
   }
@@ -267,17 +263,8 @@ class WriteupsManager {
     this.currentCategory = category;
     this.currentPage = 1;
 
-    // Apply filters with animation
+    // Apply filters
     this.applyFilters();
-    
-    // Update URL without reload
-    const url = new URL(window.location);
-    if (category === 'all') {
-      url.searchParams.delete('category');
-    } else {
-      url.searchParams.set('category', category);
-    }
-    window.history.pushState({}, '', url);
   }
 
   /**
@@ -292,25 +279,14 @@ class WriteupsManager {
       'Search writeups...',
       'Try "pwn", "crypto", "reversing"...',
       'Search by title or tags...',
-      'Press Ctrl+K to search'
+      'Find by difficulty level...'
     ];
     
     let placeholderIndex = 0;
-    const changePlaceholder = () => {
+    setInterval(() => {
       placeholderIndex = (placeholderIndex + 1) % placeholders.length;
-      searchInput.placeholder = placeholders[placeholderIndex];
-    };
-    
-    // Change placeholder every 4 seconds
-    setInterval(changePlaceholder, 4000);
-    
-    // Load search from URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search');
-    if (searchQuery) {
-      searchInput.value = searchQuery;
-      this.currentSearch = searchQuery.toLowerCase();
-    }
+      searchInput.setAttribute('placeholder', placeholders[placeholderIndex]);
+    }, 3000);
   }
 
   /**
@@ -320,15 +296,6 @@ class WriteupsManager {
     this.currentSearch = e.target.value.toLowerCase().trim();
     this.currentPage = 1;
     this.applyFilters();
-    
-    // Update URL without reload
-    const url = new URL(window.location);
-    if (this.currentSearch) {
-      url.searchParams.set('search', this.currentSearch);
-    } else {
-      url.searchParams.delete('search');
-    }
-    window.history.replaceState({}, '', url);
   }
 
   /**
@@ -340,12 +307,11 @@ class WriteupsManager {
       const categoryMatch = this.currentCategory === 'all' || 
                            writeup.category === this.currentCategory;
 
-      // Search filter (search in multiple fields)
+      // Search filter
       const searchMatch = !this.currentSearch || 
                          writeup.title.toLowerCase().includes(this.currentSearch) ||
                          writeup.description.toLowerCase().includes(this.currentSearch) ||
                          writeup.category.toLowerCase().includes(this.currentSearch) ||
-                         writeup.platform.toLowerCase().includes(this.currentSearch) ||
                          writeup.difficulty.toLowerCase().includes(this.currentSearch) ||
                          (writeup.tags && writeup.tags.some(tag => 
                            tag.toLowerCase().includes(this.currentSearch)));
@@ -353,27 +319,9 @@ class WriteupsManager {
       return categoryMatch && searchMatch;
     });
 
-    // Update UI
     this.renderWriteups();
     this.updateLoadMoreButton();
     this.showEmptyState(this.filteredWriteups.length === 0);
-    
-    // Update result count
-    this.updateResultCount();
-  }
-
-  /**
-   * Update result count display
-   */
-  updateResultCount() {
-    const totalWriteupsEl = document.getElementById('total-writeups');
-    if (totalWriteupsEl) {
-      if (this.currentSearch || this.currentCategory !== 'all') {
-        totalWriteupsEl.textContent = `${this.filteredWriteups.length} / ${this.writeups.length}`;
-      } else {
-        totalWriteupsEl.textContent = this.writeups.length;
-      }
-    }
   }
 
   /**
@@ -390,16 +338,15 @@ class WriteupsManager {
     const endIndex = this.currentPage * this.writeupsPerPage;
     const writeupsToShow = this.filteredWriteups.slice(0, endIndex);
 
-    // Use DocumentFragment for better performance
-    const fragment = document.createDocumentFragment();
+    if (writeupsToShow.length === 0 && this.filteredWriteups.length === 0) {
+      return; // Empty state will be shown
+    }
 
     // Render each writeup card
     writeupsToShow.forEach((writeup, index) => {
       const card = this.createWriteupCard(writeup, index);
-      fragment.appendChild(card);
+      grid.appendChild(card);
     });
-
-    grid.appendChild(fragment);
 
     // Trigger staggered animations
     requestAnimationFrame(() => {
@@ -407,7 +354,7 @@ class WriteupsManager {
       cards.forEach((card, index) => {
         setTimeout(() => {
           card.classList.add('animate');
-        }, Math.min(index * 50, 300)); // Cap animation delay
+        }, index * 50);
       });
     });
   }
@@ -420,10 +367,6 @@ class WriteupsManager {
     card.className = 'writeup-card animate-on-scroll scale-up';
     card.dataset.category = writeup.category;
     card.dataset.difficulty = writeup.difficulty;
-    card.dataset.writeupId = writeup.id;
-    card.setAttribute('role', 'button');
-    card.setAttribute('tabindex', '0');
-    card.setAttribute('aria-label', `Read writeup: ${writeup.title}`);
     
     const categoryInfo = this.categories[writeup.category] || { 
       name: writeup.category, 
@@ -432,22 +375,21 @@ class WriteupsManager {
     };
     
     // Format difficulty for display
-    const displayDifficulty = writeup.difficulty
-      .replace('-', ' ')
-      .replace(/\b\w/g, l => l.toUpperCase());
+    const displayDifficulty = writeup.difficulty.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
     
     // Format date
-    const formattedDate = new Date(writeup.date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    const formattedDate = new Date(writeup.date).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
     });
     
     card.innerHTML = `
       <div class="writeup-card__image" style="background: linear-gradient(135deg, ${categoryInfo.color}, #1a1a1a)">
         <div class="writeup-card__placeholder">${categoryInfo.icon}</div>
         <div class="writeup-card__difficulty">${displayDifficulty}</div>
-        ${writeup.featured ? '<div class="writeup-card__featured">⭐ Featured</div>' : ''}
+        ${writeup.featured ? '<div class="writeup-card__featured">Featured</div>' : ''}
+        ${writeup.readTime ? `<div class="writeup-card__readtime">${writeup.readTime}</div>` : ''}
       </div>
       <div class="writeup-card__content">
         <div class="writeup-card__meta">
@@ -462,44 +404,22 @@ class WriteupsManager {
           ).join('')}
         </div>
         <div class="writeup-card__actions">
-          <button class="btn btn--outline" onclick="event.stopPropagation(); window.writeupsManager.openWriteup('${writeup.id}')">
+          <button class="btn btn--outline" onclick="window.writeupsManager.openWriteup('${writeup.id}')">
             Read Writeup
           </button>
-          ${writeup.htbUrl ? 
-            `<a href="${writeup.htbUrl}" target="_blank" rel="noopener" class="btn btn--secondary btn--sm" onclick="event.stopPropagation()">
-              HTB Link ↗
-            </a>` : ''}
-          ${writeup.thmUrl ? 
-            `<a href="${writeup.thmUrl}" target="_blank" rel="noopener" class="btn btn--secondary btn--sm" onclick="event.stopPropagation()">
-              THM Link ↗
-            </a>` : ''}
+          ${writeup.htbUrl ? `
+            <a href="${writeup.htbUrl}" target="_blank" rel="noopener" class="btn btn--secondary btn--sm">
+              View on HTB
+            </a>
+          ` : ''}
         </div>
       </div>
     `;
 
-    // Add keyboard support
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        this.openWriteup(writeup.id);
-      }
-    });
+    // Add CSS variable for stagger animation
+    card.style.setProperty('--index', index);
 
     return card;
-  }
-
-  /**
-   * Escape HTML to prevent XSS
-   */
-  escapeHtml(text) {
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, m => map[m]);
   }
 
   /**
@@ -509,17 +429,6 @@ class WriteupsManager {
     this.currentPage++;
     this.renderWriteups();
     this.updateLoadMoreButton();
-    
-    // Smooth scroll to new content
-    const newCards = document.querySelectorAll('.writeup-card:not(.animate)');
-    if (newCards.length > 0) {
-      setTimeout(() => {
-        newCards[0].scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'nearest' 
-        });
-      }, 100);
-    }
   }
 
   /**
@@ -537,8 +446,7 @@ class WriteupsManager {
         loadMoreSection.style.display = 'block';
         const remaining = this.filteredWriteups.length - totalShown;
         const toShow = Math.min(this.writeupsPerPage, remaining);
-        loadMoreBtn.textContent = `Load More (${toShow} of ${remaining})`;
-        loadMoreBtn.setAttribute('aria-label', `Load ${toShow} more writeups`);
+        loadMoreBtn.textContent = `Load More (${toShow} of ${remaining} remaining)`;
       }
     }
   }
@@ -584,40 +492,27 @@ class WriteupsManager {
     const totalWriteupsEl = document.getElementById('total-writeups');
     if (totalWriteupsEl) {
       totalWriteupsEl.textContent = this.writeups.length;
+      // Animate the number
+      this.animateNumber(totalWriteupsEl, 0, this.writeups.length, 1000);
     }
-    
-    // Update category counts
-    const categoryCounts = {};
-    this.writeups.forEach(w => {
-      categoryCounts[w.category] = (categoryCounts[w.category] || 0) + 1;
-    });
-    
-    // Update filter button counts
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      const category = btn.dataset.category;
-      if (category && category !== 'all' && categoryCounts[category]) {
-        const count = categoryCounts[category];
-        const badge = document.createElement('span');
-        badge.className = 'filter-btn__count';
-        badge.textContent = count;
-        badge.style.cssText = `
-          margin-left: 0.5rem;
-          padding: 0.125rem 0.375rem;
-          background: var(--color-accent);
-          color: white;
-          border-radius: var(--radius-full);
-          font-size: 0.75rem;
-        `;
-        
-        // Remove existing badge if any
-        const existingBadge = btn.querySelector('.filter-btn__count');
-        if (existingBadge) {
-          existingBadge.remove();
-        }
-        
-        btn.appendChild(badge);
+  }
+
+  /**
+   * Animate number counting
+   */
+  animateNumber(element, start, end, duration) {
+    const startTime = performance.now();
+    const updateNumber = (currentTime) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      const current = Math.floor(start + (end - start) * progress);
+      element.textContent = current;
+      
+      if (progress < 1) {
+        requestAnimationFrame(updateNumber);
       }
-    });
+    };
+    requestAnimationFrame(updateNumber);
   }
 
   /**
@@ -627,41 +522,30 @@ class WriteupsManager {
     const modal = document.getElementById('writeup-modal');
     if (!modal) return;
 
-    // Trap focus in modal
-    modal.addEventListener('keydown', (e) => {
-      if (e.key === 'Tab') {
-        const focusableElements = modal.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
+    // Make sure modal is hidden initially
+    modal.style.display = 'none';
+    modal.classList.remove('active');
 
-        if (e.shiftKey && document.activeElement === firstElement) {
-          lastElement.focus();
-          e.preventDefault();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
-          firstElement.focus();
-          e.preventDefault();
-        }
-      }
-    });
-  }
+    // Close modal when clicking backdrop
+    const backdrop = modal.querySelector('.modal__backdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', () => this.closeModal());
+    }
 
-  /**
-   * Check if modal is open
-   */
-  isModalOpen() {
-    const modal = document.getElementById('writeup-modal');
-    return modal && modal.classList.contains('active');
+    // Close modal with close button
+    const closeBtn = modal.querySelector('.modal__close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.closeModal());
+    }
   }
 
   /**
    * Open writeup modal and load markdown content
    */
-  async openWriteup(writeupId, pushState = true) {
+  async openWriteup(writeupId) {
     const writeup = this.writeups.find(w => w.id === writeupId);
     if (!writeup) {
-      console.error('Writeup not found:', writeupId);
+      console.error(`Writeup with id ${writeupId} not found`);
       return;
     }
 
@@ -669,24 +553,20 @@ class WriteupsManager {
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
 
-    if (!modal || !modalTitle || !modalBody) return;
+    if (!modal || !modalTitle || !modalBody) {
+      console.error('Modal elements not found');
+      return;
+    }
 
     // Update modal title
     modalTitle.textContent = writeup.title;
     
     // Show modal
-    modal.classList.add('active');
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.classList.add('active');
+    }, 10);
     document.body.style.overflow = 'hidden';
-    
-    // Update browser history
-    if (pushState) {
-      window.history.pushState(
-        { modalOpen: true, writeupId }, 
-        '', 
-        `#writeup-${writeupId}`
-      );
-    }
 
     // Show loading state
     modalBody.innerHTML = `
@@ -697,28 +577,29 @@ class WriteupsManager {
     `;
 
     try {
-      // Construct the correct path to the markdown file
-      const markdownPath = `./writeups/${writeup.markdownFile}`;
+      // Try to load the markdown content
+      const content = await this.loadMarkdownContent(writeup.markdownFile);
+      const htmlContent = this.parseMarkdown(content);
       
-      console.log(`Loading writeup from: ${markdownPath}`);
-      
-      const content = await this.loadMarkdownContent(markdownPath);
-      const htmlContent = await this.markdownToHtml(content);
+      // Format date
+      const formattedDate = new Date(writeup.date).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
       
       modalBody.innerHTML = `
         <div class="writeup-content">
           <div class="writeup-meta">
             <span class="writeup-category">${this.categories[writeup.category]?.name || writeup.category}</span>
             <span class="writeup-difficulty">${writeup.difficulty.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
-            <span class="writeup-date">${new Date(writeup.date).toLocaleDateString()}</span>
-            ${writeup.htbUrl ? 
-              `<a href="${writeup.htbUrl}" target="_blank" rel="noopener" class="writeup-htb-link">
+            <span class="writeup-date">${formattedDate}</span>
+            ${writeup.readTime ? `<span class="writeup-readtime">📖 ${writeup.readTime}</span>` : ''}
+            ${writeup.htbUrl ? `
+              <a href="${writeup.htbUrl}" target="_blank" rel="noopener" class="writeup-htb-link">
                 View on HackTheBox ↗
-              </a>` : ''}
-            ${writeup.thmUrl ? 
-              `<a href="${writeup.thmUrl}" target="_blank" rel="noopener" class="writeup-thm-link">
-                View on TryHackMe ↗
-              </a>` : ''}
+              </a>
+            ` : ''}
           </div>
           <div class="writeup-markdown-content">
             ${htmlContent}
@@ -726,102 +607,125 @@ class WriteupsManager {
         </div>
       `;
       
-      // Highlight code blocks if Prism.js is available
-      if (typeof Prism !== 'undefined') {
-        Prism.highlightAll();
-      }
+      // Scroll to top of modal content
+      modalBody.scrollTop = 0;
       
     } catch (error) {
       console.error('Failed to load writeup content:', error);
+      
+      // Show a more helpful error message
       modalBody.innerHTML = `
         <div class="writeup-error">
-          <h3>Content Not Available</h3>
-          <p>This writeup is currently being prepared or there was an error loading the content.</p>
-          <p><strong>Challenge:</strong> ${writeup.title}</p>
-          <p><strong>Category:</strong> ${this.categories[writeup.category]?.name || writeup.category}</p>
-          ${writeup.htbUrl ? 
-            `<a href="${writeup.htbUrl}" target="_blank" rel="noopener" class="btn btn--primary">
+          <h3>📄 Writeup Loading Error</h3>
+          <p>We couldn't load the writeup content. This might be because:</p>
+          <ul style="text-align: left; display: inline-block;">
+            <li>The markdown file is still being prepared</li>
+            <li>There was a network error</li>
+            <li>The file path is incorrect</li>
+          </ul>
+          <div style="margin-top: 2rem;">
+            <p><strong>Writeup:</strong> ${writeup.title}</p>
+            <p><strong>Category:</strong> ${this.categories[writeup.category]?.name || writeup.category}</p>
+            <p><strong>File:</strong> ${writeup.markdownFile}</p>
+          </div>
+          ${writeup.htbUrl ? `
+            <a href="${writeup.htbUrl}" target="_blank" rel="noopener" class="btn btn--primary" style="margin-top: 2rem;">
               View Challenge on HackTheBox ↗
-            </a>` : ''}
-          ${writeup.thmUrl ? 
-            `<a href="${writeup.thmUrl}" target="_blank" rel="noopener" class="btn btn--primary">
-              View Challenge on TryHackMe ↗
-            </a>` : ''}
+            </a>
+          ` : ''}
+          <button class="btn btn--outline" style="margin-top: 1rem;" onclick="window.writeupsManager.closeModal()">
+            Close
+          </button>
         </div>
       `;
     }
 
-    // Focus modal for accessibility
+    // Focus trap for accessibility
     modal.focus();
   }
 
   /**
    * Load markdown content from file
    */
-  async loadMarkdownContent(filepath) {
+  async loadMarkdownContent(filename) {
     // Check cache first
-    if (this.markdownCache.has(filepath)) {
-      return this.markdownCache.get(filepath);
+    if (this.markdownCache.has(filename)) {
+      console.log(`Loading ${filename} from cache`);
+      return this.markdownCache.get(filename);
     }
 
-    try {
-      const response = await fetch(filepath, {
-        cache: 'force-cache' // Use cache when possible
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    // Try multiple paths to ensure we find the file
+    const possiblePaths = [
+      `./writeups/${filename}`,
+      `/writeups/${filename}`,
+      `writeups/${filename}`,
+      `./${filename}`,
+      `/${filename}`,
+      filename
+    ];
+    
+    let content = null;
+    let successPath = null;
+    
+    for (const path of possiblePaths) {
+      try {
+        console.log(`Trying to fetch from: ${path}`);
+        const response = await fetch(path);
+        
+        if (response.ok) {
+          content = await response.text();
+          successPath = path;
+          break;
+        }
+      } catch (e) {
+        console.log(`Failed to load from ${path}`);
       }
-      
-      const content = await response.text();
-      
-      if (!content.trim()) {
-        throw new Error('Empty file content');
-      }
-      
-      // Cache the content
-      this.markdownCache.set(filepath, content);
-      return content;
-      
-    } catch (error) {
-      console.error(`Failed to load ${filepath}:`, error);
-      
-      // Return fallback content
-      return `# Writeup Coming Soon\n\nThis writeup is currently being prepared. Please check back later!`;
-    }
-  }
-
-  /**
-   * Close writeup modal
-   */
-  closeModal(popState = true) {
-    const modal = document.getElementById('writeup-modal');
-    if (modal && modal.classList.contains('active')) {
-      modal.classList.remove('active');
-      setTimeout(() => {
-        modal.style.display = 'none';
-      }, 300);
-      document.body.style.overflow = '';
-      
-      // Update browser history
-      if (popState && window.location.hash.startsWith('#writeup-')) {
-        window.history.back();
-      }
-    }
-  }
-
-  /**
-   * Convert markdown to HTML
-   */
-  async markdownToHtml(markdown) {
-    // Wait for marked.js to load
-    if (typeof marked === 'undefined') {
-      await this.loadMarkedLibrary();
     }
     
+    if (!content) {
+      // Try to generate placeholder content if file not found
+      console.log('Using placeholder content for missing file');
+      content = this.generatePlaceholderContent(filename);
+    } else {
+      console.log(`Successfully loaded from: ${successPath}`);
+      // Cache the content
+      this.markdownCache.set(filename, content);
+    }
+    
+    return content;
+  }
+
+  /**
+   * Generate placeholder content for missing writeups
+   */
+  generatePlaceholderContent(filename) {
+    return `# Writeup In Progress
+
+This writeup is currently being prepared and will be available soon.
+
+## File Information
+- **Requested File:** ${filename}
+- **Status:** Content pending
+
+Please check back later or visit the HackTheBox platform for more information about this challenge.
+
+---
+
+*Note: Writeups are added regularly as challenges are completed and documented.*`;
+  }
+
+  /**
+   * Parse markdown to HTML
+   */
+  parseMarkdown(markdown) {
     if (typeof marked === 'undefined') {
-      console.error('Marked.js library is not available');
-      return '<p>Error: Markdown parser not available.</p>';
+      console.error('Marked.js is not loaded');
+      return `<div class="error">
+        <p>Markdown parser not available. Please refresh the page.</p>
+        <pre style="background: var(--color-surface); padding: 1rem; border-radius: 8px; overflow-x: auto;">
+          ${this.escapeHtml(markdown)}
+        </pre>
+      </div>`;
     }
     
     if (!markdown || !markdown.trim()) {
@@ -829,54 +733,57 @@ class WriteupsManager {
     }
 
     try {
-      // Configure marked with options
-      marked.setOptions({
-        breaks: true,
-        gfm: true,
-        headerIds: true,
-        mangle: false,
-        highlight: function(code, lang) {
-          // Use Prism.js if available
-          if (typeof Prism !== 'undefined' && Prism.languages[lang]) {
-            return Prism.highlight(code, Prism.languages[lang], lang);
-          }
-          return code;
-        }
-      });
-
-      // Remove frontmatter if present
-      const contentWithoutFrontmatter = markdown
-        .replace(/^---[\s\S]*?---\n?/, '')
-        .trim();
+      // Remove frontmatter if present (YAML between --- markers)
+      const contentWithoutFrontmatter = markdown.replace(/^---[\s\S]*?---\n?/m, '').trim();
       
       // Parse markdown to HTML
       const html = marked.parse(contentWithoutFrontmatter);
       
       return html;
-      
     } catch (error) {
       console.error('Error parsing markdown:', error);
-      return `<p>Error parsing content: ${error.message}</p>`;
+      return `
+        <div class="error">
+          <p>Error parsing content: ${error.message}</p>
+          <pre style="background: var(--color-surface); padding: 1rem; border-radius: 8px; overflow-x: auto;">
+            ${this.escapeHtml(markdown)}
+          </pre>
+        </div>
+      `;
     }
   }
 
   /**
-   * Load Marked.js library dynamically
+   * Close writeup modal
    */
-  async loadMarkedLibrary() {
-    return new Promise((resolve, reject) => {
-      if (typeof marked !== 'undefined') {
-        resolve();
-        return;
-      }
+  closeModal() {
+    const modal = document.getElementById('writeup-modal');
+    if (modal) {
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+      document.body.style.overflow = '';
       
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-      script.async = true;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
+      // Clear modal content to free memory
+      const modalBody = document.getElementById('modal-body');
+      if (modalBody) {
+        modalBody.innerHTML = '';
+      }
+    }
+  }
+
+  /**
+   * Escape HTML to prevent XSS
+   */
+  escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   /**
@@ -903,9 +810,6 @@ class WriteupsManager {
       searchInput.value = '';
     }
 
-    // Clear URL params
-    window.history.replaceState({}, '', window.location.pathname);
-
     // Apply filters
     this.applyFilters();
   }
@@ -930,27 +834,15 @@ window.clearFilters = function() {
   }
 };
 
-// Initialize when DOM is loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initWriteups);
-} else {
-  initWriteups();
-}
+window.retryLoadWriteups = function() {
+  location.reload();
+};
 
-function initWriteups() {
-  // Only initialize on writeups page
-  if (window.location.pathname.includes('writeups')) {
-    window.writeupsManager = new WriteupsManager();
-    
-    // Handle initial hash
-    if (window.location.hash.startsWith('#writeup-')) {
-      const writeupId = window.location.hash.replace('#writeup-', '');
-      setTimeout(() => {
-        window.writeupsManager.openWriteup(writeupId, false);
-      }, 100);
-    }
-  }
-}
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Initializing Writeups Manager...');
+  window.writeupsManager = new WriteupsManager();
+});
 
 // Export for module use
 if (typeof module !== 'undefined' && module.exports) {
